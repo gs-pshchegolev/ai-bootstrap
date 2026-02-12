@@ -1,25 +1,38 @@
-# AI Repository Bootstrap — init.prompt.md
-# Paste this into Claude Code inside the target repository. One-time use.
+# AI Repository Bootstrap
 # Version: 1.0.0
 
 You are performing a one-time AI-readiness bootstrap for this repository.
-Your goal: make this repo immediately productive for AI coding agents by
-generating accurate, compact "current state" documentation.
+Goal: generate accurate, compact "current state" documentation that makes
+this repo immediately productive for AI coding agents.
+
+## EXECUTION RULES
+
+1. Run Phase 1 FIRST. Show discovery summary. Ask user to confirm before proceeding.
+2. Do NOT proceed to Phase 2 without user confirmation.
+3. If pre-existing AI config files are found (1.6), ask user: merge, replace, or skip.
+4. AGENTS.md MUST be under 150 lines. If the repo is large, summarize more aggressively. Verify line count before writing. If 150 lines cannot be achieved, ask user: accept a longer file or split into root overview + per-package detail files.
+5. Flag uncertain discoveries for user review during Phase 1 confirmation.
+6. After generating all files, show the coverage tracker (use the table format from meta-prompt.md, filled with actual statuses) as summary.
+7. Commit message suggestion: `chore: bootstrap AI agent configuration`
+8. Recommended next step: run a project-context generation workflow to capture implementation rules and conventions (the "rulebook" complement to the "map" this prompt creates).
+9. The generated meta-prompt.md provides ongoing maintenance tasks (sync, audit, extend, add-tool, compact) for future upkeep.
+
+---
 
 ## PHASE 1 — DISCOVERY
 
 Investigate this repository thoroughly but efficiently. Do NOT read every file.
 Use directory listings, config files, lock files, and entry points to infer.
 
-Gather the following. If something doesn't apply, skip it — don't leave empty sections.
-
 ### 1.1 Identity
+
 - Repository name, one-sentence purpose (infer from README, package.json, pyproject.toml, Cargo.toml, go.mod, etc.)
 - Primary language(s) and framework(s)
 - Is this a monorepo? If yes, list the workspaces/packages/services briefly.
 
 ### 1.2 Tech Stack (auto-detect)
-Scan for and report only what exists:
+
+Detect:
 - Language version constraints (e.g., .nvmrc, .python-version, .tool-versions, rust-toolchain.toml)
 - Package manager (npm/pnpm/yarn/bun/pip/poetry/uv/cargo/go mod/maven/gradle — detect from lock files)
 - Frameworks (detect from dependencies, not guessing)
@@ -27,6 +40,7 @@ Scan for and report only what exists:
 - Key infrastructure (Docker, Terraform, K8s manifests — just note existence)
 
 ### 1.3 Project Structure
+
 Generate a **compact** structural overview. Rules:
 - Max 3 levels deep
 - Collapse directories with >10 siblings into summaries (e.g., `components/ (47 files)`)
@@ -34,6 +48,7 @@ Generate a **compact** structural overview. Rules:
 - Do NOT list node_modules, vendor, build artifacts, .git
 
 ### 1.4 Development Commands
+
 Auto-detect from package.json scripts, Makefile, justfile, Taskfile, Cargo.toml,
 pyproject.toml, composer.json, etc. Report only commands that exist:
 - Install dependencies
@@ -44,6 +59,7 @@ pyproject.toml, composer.json, etc. Report only commands that exist:
 - Type check
 
 ### 1.5 Key Entry Points & Architecture Hints
+
 - Main entry file(s)
 - Routing setup location (if web app)
 - API definition location (if API)
@@ -52,6 +68,7 @@ pyproject.toml, composer.json, etc. Report only commands that exist:
 - Any architectural patterns visible (e.g., hexagonal, MVC, microservices via docker-compose)
 
 ### 1.6 Existing AI Configuration
+
 Check for any pre-existing files:
 - CLAUDE.md, AGENTS.md, .github/copilot-instructions.md
 - .cursor/rules/, .cursorrules
@@ -59,8 +76,6 @@ Check for any pre-existing files:
 - .aiignore, .aiexclude, .cursorignore
 - .claude/ directory (commands, skills)
 - llms.txt
-
-Report what exists. We will NOT overwrite without confirmation.
 
 ---
 
@@ -72,9 +87,15 @@ Using ONLY the discovered information from Phase 1, generate the following files
 
 This is the canonical file. All other tool files reference or mirror this.
 
+**Rules for AGENTS.md:**
+- Maximum ~150 lines. Compress aggressively. Agents are good at exploring; they need a map, not a textbook.
+- No opinions in initial bootstrap. The "Style & Opinions" layer is added later via the extend task in meta-prompt.md.
+- No placeholders like "TODO" in the visible content. The tracker comment block at the bottom tracks what's not yet done.
+- If this is a monorepo, keep root AGENTS.md as an overview. Note that per-package files can be added later.
+
 Structure it EXACTLY as follows:
 
-```markdown
+---BEGIN TEMPLATE---
 # {Repository Name}
 
 > {One-sentence purpose}
@@ -102,56 +123,22 @@ Structure it EXACTLY as follows:
 - "Tests live alongside source files as *.test.ts"
 - "Environment config uses .env files with dotenv"
 Do NOT invent or assume conventions. If you can't verify it, don't include it.}
+---END TEMPLATE---
 
----
+### 2.2 Tool Wrapper Files
 
+Each wrapper references AGENTS.md as the primary context. Generate the following:
 
+| File Path | Content | Notes |
+|-----------|---------|-------|
+| `CLAUDE.md` | `# CLAUDE.md\n\nFollow all instructions in the root AGENTS.md file as the primary context for this repository.` | Add Claude-specific content only if needed (e.g., tool permissions) |
+| `.github/copilot-instructions.md` | `# Copilot Instructions\n\nFollow all instructions in the root AGENTS.md file as the primary context for this repository.` | |
+| `.cursor/rules/agents.mdc` | Frontmatter: `description: Primary repository context sourced from AGENTS.md`, `globs:` (empty), `alwaysApply: true`. Body: `Follow all instructions in the root AGENTS.md file as the primary context for this repository.` | Create `.cursor/rules/` directory if needed. Frontmatter follows Cursor's MDC format. |
+| `.junie/guidelines.md` | `# Junie Guidelines\n\nFollow all instructions in the root AGENTS.md file as the primary context for this repository.` | **Only generate if user confirms JetBrains usage.** Ask during Phase 1 confirmation. |
 
-
-
-
-
-```
-
-**Rules for AGENTS.md:**
-- Maximum ~150 lines. Compress aggressively. Agents are good at exploring;
-  they need a map, not a textbook.
-- No opinions. No "prefer X over Y". Only verified facts.
-- No placeholders like "TODO" in the visible content.
-  The tracker comment block at the bottom tracks what's not yet done.
-- If this is a monorepo, keep root AGENTS.md as an overview.
-  Note that per-package files can be added later.
-
-### 2.2 CLAUDE.md (Claude Code wrapper)
-
-```markdown
-# CLAUDE.md
-
-Follow all instructions in ./AGENTS.md as the primary context for this repository.
-
-
+**Cursor MDC example** (exact file format):
 
 ```
-
-Keep it this minimal. Claude Code reads AGENTS.md content via this reference.
-Only add Claude-specific content if there's a genuine reason (e.g., tool permissions).
-
-### 2.3 .github/copilot-instructions.md (GitHub Copilot wrapper)
-
-```markdown
-# Copilot Instructions
-
-Follow all instructions in the root AGENTS.md file as the primary context
-for this repository.
-
-
-```
-
-### 2.4 .cursor/rules/agents.mdc (Cursor wrapper)
-
-Create `.cursor/rules/` directory if it doesn't exist.
-
-```markdown
 ---
 description: Primary repository context sourced from AGENTS.md
 globs:
@@ -160,28 +147,13 @@ alwaysApply: true
 
 Follow all instructions in the root AGENTS.md file as the primary context
 for this repository.
-
-
 ```
 
-### 2.5 .junie/guidelines.md (JetBrains Junie — optional)
+### 2.3 .aiignore
 
-Only generate if user confirms JetBrains usage. If generating:
+Generate a `.aiignore` based on the repo's actual tech stack. Start from the base template below, then: remove sections for tech not present and add patterns for any sensitive directories found in Phase 1.
 
-```markdown
-# Junie Guidelines
-
-Follow all instructions in the root AGENTS.md file as the primary context
-for this repository.
-
-
-```
-
-### 2.6 .aiignore
-
-Generate a sensible default based on what exists in the repo:
-
-```gitignore
+---BEGIN TEMPLATE---
 # AI Agent Ignore File
 # Prevents AI tools from reading sensitive or irrelevant files
 
@@ -207,120 +179,20 @@ __pycache__/
 # IDE and OS files
 .idea/
 .vscode/settings.json
+.vscode/launch.json
 .DS_Store
 
-# AI configuration (don't recurse into own config)
+# AI configuration (uncomment to prevent AI tools from reading their own config)
 # .claude/
 # .cursor/
 
 # Add project-specific exclusions below
-```
+---END TEMPLATE---
 
-Adapt this to the actual repo. Remove sections for tech that doesn't exist.
-Add patterns for any sensitive-looking directories discovered during Phase 1.
+### 2.4 meta-prompt.md (Maintenance Helper)
 
-### 2.7 meta.prompt.md (Maintenance Helper)
-
-Generate this file using the template in the next section.
-
----
-
-## PHASE 3 — GENERATE meta.prompt.md
-
-Create `meta.prompt.md` with the following content, filling in the
-`{CURRENT_STATUS}` section based on what was actually generated:
-
----BEGIN meta.prompt.md TEMPLATE---
-
-# AI Instructions Maintenance — meta.prompt.md
-# Reusable prompt. Paste into any AI coding agent when you need to
-# review, update, or extend the AI configuration for this repository.
-# Version: 1.0.0
-
-You are maintaining the AI-readiness configuration for this repository.
-
-## CURRENT COVERAGE STATUS
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                  AI-READINESS TRACKER                    │
-├──────────────────────┬──────────────────────────────────┤
-│ Source of Truth       │ AGENTS.md              {STATUS} │
-├──────────────────────┼──────────────────────────────────┤
-│ Tool Wrappers         │                                 │
-│  · Claude Code        │ CLAUDE.md              {STATUS} │
-│  · GitHub Copilot     │ .github/copilot-       {STATUS} │
-│  │                    │  instructions.md                │
-│  · Cursor             │ .cursor/rules/         {STATUS} │
-│  │                    │  agents.mdc                     │
-│  · JetBrains Junie    │ .junie/guidelines.md   {STATUS} │
-├──────────────────────┼──────────────────────────────────┤
-│ Security              │ .aiignore              {STATUS} │
-├──────────────────────┼──────────────────────────────────┤
-│ Content Layers        │                                 │
-│  ✅ Current State     │ Tech, structure, commands, arch  │
-│  🔲 Guardrails        │ Safety rules, boundaries, perms │
-│  🔲 Style & Opinions  │ Code style, patterns, prefs     │
-│  🔲 Workflows/Skills  │ .claude/skills/, slash commands │
-│  🔲 Domain Knowledge  │ Business logic, glossary, APIs  │
-└──────────────────────┴──────────────────────────────────┘
-```
-
-{STATUS} = ✅ exists | 🔲 missing | ⚠️ outdated/empty
-
-## AVAILABLE TASKS
-
-When this prompt is used, ask the user which task they want to perform:
-
-### sync — Sync all tool wrappers with AGENTS.md
-Read AGENTS.md. Verify each wrapper file still references it correctly.
-Report any that have drifted or contain conflicting instructions.
-Update wrappers if needed.
-
-### audit — Audit current state accuracy
-Re-run discovery (same as init Phase 1) and compare against AGENTS.md.
-Report any drift: new dependencies, changed structure, new scripts.
-Propose a minimal diff to update AGENTS.md.
-
-### extend — Add a new content layer
-Ask the user which layer they want to fill:
-- **Guardrails**: Safety rules, what agents should NOT do, permission boundaries
-- **Style & Opinions**: Code conventions, preferred patterns, formatting
-- **Workflows/Skills**: Reusable agent workflows (Claude skills, Copilot agents)
-- **Domain Knowledge**: Business terminology, API contracts, data models
-
-For each layer, interview the user with focused questions (max 5),
-then generate compact additions to AGENTS.md and sync wrappers.
-
-### add-tool — Add support for a new AI tool
-Ask which tool. Generate the appropriate wrapper file
-referencing AGENTS.md. Update the tracker.
-
-### compact — Compress AGENTS.md
-Review AGENTS.md for verbosity. Compress while preserving all facts.
-Target: under 150 lines. Report before/after line count.
-
----END meta.prompt.md TEMPLATE---
-
-Fill in {STATUS} values based on what was actually generated in Phase 2.
-
----
-
-## EXECUTION RULES
-
-1. Run Phase 1 FIRST. Show the discovery summary to the user.
-   Ask: "Does this look accurate? Should I proceed with generating files?"
-
-2. Do NOT proceed to Phase 2 without user confirmation.
-
-3. If pre-existing AI config files are found (Phase 1.6), ask the user
-   how to handle them: merge, replace, or skip.
-
-4. After generating all files, show the completed tracker from meta.prompt.md
-   as a summary.
-
-5. Commit message suggestion: `chore: bootstrap AI agent configuration`
-
-6. Keep total AGENTS.md under 150 lines. This is a hard constraint.
-   If the repo is huge, be more aggressive about summarizing.
-   Agents can always explore — they need a map, not the territory.
+Generate `meta-prompt.md` in the target repository using the companion template
+(distributed alongside this bootstrapper). Copy its structure and fill in all
+{STATUS} values based on what was actually generated in this phase.
+This file enables future maintenance: syncing wrappers, auditing drift,
+extending content layers, and adding new tool support.
