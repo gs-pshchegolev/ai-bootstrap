@@ -6,8 +6,8 @@
 
 The Garden System provides AI agent maintenance for repositories using AGENTS.md configuration:
 
-- **Gardner Gary** 🪴 - Interactive Repository Garden Keeper subagent (v1.0.0)
-- **9 maintenance skills** - Individual operations for keeping AI configs healthy
+- **Gardner Gary** 🪴 - Interactive Repository Garden Keeper subagent (v1.1.0)
+- **10 maintenance skills** - Individual operations for keeping AI configs healthy
 
 The system follows a "gardening" philosophy: documentation needs regular care, pruning, and attention to stay healthy.
 
@@ -23,13 +23,14 @@ Your friendly Repository Garden Keeper with a menu-driven interface for all main
 
 | Skill | Description |
 |-------|-------------|
+| `/garden-bootstrap` 🌱 | First-time AI-readiness setup (one-time) |
 | `/garden-sync` 🔄 | Sync wrappers with AGENTS.md |
 | `/garden-audit` 🔍 | Audit for drift between docs and code |
 | `/garden-extend` 🌱 | Add content layers (guardrails, principles, style) |
 | `/garden-references` 📚 | Fetch and manage dependency docs (llms.txt) |
 | `/garden-add-tool` 🛠️ | Add support for new AI tools |
 | `/garden-scaffold` 🏗️ | Set up docs/ knowledge base structure |
-| `/garden-garden` 🪴 | Find and fix documentation issues |
+| `/garden-maintain` 🪴 | Find and fix documentation issues |
 | `/garden-compact` ✂️ | Compress AGENTS.md while preserving facts |
 | `/garden-help` 💡 | Get help understanding when to use each skill |
 
@@ -54,8 +55,9 @@ claude /garden-sync
 
 | Scenario | Recommended Skill |
 |----------|-------------------|
+| First-time setup (no AGENTS.md) | `/garden-bootstrap` |
 | After major code changes | `/garden-audit` |
-| Monthly health check | `/garden-garden` |
+| Monthly health check | `/garden-maintain` |
 | Adding new features | `/garden-extend` |
 | Dependencies changed | `/garden-references` |
 | AGENTS.md too long (>150 lines) | `/garden-compact` |
@@ -68,9 +70,11 @@ claude /garden-sync
 
 ## Version
 
-**Current:** 1.0.0
+**Current:** 1.1.0
 
 Check version: `cat _gs/VERSION`
+
+See [CHANGELOG](_gs/CHANGELOG.md) for version history.
 
 ---
 

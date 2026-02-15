@@ -37,7 +37,7 @@ Gary will:
 ```
 User: /gardener
 
-Gary: 🪴 Hello! I'm Gardner Gary (v1.0.0)...
+Gary: 🪴 Hello! I'm Gardner Gary (v1.1.0)...
       [Shows health status]
       [Shows maintenance menu]
 
@@ -65,15 +65,17 @@ Gary: 🪴 Happy gardening! Call me anytime with /gardener
 
 | Code | Skill | When to Use |
 |------|-------|-------------|
+| `BS` | Bootstrap | First-time setup (only if AGENTS.md missing) |
 | `SY` | Sync | Verify wrappers reference AGENTS.md correctly |
 | `AU` | Audit | Check for drift after code changes |
 | `EX` | Extend | Add new content layers (guardrails, principles) |
-| `RF` | References | Update dependency documentation |
+| `RE` | References | Update dependency documentation |
 | `AT` | Add Tool | Generate wrapper for new AI tool |
 | `SC` | Scaffold | Set up docs/ directory structure |
-| `GD` | Garden | Find staleness, broken links, orphans |
+| `GD` | Maintain | Find staleness, broken links, orphans |
 | `CO` | Compact | Compress AGENTS.md when too long |
-| `HL` | Help | Learn when to use each skill |
+| `MH` | Menu | Redisplay the menu |
+| `DA` | Dismiss | Exit and return to normal Claude |
 
 ---
 
@@ -103,7 +105,7 @@ claude /garden-add-tool
 claude /garden-scaffold
 
 # Garden documentation (staleness, links, orphans)
-claude /garden-garden
+claude /garden-maintain
 
 # Compress AGENTS.md
 claude /garden-compact
@@ -143,13 +145,13 @@ claude /garden-audit
 
 ### Monthly Health Check
 
-**Run:** `/garden-garden`
+**Run:** `/garden-maintain`
 
 Identifies staleness, broken links, orphaned files, and coverage gaps.
 
 ```bash
 # First of the month routine maintenance
-claude /garden-garden
+claude /garden-maintain
 ```
 
 ### When Adding Features
@@ -202,7 +204,7 @@ claude /garden-add-tool
 |-----------|------|---------|
 | After changes | Audit | `/garden-audit` |
 | Weekly | Sync | `/garden-sync` |
-| Monthly | Garden | `/garden-garden` |
+| Monthly | Garden | `/garden-maintain` |
 | As needed | Extend | `/garden-extend` |
 | As needed | References | `/garden-references` |
 | As needed | Compact | `/garden-compact` |
@@ -216,7 +218,7 @@ claude /garden-add-tool
 ```
 your-repo/
 ├── _gs/                                   # Garden system source
-│   ├── VERSION                            # Version file (1.0.0)
+│   ├── VERSION                            # Version file (1.1.0)
 │   ├── core/
 │   │   ├── config.yaml                    # Configuration
 │   │   ├── agents/
@@ -287,7 +289,7 @@ A: Both work! Gardener is best for exploration and discovery. Skills are best fo
 
 **Q: How often should I run garden maintenance?**
 
-A: Run `/garden-audit` after major changes, `/garden-garden` monthly, and `/garden-extend` when adding significant features.
+A: Run `/garden-audit` after major changes, `/garden-maintain` monthly, and `/garden-extend` when adding significant features.
 
 **Q: Can I use this with tools other than Claude Code?**
 
@@ -362,7 +364,7 @@ The Garden System follows semantic versioning:
 cat _gs/VERSION
 ```
 
-**Current version:** 1.0.0
+**Current version:** 1.1.0
 
 ---
 

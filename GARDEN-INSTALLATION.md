@@ -204,7 +204,7 @@ claude /gardener
 ### Expected Output
 
 ```
-🪴 Hello! I'm Gardner Gary (v1.0.0), your Repository Garden Keeper.
+🪴 Hello! I'm Gardner Gary (v1.1.0), your Repository Garden Keeper.
 
 ## 🌱 Garden Health Status
 

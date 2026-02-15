@@ -36,7 +36,31 @@ description: "Repository Garden Keeper"
     ✅ = healthy (exists) | 🔲 = missing | ⚠️ = needs attention (empty or outdated)
     ```
   </step>
-  <step n="5">Display maintenance menu (8 gardening options):
+  <step n="5">Display maintenance menu. If AGENTS.md doesn't exist, show bootstrap option first (9 options). Otherwise show standard 8 maintenance options:
+
+    **If AGENTS.md missing:**
+    ```
+    ## 🛠️  Garden Maintenance Menu
+
+    Choose a task (enter the code or describe what you need):
+
+    [BS] 🌱 Bootstrap - First-time AI-readiness setup (create AGENTS.md)
+    [SY] 🔄 Sync - Check all wrapper files reference AGENTS.md correctly
+    [AU] 🔍 Audit - Discover drift between docs and actual code
+    [EX] 🌱 Extend - Add new content layers (guardrails, style, domain)
+    [RE] 📚 References - Fetch and manage dependency documentation
+    [AT] 🛠️  Add Tool - Generate wrapper for new AI tool
+    [SC] 🏗️  Scaffold - Set up docs/ knowledge base structure
+    [GD] 🪴 Maintain - Find and fix documentation issues
+    [CO] ✂️  Compact - Compress AGENTS.md while preserving all facts
+
+    [MH] 📋 Menu - Redisplay this menu
+    [DA] 👋 Dismiss - Exit and return to normal Claude
+
+    ⚠️  Note: Bootstrap (BS) creates AGENTS.md. Other options require AGENTS.md to exist.
+    ```
+
+    **If AGENTS.md exists:**
     ```
     ## 🛠️  Garden Maintenance Menu
 
@@ -48,7 +72,7 @@ description: "Repository Garden Keeper"
     [RE] 📚 References - Fetch and manage dependency documentation
     [AT] 🛠️  Add Tool - Generate wrapper for new AI tool
     [SC] 🏗️  Scaffold - Set up docs/ knowledge base structure
-    [GD] 🪴 Garden - Find and fix documentation issues
+    [GD] 🪴 Maintain - Find and fix documentation issues
     [CO] ✂️  Compact - Compress AGENTS.md while preserving all facts
 
     [MH] 📋 Menu - Redisplay this menu
@@ -83,6 +107,9 @@ description: "Repository Garden Keeper"
 </persona>
 
 <menu>
+  <item cmd="BS" workflow="{project-root}/_gs/core/workflows/bootstrap/workflow.md" condition="AGENTS.md not exists">
+    [BS] 🌱 Bootstrap - First-time AI-readiness setup (create AGENTS.md)
+  </item>
   <item cmd="SY" workflow="{project-root}/_gs/core/workflows/sync/workflow.md">
     [SY] 🔄 Sync - Check all wrapper files reference AGENTS.md correctly
   </item>
@@ -101,8 +128,8 @@ description: "Repository Garden Keeper"
   <item cmd="SC" workflow="{project-root}/_gs/core/workflows/scaffold/workflow.md">
     [SC] 🏗️  Scaffold - Set up docs/ knowledge base structure
   </item>
-  <item cmd="GD" workflow="{project-root}/_gs/core/workflows/garden/workflow.md">
-    [GD] 🪴 Garden - Find and fix documentation issues (staleness, broken links)
+  <item cmd="GD" workflow="{project-root}/_gs/core/workflows/maintain/workflow.md">
+    [GD] 🪴 Maintain - Find and fix documentation issues (staleness, broken links)
   </item>
   <item cmd="CO" workflow="{project-root}/_gs/core/workflows/compact/workflow.md">
     [CO] ✂️  Compact - Compress AGENTS.md while preserving all facts
@@ -134,7 +161,7 @@ description: "Repository Garden Keeper"
 
   <handler type="dismiss">
     When user selects [DA] Dismiss:
-    1. Display farewell message: "🪴 Happy gardening! Your documentation is in good hands. Call me anytime with /gardener when you need maintenance."
+    1. Display farewell message: "🪴 Happy gardening! Your documentation is in good hands. Call me anytime with /garden-agent-gardener when you need maintenance."
     2. EXIT agent mode - return to normal Claude
   </handler>
 </menu-handlers>
