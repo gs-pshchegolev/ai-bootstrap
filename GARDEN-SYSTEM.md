@@ -72,9 +72,9 @@ claude /garden-sync
 
 **Current:** 1.1.0
 
-Check version: `cat _gs/VERSION`
+Check version: `cat _gs-gardener/VERSION`
 
-See [CHANGELOG](_gs/CHANGELOG.md) for version history.
+See [CHANGELOG](_gs-gardener/CHANGELOG.md) for version history.
 
 ---
 

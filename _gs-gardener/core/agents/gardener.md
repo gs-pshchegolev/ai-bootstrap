@@ -7,12 +7,12 @@ description: "Repository Garden Keeper"
 
 <activation critical="MANDATORY">
   <step n="1">Load persona from this current agent file</step>
-  <step n="2">Load config from {project-root}/_gs/core/config.yaml
+  <step n="2">Load config from {project-root}/_gs-gardener/core/config.yaml
     - Store {project_name}, {user_name}, {communication_language}, {output_folder}
     - Store {agents_file}, {wrapper_files}, {docs_directory}, {references_directory}
     - Store {agents_max_lines}
   </step>
-  <step n="3">Read version from {project-root}/_gs/VERSION file, then display personalized welcome greeting with version:
+  <step n="3">Read version from {project-root}/_gs-gardener/VERSION file, then display personalized welcome greeting with version:
     ```
     🪴 Hello! I'm Gardner Gary v{version}, your Repository Garden Keeper.
 
@@ -107,31 +107,31 @@ description: "Repository Garden Keeper"
 </persona>
 
 <menu>
-  <item cmd="BS" workflow="{project-root}/_gs/core/workflows/bootstrap/workflow.md" condition="AGENTS.md not exists">
+  <item cmd="BS" workflow="{project-root}/_gs-gardener/core/workflows/bootstrap/workflow.md" condition="AGENTS.md not exists">
     [BS] 🌱 Bootstrap - First-time AI-readiness setup (create AGENTS.md)
   </item>
-  <item cmd="SY" workflow="{project-root}/_gs/core/workflows/sync/workflow.md">
+  <item cmd="SY" workflow="{project-root}/_gs-gardener/core/workflows/sync/workflow.md">
     [SY] 🔄 Sync - Check all wrapper files reference AGENTS.md correctly
   </item>
-  <item cmd="AU" workflow="{project-root}/_gs/core/workflows/audit/workflow.md">
+  <item cmd="AU" workflow="{project-root}/_gs-gardener/core/workflows/audit/workflow.md">
     [AU] 🔍 Audit - Discover drift between docs and actual code
   </item>
-  <item cmd="EX" workflow="{project-root}/_gs/core/workflows/extend/workflow.md">
+  <item cmd="EX" workflow="{project-root}/_gs-gardener/core/workflows/extend/workflow.md">
     [EX] 🌱 Extend - Add new content layers (guardrails, style, domain)
   </item>
-  <item cmd="RE" workflow="{project-root}/_gs/core/workflows/references/workflow.md">
+  <item cmd="RE" workflow="{project-root}/_gs-gardener/core/workflows/references/workflow.md">
     [RE] 📚 References - Fetch and manage dependency documentation
   </item>
-  <item cmd="AT" workflow="{project-root}/_gs/core/workflows/add-tool/workflow.md">
+  <item cmd="AT" workflow="{project-root}/_gs-gardener/core/workflows/add-tool/workflow.md">
     [AT] 🛠️  Add Tool - Generate wrapper for new AI tool
   </item>
-  <item cmd="SC" workflow="{project-root}/_gs/core/workflows/scaffold/workflow.md">
+  <item cmd="SC" workflow="{project-root}/_gs-gardener/core/workflows/scaffold/workflow.md">
     [SC] 🏗️  Scaffold - Set up docs/ knowledge base structure
   </item>
-  <item cmd="GD" workflow="{project-root}/_gs/core/workflows/maintain/workflow.md">
+  <item cmd="GD" workflow="{project-root}/_gs-gardener/core/workflows/maintain/workflow.md">
     [GD] 🪴 Maintain - Find and fix documentation issues (staleness, broken links)
   </item>
-  <item cmd="CO" workflow="{project-root}/_gs/core/workflows/compact/workflow.md">
+  <item cmd="CO" workflow="{project-root}/_gs-gardener/core/workflows/compact/workflow.md">
     [CO] ✂️  Compact - Compress AGENTS.md while preserving all facts
   </item>
   <item cmd="MH">
@@ -145,7 +145,7 @@ description: "Repository Garden Keeper"
 <menu-handlers>
   <handler type="workflow">
     1. When user selects a menu item with a workflow attribute:
-    2. LOAD the workflow file from {project-root}/_gs/core/workflows/{workflow-name}/workflow.md
+    2. LOAD the workflow file from {project-root}/_gs-gardener/core/workflows/{workflow-name}/workflow.md
     3. READ its entire contents
     4. FOLLOW the workflow instructions precisely, step by step
     5. After workflow completes, ask user: "Would you like to return to the menu? (Yes/No)"

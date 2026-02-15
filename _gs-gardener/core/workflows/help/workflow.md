@@ -358,7 +358,7 @@ Here are all 9 maintenance skills available:
 - **Report before act:** I always show findings before making changes - review carefully!
 - **No information loss:** I never delete facts, only compress verbosity
 - **Gardening takes time:** Some tasks (audit, maintain) scan extensively - be patient! 🐌
-- **Version tracking:** Check `_gs/VERSION` to see which garden system version you're running
+- **Version tracking:** Check `_gs-gardener/VERSION` to see which garden system version you're running
 ```
 
 Then ask: "🪴 Any other questions? I'm here to help!"

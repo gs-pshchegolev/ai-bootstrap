@@ -245,7 +245,7 @@ Copy the garden system to enable ongoing maintenance via Gardner Gary 🪴:
 **Option A: Direct Copy (Recommended)**
 ```bash
 # Copy garden system source
-cp -r {ai-bootstrap-path}/_gs/ _gs/
+cp -r {ai-bootstrap-path}/_gs-gardener/ _gs-gardener/
 
 # Copy command files to enable skills
 cp {ai-bootstrap-path}/.claude/commands/garden-*.md .claude/commands/
@@ -257,7 +257,7 @@ cp {ai-bootstrap-path}/.claude/commands/garden-*.md .claude/commands/
 git submodule add {ai-bootstrap-repo-url} _ai-bootstrap
 
 # Symlink garden system
-ln -s _ai-bootstrap/_gs _gs
+ln -s _ai-bootstrap/_gs-gardener _gs-gardener
 
 # Copy command files
 cp _ai-bootstrap/.claude/commands/garden-*.md .claude/commands/
@@ -287,7 +287,7 @@ After generating all files, display a coverage tracker showing what was created:
 | JetBrains Junie | .junie/guidelines.md | {✅ Created / 🔲 Skipped} |
 | Security | .aiignore | ✅ Created |
 | Knowledge Base | docs/ | ✅ Created |
-| Garden System | _gs/ | ✅ Installed |
+| Garden System | _gs-gardener/ | ✅ Installed |
 | Garden Commands | .claude/commands/garden-*.md | ✅ Installed ({count} skills) |
 
 ✅ = created | 🔲 = skipped

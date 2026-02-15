@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **`/garden-garden` renamed to `/garden-maintain`** - Clearer command name (no longer self-referential)
-- **Workflow directory renamed** - `_gs/core/workflows/garden/` → `_gs/core/workflows/maintain/`
+- **Workflow directory renamed** - `_gs-gardener/core/workflows/garden/` → `_gs-gardener/core/workflows/maintain/`
 - **Help workflow structure** - Now defers heavy I/O checks to contextual analysis (Phase 4)
 - **Gardner Gary menu** - Shows 9 options when AGENTS.md missing, 8 when it exists
 - **Bootstrap integration** - ai-bootstrapper.md converted to standard garden workflow
@@ -49,10 +49,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `/garden-garden` - Find and fix documentation issues
   - `/garden-compact` - Compress AGENTS.md while preserving facts
   - `/garden-help` - Get help understanding when to use each skill
-- Configuration system (`_gs/core/config.yaml`)
+- Configuration system (`_gs-gardener/core/config.yaml`)
 - Workflow-based architecture (8 workflows)
 - Coverage status tracking
-- Version tracking (`_gs/VERSION`)
+- Version tracking (`_gs-gardener/VERSION`)
 
 ### Philosophy
 - Progressive disclosure - Start simple, reveal complexity as needed
