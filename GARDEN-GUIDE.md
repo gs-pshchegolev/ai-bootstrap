@@ -20,7 +20,7 @@ The gardener provides a friendly, menu-driven interface for all maintenance task
 ### Starting the Gardener
 
 ```bash
-claude /gardener
+claude /garden-agent-gardener
 ```
 
 ### Interactive Flow
@@ -35,9 +35,9 @@ Gary will:
 ### Example Session
 
 ```
-User: /gardener
+User: /garden-agent-gardener
 
-Gary: 🪴 Hello! I'm Gardner Gary (v1.1.0)...
+Gary: 🪴 Hello! I'm Gardner Gary (v1.2.0)...
       [Shows health status]
       [Shows maintenance menu]
 
@@ -58,7 +58,7 @@ Gary: [Fixes issues]
 
 User: No
 
-Gary: 🪴 Happy gardening! Call me anytime with /gardener
+Gary: 🪴 Happy gardening! Call me anytime with /garden-agent-gardener
 ```
 
 ### Menu Options
@@ -86,6 +86,9 @@ Invoke skills directly without the interactive menu - useful for quick tasks and
 ### Skill Commands
 
 ```bash
+# First-time AI-readiness setup (create AGENTS.md)
+claude /garden-bootstrap
+
 # Sync wrappers with AGENTS.md
 claude /garden-sync
 
@@ -204,7 +207,7 @@ claude /garden-add-tool
 |-----------|------|---------|
 | After changes | Audit | `/garden-audit` |
 | Weekly | Sync | `/garden-sync` |
-| Monthly | Garden | `/garden-maintain` |
+| Monthly | Maintain | `/garden-maintain` |
 | As needed | Extend | `/garden-extend` |
 | As needed | References | `/garden-references` |
 | As needed | Compact | `/garden-compact` |
@@ -218,40 +221,43 @@ claude /garden-add-tool
 ```
 your-repo/
 ├── _gs-gardener/                                   # Garden system source
-│   ├── VERSION                            # Version file (1.1.0)
+│   ├── VERSION                            # Version file (1.2.0)
 │   ├── core/
 │   │   ├── config.yaml                    # Configuration
 │   │   ├── agents/
 │   │   │   └── gardener.md                # Gardner Gary definition
 │   │   └── workflows/
-│   │       ├── sync/workflow.md
-│   │       ├── audit/workflow.md
-│   │       ├── extend/workflow.md
-│   │       ├── references/workflow.md
 │   │       ├── add-tool/workflow.md
+│   │       ├── audit/workflow.md
+│   │       ├── bootstrap/workflow.md
+│   │       ├── compact/workflow.md
+│   │       ├── extend/workflow.md
+│   │       ├── help/workflow.md
+│   │       ├── maintain/workflow.md
+│   │       ├── references/workflow.md
 │   │       ├── scaffold/workflow.md
-│   │       ├── garden/workflow.md
-│   │       └── compact/workflow.md
+│   │       └── sync/workflow.md
 │   └── _config/
 │       └── templates/
 │           └── coverage-status-template.md
 └── .claude/
     └── commands/
         ├── garden-agent-gardener.md       # Gardener command
-        ├── garden-sync.md                 # Skill commands
+        ├── garden-add-tool.md             # Skill commands
         ├── garden-audit.md
-        ├── garden-extend.md
-        ├── garden-references.md
-        ├── garden-add-tool.md
-        ├── garden-scaffold.md
-        ├── garden-garden.md
+        ├── garden-bootstrap.md
         ├── garden-compact.md
-        └── garden-help.md
+        ├── garden-extend.md
+        ├── garden-help.md
+        ├── garden-maintain.md
+        ├── garden-references.md
+        ├── garden-scaffold.md
+        └── garden-sync.md
 ```
 
 ### How It Works
 
-1. **User invokes skill:** `claude /gardener` or `claude /garden-sync`
+1. **User invokes skill:** `claude /garden-agent-gardener` or `claude /garden-sync`
 2. **Command file loads:** `.claude/commands/garden-agent-gardener.md`
 3. **For gardener:** Loads agent definition, displays menu, waits for input
 4. **For skill:** Loads workflow from `_gs-gardener/core/workflows/{name}/workflow.md`
@@ -364,19 +370,19 @@ The Garden System follows semantic versioning:
 cat _gs-gardener/VERSION
 ```
 
-**Current version:** 1.1.0
+**Current version:** 1.2.0
 
 ---
 
 ## Support
 
 - **Issues:** Report at [ai-bootstrap repository](https://github.com/your-org/ai-bootstrap/issues)
-- **Questions:** Ask Gardner Gary! `claude /gardener`
+- **Questions:** Ask Gardner Gary! `claude /garden-agent-gardener`
 - **Updates:** Watch ai-bootstrap repository for new releases
 
 ---
 
-**Version:** 1.0.0
+**Version:** 1.2.0
 **Last Updated:** 2026-02-15
 **Maintained by:** ai-bootstrap project
 
