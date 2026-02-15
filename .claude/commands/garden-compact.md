@@ -5,4 +5,4 @@ description: 'Compress AGENTS.md - reduce verbosity while preserving all facts (
 
 # compact
 
-IT IS CRITICAL THAT YOU FOLLOW THIS COMMAND: LOAD the FULL @{project-root}/_gs/core/workflows/compact/workflow.md, READ its entire contents and follow its directions exactly!
+IT IS CRITICAL THAT YOU FOLLOW THIS COMMAND: LOAD the FULL @{project-root}/_gs-gardener/core/workflows/compact/workflow.md, READ its entire contents and follow its directions exactly!
