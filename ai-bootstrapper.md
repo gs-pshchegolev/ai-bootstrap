@@ -1,5 +1,5 @@
 # AI Repository Bootstrap
-# Version: 1.0.0
+# Version: 2.0.0
 
 You are performing a one-time AI-readiness bootstrap for this repository.
 Goal: generate accurate, compact "current state" documentation that makes
@@ -10,12 +10,15 @@ this repo immediately productive for AI coding agents.
 1. Run Phase 1 FIRST. Show discovery summary. Ask user to confirm before proceeding.
 2. Do NOT proceed to Phase 2 without user confirmation.
 3. If pre-existing AI config files are found (1.6), ask user: merge, replace, or skip.
-4. AGENTS.md MUST be under 150 lines. If the repo is large, summarize more aggressively. Verify line count before writing. If 150 lines cannot be achieved, ask user: accept a longer file or split into root overview + per-package detail files.
+4. AGENTS.md MUST be under 150 lines. It is a table of contents, not an encyclopedia. Deep content goes in `docs/`. If 150 lines cannot be achieved, ask user: accept a longer file or split into root overview + per-package detail files.
 5. Flag uncertain discoveries for user review during Phase 1 confirmation.
-6. After generating all files, show the coverage tracker (use the table format from meta-prompt.md, filled with actual statuses) as summary.
-7. Commit message suggestion: `chore: bootstrap AI agent configuration`
-8. Recommended next step: run a project-context generation workflow to capture implementation rules and conventions (the "rulebook" complement to the "map" this prompt creates).
-9. The generated meta-prompt.md provides ongoing maintenance tasks (sync, audit, extend, add-tool, compact) for future upkeep.
+6. During Phase 1 confirmation, ask: "Is there important context that lives outside this repo (Slack decisions, wiki pages, design docs) that should be captured in `docs/`?"
+7. After generating all files, show the coverage tracker (use the garden system coverage template format, filled with actual statuses) as summary.
+8. Commit message suggestion: `chore: bootstrap AI agent configuration`
+9. Recommended next steps after bootstrap:
+   a. Run a project-context generation workflow to capture implementation rules and conventions.
+   b. Use `/garden-extend` to add guardrails, golden principles, and domain knowledge.
+   c. Use `/garden-references` to fetch llms.txt files for key dependencies.
 
 ---
 
@@ -76,6 +79,13 @@ Check for any pre-existing files:
 - .aiignore, .aiexclude, .cursorignore
 - .claude/ directory (commands, skills)
 - llms.txt
+- docs/ directory (existing knowledge base)
+
+### 1.7 Reference Documentation
+
+For key frameworks and libraries detected in 1.2, check if they publish an llms.txt
+or similar AI-optimized documentation. Note any that exist — these can be fetched
+later via `/garden-references` from the garden system.
 
 ---
 
@@ -85,13 +95,15 @@ Using ONLY the discovered information from Phase 1, generate the following files
 
 ### 2.1 AGENTS.md (Source of Truth)
 
-This is the canonical file. All other tool files reference or mirror this.
+This is the compact index file. All other tool files reference it. Deep
+documentation lives in `docs/` — AGENTS.md points there.
 
 **Rules for AGENTS.md:**
-- Maximum ~150 lines. Compress aggressively. Agents are good at exploring; they need a map, not a textbook.
-- No opinions in initial bootstrap. The "Style & Opinions" layer is added later via the extend task in meta-prompt.md.
-- No placeholders like "TODO" in the visible content. The tracker comment block at the bottom tracks what's not yet done.
+- Maximum ~150 lines. This is a map, not the territory. Agents can always explore.
+- No opinions in initial bootstrap. The "Style & Opinions" layer is added later via `/garden-extend` from the garden system.
+- No placeholders like "TODO" in the visible content.
 - If this is a monorepo, keep root AGENTS.md as an overview. Note that per-package files can be added later.
+- Include a "Further Reading" section linking to docs/ files when they exist.
 
 Structure it EXACTLY as follows:
 
@@ -123,6 +135,14 @@ Structure it EXACTLY as follows:
 - "Tests live alongside source files as *.test.ts"
 - "Environment config uses .env files with dotenv"
 Do NOT invent or assume conventions. If you can't verify it, don't include it.}
+
+## Further Reading
+
+{Links to docs/ files. Only include entries for files that exist:
+- `docs/ARCHITECTURE.md` — detailed architecture and domain boundaries
+- `docs/core-beliefs.md` — golden principles and operating rules
+- `docs/references/` — llms.txt files for key dependencies
+If no docs/ directory exists yet, write: "Run `/garden-scaffold` from the garden system to set up the knowledge base."}
 ---END TEMPLATE---
 
 ### 2.2 Tool Wrapper Files
@@ -189,10 +209,46 @@ __pycache__/
 # Add project-specific exclusions below
 ---END TEMPLATE---
 
-### 2.4 meta-prompt.md (Maintenance Helper)
+### 2.4 docs/ Directory (Knowledge Base Scaffold)
 
-Generate `meta-prompt.md` in the target repository using the companion template
-(distributed alongside this bootstrapper). Copy its structure and fill in all
-{STATUS} values based on what was actually generated in this phase.
-This file enables future maintenance: syncing wrappers, auditing drift,
-extending content layers, and adding new tool support.
+Create a minimal `docs/` directory as the foundation for progressive disclosure.
+Only create files that have actual content from Phase 1:
+
+| File | Content | When to create |
+|------|---------|----------------|
+| `docs/ARCHITECTURE.md` | Expanded version of 1.5 — entry points, patterns, domain boundaries, dependency directions. Content that won't fit in AGENTS.md's 150-line budget. | Always, if Architecture section in AGENTS.md needs more than ~10 lines |
+| `docs/references/` | Empty directory. Placeholder for llms.txt files fetched later via `/garden-references` from the garden system. | Always |
+| `docs/core-beliefs.md` | Empty stub: `# Core Beliefs\n\nGolden principles for this repository. Use `/garden-extend` from the garden system to populate.` | Always |
+
+Do NOT create files with fabricated content. Stubs with clear "how to populate" instructions are better than invented documentation.
+
+### 2.5 Garden System (Maintenance System)
+
+Copy the garden system to enable ongoing maintenance via Gardner Gary 🪴:
+
+**Option A: Direct Copy (Recommended)**
+```bash
+# Copy garden system source
+cp -r {ai-bootstrap-path}/_gs/ _gs/
+
+# Copy command files to enable skills
+cp {ai-bootstrap-path}/.claude/commands/garden-*.md .claude/commands/
+```
+
+**Option B: Git Submodule (For version tracking)**
+```bash
+# Add ai-bootstrap as submodule
+git submodule add {ai-bootstrap-repo-url} _ai-bootstrap
+
+# Symlink garden system
+ln -s _ai-bootstrap/_gs _gs
+
+# Copy command files
+cp _ai-bootstrap/.claude/commands/garden-*.md .claude/commands/
+```
+
+This enables:
+- `/gardener` - Interactive maintenance menu with Gardner Gary
+- Individual skills: `/garden-sync`, `/garden-audit`, `/garden-extend`, `/garden-references`, `/garden-add-tool`, `/garden-scaffold`, `/garden-garden`, `/garden-compact`
+
+See GARDEN-SYSTEM.md in the ai-bootstrap repository for full deployment and usage guide.

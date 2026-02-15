@@ -1,0 +1,25 @@
+# Garden System Configuration
+# Version: 1.0.0
+
+project_name: ai-bootstrap
+user_name: User
+communication_language: English
+output_folder: "{project-root}/docs"
+
+# Coverage tracking
+agents_file: "{project-root}/AGENTS.md"
+wrapper_files:
+  - "{project-root}/CLAUDE.md"
+  - "{project-root}/.github/copilot-instructions.md"
+  - "{project-root}/.cursor/rules/agents.mdc"
+  - "{project-root}/.junie/guidelines.md"
+
+# Content layers
+docs_directory: "{project-root}/docs"
+references_directory: "{project-root}/docs/references"
+
+# Constraints
+agents_max_lines: 150
+
+# Garden System Version
+version: "1.0.0"
