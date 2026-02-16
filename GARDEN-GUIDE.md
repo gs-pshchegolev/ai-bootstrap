@@ -20,7 +20,7 @@ The gardener provides a friendly, menu-driven interface for all maintenance task
 ### Starting the Gardener
 
 ```bash
-claude /garden-agent-gardener
+/garden-agent-gardener
 ```
 
 ### Interactive Flow
@@ -87,34 +87,34 @@ Invoke skills directly without the interactive menu - useful for quick tasks and
 
 ```bash
 # First-time AI-readiness setup (create AGENTS.md)
-claude /garden-bootstrap
+/garden-bootstrap
 
 # Sync wrappers with AGENTS.md
-claude /garden-sync
+/garden-sync
 
 # Audit for drift between docs and code
-claude /garden-audit
+/garden-audit
 
 # Add content layer (guardrails, principles, style, domain)
-claude /garden-extend
+/garden-extend
 
 # Fetch and manage dependency docs (llms.txt)
-claude /garden-references
+/garden-references
 
 # Add new AI tool wrapper
-claude /garden-add-tool
+/garden-add-tool
 
 # Setup docs/ directory structure
-claude /garden-scaffold
+/garden-scaffold
 
 # Garden documentation (staleness, links, orphans)
-claude /garden-maintain
+/garden-maintain
 
 # Compress AGENTS.md
-claude /garden-compact
+/garden-compact
 
 # Get help understanding skills
-claude /garden-help
+/garden-help
 ```
 
 ### When to Use Direct Skills
@@ -143,7 +143,7 @@ Catches drift between documentation and actual code. Verifies that AGENTS.md sti
 
 ```bash
 # After refactoring, adding features, or moving files
-claude /garden-audit
+/garden-audit
 ```
 
 ### Monthly Health Check
@@ -154,7 +154,7 @@ Identifies staleness, broken links, orphaned files, and coverage gaps.
 
 ```bash
 # First of the month routine maintenance
-claude /garden-maintain
+/garden-maintain
 ```
 
 ### When Adding Features
@@ -165,7 +165,7 @@ Documents new patterns, guardrails, golden principles, or domain knowledge.
 
 ```bash
 # After implementing significant new functionality
-claude /garden-extend
+/garden-extend
 ```
 
 ### When Dependencies Change
@@ -176,7 +176,7 @@ Updates llms.txt files for frameworks and libraries.
 
 ```bash
 # After upgrading frameworks or adding new dependencies
-claude /garden-references
+/garden-references
 ```
 
 ### When AGENTS.md Gets Too Long
@@ -187,7 +187,7 @@ Compresses AGENTS.md to target 150 lines while preserving all facts.
 
 ```bash
 # When AGENTS.md exceeds 150 lines
-claude /garden-compact
+/garden-compact
 ```
 
 ### When Adding New AI Tool
@@ -198,7 +198,7 @@ Generates wrapper file that properly references AGENTS.md.
 
 ```bash
 # When integrating Cursor, Aider, or other AI tools
-claude /garden-add-tool
+/garden-add-tool
 ```
 
 ### Recommended Cadence
@@ -257,7 +257,7 @@ your-repo/
 
 ### How It Works
 
-1. **User invokes skill:** `claude /garden-agent-gardener` or `claude /garden-sync`
+1. **User invokes skill:** `/garden-agent-gardener` or `/garden-sync`
 2. **Command file loads:** `.claude/commands/garden-agent-gardener.md`
 3. **For gardener:** Loads agent definition, displays menu, waits for input
 4. **For skill:** Loads workflow from `_gs-gardener/core/workflows/{name}/workflow.md`
@@ -331,7 +331,7 @@ A: Yes! Skills can be invoked directly. Example:
 ```bash
 # In GitHub Actions
 - name: Audit AI config
-  run: claude /garden-audit --non-interactive
+  run: /garden-audit --non-interactive
 ```
 
 **Q: What happens if workflows conflict with each other?**
@@ -377,7 +377,7 @@ cat _gs-gardener/VERSION
 ## Support
 
 - **Issues:** Report at [ai-bootstrap repository](https://github.com/your-org/ai-bootstrap/issues)
-- **Questions:** Ask 🪴 Gary The Gardener! `claude /garden-agent-gardener`
+- **Questions:** Ask 🪴 Gary The Gardener! `/garden-agent-gardener`
 - **Updates:** Watch ai-bootstrap repository for new releases
 
 ---

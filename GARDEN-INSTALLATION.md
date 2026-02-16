@@ -198,7 +198,7 @@ After installation (any method), verify the garden system works:
 
 ```bash
 cd /path/to/target-repo
-claude /gardener
+/garden-agent-gardener
 ```
 
 ### Expected Output
@@ -252,7 +252,7 @@ Edit the config file to match your repository structure:
 vim _gs-gardener/core/config.yaml
 
 # Restart gardener for changes to take effect
-claude /gardener
+/garden-agent-gardener
 ```
 
 ## Troubleshooting

@@ -232,7 +232,7 @@ async function runInstall(force, dryRun) {
   // ── 2. Claude Code skill commands ─────────────────────────────────
   const cmdSrc = join(PKG_ROOT, '.claude', 'commands');
   const cmdDest = join(dest, '.claude', 'commands');
-  if (!dryRun) mkdirSync(cmdDest, { recursive: true });
+  if (!dryRun && !existsSync(cmdDest)) mkdirSync(cmdDest, { recursive: true });
 
   const gardenCmds = readdirSync(cmdSrc).filter(f => f.startsWith('garden-') && f.endsWith('.md'));
   const shouldUpdateCmds = isUpgrade || force || !installedVersion;
@@ -305,10 +305,13 @@ __pycache__/
   for (const slug of toolsToInstall) {
     const tool = TOOLS[slug];
 
-    // Create directories
+    // Create directories if needed
     if (tool.dirs && !dryRun) {
       for (const d of tool.dirs) {
-        mkdirSync(join(dest, d), { recursive: true });
+        const dirPath = join(dest, d);
+        if (!existsSync(dirPath)) {
+          mkdirSync(dirPath, { recursive: true });
+        }
       }
     }
 
@@ -341,6 +344,15 @@ __pycache__/
     const icon = r.written ? green('✅') : yellow('⚠️');
     const note = r.written ? '' : dim(' (already existed)');
     console.log(`  ${icon} ${r.label.padEnd(15)} → ${dim(r.path)}${note}`);
+  }
+
+  // Next steps
+  if (!dryRun) {
+    console.log(`\n${bold('Next steps:')}`);
+    console.log(`  1. Run ${green('/garden-bootstrap')} to set up AI-ready documentation`);
+    console.log(`     Creates AGENTS.md — the source of truth for all your AI tools`);
+    console.log(`  2. Run ${green('/garden-audit')} to verify accuracy`);
+    console.log(`  3. Run ${green('/garden-extend')} to add guardrails & principles`);
   }
 
   // Garden metaphor

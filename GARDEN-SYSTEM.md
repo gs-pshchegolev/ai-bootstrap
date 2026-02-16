@@ -37,18 +37,18 @@ Your friendly Repository Garden Keeper with a menu-driven interface for all main
 ## Quick Start
 
 1. **Install the system** in your repository (see [Installation Guide](GARDEN-INSTALLATION.md))
-2. **Test it works:** `claude /gardener`
+2. **Test it works:** `/garden-agent-gardener`
 3. **Use the gardener** for interactive maintenance or invoke skills directly
 
 ### Example Session
 
 ```bash
 # Interactive (recommended for exploration)
-claude /gardener
+/garden-agent-gardener
 
 # Direct skill invocation (quick tasks)
-claude /garden-audit
-claude /garden-sync
+/garden-audit
+/garden-sync
 ```
 
 ## When to Use Garden Maintenance
