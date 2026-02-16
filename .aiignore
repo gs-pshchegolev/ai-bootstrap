@@ -1,0 +1,27 @@
+# AI Agent Ignore File
+# Prevents AI tools from reading sensitive or irrelevant files
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+**/secrets/
+**/*.pem
+**/*.key
+**/*.cert
+
+# Large generated / vendored files
+node_modules/
+vendor/
+dist/
+build/
+.next/
+target/
+__pycache__/
+*.pyc
+
+# IDE and OS files
+.idea/
+.vscode/settings.json
+.vscode/launch.json
+.DS_Store

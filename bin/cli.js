@@ -45,19 +45,22 @@ const AGENT_DESC = '🪴 Gary The Gardener - documentation maintenance agent';
 
 // ── Tool definitions ─────────────────────────────────────────────────
 const TOOLS = {
-  'claude-code': {
-    label: 'Claude Code',
-    detect: [],
-    alwaysInstall: true,
-    // Commands are copied from package source (steps 2-3 in install)
-    summaryPath: '.claude/commands/',
+  "claude-code": {
+    label: "Claude Code",
+    detect: [".claude"],
+    dirs: [".claude", ".claude/commands"],
+    agentFile: {
+      path: "CLAUDE.md",
+      content: `# CLAUDE.md\n\nFollow all instructions in the root AGENTS.md file as the primary context for this repository.\n`,
+    },
+    summaryPath: ".claude/commands/",
   },
   cursor: {
-    label: 'Cursor',
-    detect: ['.cursor', '.cursorrules'],
-    dirs: ['.cursor', '.cursor/rules'],
+    label: "Cursor",
+    detect: [".cursor", ".cursorrules"],
+    dirs: [".cursor", ".cursor/rules"],
     agentFile: {
-      path: '.cursor/rules/garden-agent-gardener.mdc',
+      path: ".cursor/rules/garden-agent-gardener.mdc",
       content: `---
 description: "${AGENT_DESC}"
 globs:
@@ -69,14 +72,14 @@ alwaysApply: true
 ${AGENT_ACTIVATION}
 `,
     },
-    summaryPath: '.cursor/rules/garden-agent-gardener.mdc',
+    summaryPath: ".cursor/rules/garden-agent-gardener.mdc",
   },
   copilot: {
-    label: 'GitHub Copilot',
-    detect: ['.github/copilot-instructions.md', '.github'],
-    dirs: ['.github', '.github/agents'],
+    label: "GitHub Copilot",
+    detect: [".github/copilot-instructions.md", ".github"],
+    dirs: [".github", ".github/agents"],
     agentFile: {
-      path: '.github/agents/gardener.md',
+      path: ".github/agents/gardener.md",
       content: `---
 name: 'gardener'
 description: '${AGENT_DESC}'
@@ -87,14 +90,14 @@ description: '${AGENT_DESC}'
 ${AGENT_ACTIVATION}
 `,
     },
-    summaryPath: '.github/agents/gardener.md',
+    summaryPath: ".github/agents/gardener.md",
   },
   windsurf: {
-    label: 'Windsurf',
-    detect: ['.windsurfrules', '.windsurf'],
-    dirs: ['.windsurf', '.windsurf/rules'],
+    label: "Windsurf",
+    detect: [".windsurfrules", ".windsurf"],
+    dirs: [".windsurf", ".windsurf/rules"],
     agentFile: {
-      path: '.windsurf/rules/garden-agent-gardener.md',
+      path: ".windsurf/rules/garden-agent-gardener.md",
       content: `# gardener
 
 > ${AGENT_DESC}
@@ -102,14 +105,14 @@ ${AGENT_ACTIVATION}
 ${AGENT_ACTIVATION}
 `,
     },
-    summaryPath: '.windsurf/rules/garden-agent-gardener.md',
+    summaryPath: ".windsurf/rules/garden-agent-gardener.md",
   },
   junie: {
-    label: 'JetBrains Junie',
-    detect: ['.junie'],
-    dirs: ['.junie'],
+    label: "JetBrains Junie",
+    detect: [".junie"],
+    dirs: [".junie"],
     agentFile: {
-      path: '.junie/guidelines.md',
+      path: ".junie/guidelines.md",
       content: `# 🪴 Gary The Gardener
 
 > Documentation maintenance agent for this repository.
@@ -117,12 +120,11 @@ ${AGENT_ACTIVATION}
 ${AGENT_ACTIVATION}
 `,
     },
-    summaryPath: '.junie/guidelines.md',
+    summaryPath: ".junie/guidelines.md",
   },
 };
 
 const TOOL_SLUGS = Object.keys(TOOLS);
-const OPTIONAL_SLUGS = TOOL_SLUGS.filter(s => !TOOLS[s].alwaysInstall);
 
 // ── Parse CLI arguments ─────────────────────────────────────────────
 const { values, positionals } = parseArgs({
@@ -172,26 +174,17 @@ if (command === 'status') {
 async function runInstall(force, dryRun) {
   const dest = process.cwd();
 
-  console.log(`\n🪴 ${bold('Gary The Gardener')} v${VERSION}`);
+  console.log(`\n🪴 ${bold("Gary The Gardener")} v${VERSION}`);
   if (dryRun) console.log(yellow(`   (dry run — no files will be written)`));
-  console.log('');
+  console.log("");
 
   // Validate --tools flag early, before any file operations
   const requestedTools = parseToolsFlag(values.tools);
 
-  // Sanity check: don't install into the package itself
-  if (existsSync(join(dest, 'bin', 'cli.js')) && existsSync(join(dest, '_gs-gardener', 'core'))) {
-    const pkg = safeReadJson(join(dest, 'package.json'));
-    if (pkg?.name === '@pshch/gary-the-gardener') {
-      console.log(red('Error: Refusing to install into the gary-the-gardener package itself.'));
-      process.exit(1);
-    }
-  }
-
   // ── Detect existing installation ──────────────────────────────────
-  const coreSrc = join(PKG_ROOT, '_gs-gardener');
-  const coreDest = join(dest, '_gs-gardener');
-  const configPath = join(coreDest, 'core', 'config.yaml');
+  const coreSrc = join(PKG_ROOT, "_gs-gardener");
+  const coreDest = join(dest, "_gs-gardener");
+  const configPath = join(coreDest, "core", "config.yaml");
 
   const installedVersion = readInstalledVersion(coreDest);
   const isUpgrade = installedVersion && installedVersion !== VERSION;
@@ -199,14 +192,18 @@ async function runInstall(force, dryRun) {
   let freshInstall = false;
 
   if (isUpgrade) {
-    console.log(`  Upgrading ${dim(`v${installedVersion}`)} → ${green(`v${VERSION}`)}\n`);
+    console.log(
+      `  Upgrading ${dim(`v${installedVersion}`)} → ${green(`v${VERSION}`)}\n`,
+    );
   } else if (isCurrent && !force) {
     console.log(`  Already up to date ${dim(`(v${VERSION})`)}\n`);
   }
 
   // ── 1. Core Garden System ─────────────────────────────────────────
   if (isCurrent && !force) {
-    console.log(`  ${green('✓')} Core system → ${dim('_gs-gardener/ (unchanged)')}`);
+    console.log(
+      `  ${green("✓")} Core system → ${dim("_gs-gardener/ (unchanged)")}`,
+    );
   } else {
     const savedConfig = isUpgrade ? safeReadFile(configPath) : null;
 
@@ -218,44 +215,25 @@ async function runInstall(force, dryRun) {
           .replace(/^# Version: .+$/m, `# Version: ${VERSION}`)
           .replace(/^version: .+$/m, `version: "${VERSION}"`);
         writeFileSync(configPath, updated);
-        console.log(`  ${green('✓')} Core system → ${dim('_gs-gardener/ (upgraded, config preserved)')}`);
+        console.log(
+          `  ${green("✓")} Core system → ${dim("_gs-gardener/ (upgraded, config preserved)")}`,
+        );
       } else {
         freshInstall = true;
-        console.log(`  ${green('✓')} Core system → ${dim('_gs-gardener/')}`);
+        console.log(`  ${green("✓")} Core system → ${dim("_gs-gardener/")}`);
       }
     } else {
-      const label = isUpgrade ? '(would upgrade, config preserved)' : '';
-      console.log(`  ${green('✓')} Core system → ${dim(`_gs-gardener/ ${label}`)}`);
+      const label = isUpgrade ? "(would upgrade, config preserved)" : "";
+      console.log(
+        `  ${green("✓")} Core system → ${dim(`_gs-gardener/ ${label}`)}`,
+      );
     }
   }
 
-  // ── 2. Claude Code skill commands ─────────────────────────────────
-  const cmdSrc = join(PKG_ROOT, '.claude', 'commands');
-  const cmdDest = join(dest, '.claude', 'commands');
-  if (!dryRun && !existsSync(cmdDest)) mkdirSync(cmdDest, { recursive: true });
-
-  const gardenCmds = readdirSync(cmdSrc).filter(f => f.startsWith('garden-') && f.endsWith('.md'));
-  const shouldUpdateCmds = isUpgrade || force || !installedVersion;
-  let copied = 0;
-  for (const file of gardenCmds) {
-    const destFile = join(cmdDest, file);
-    if (existsSync(destFile) && !shouldUpdateCmds) continue;
-    if (!dryRun) cpSync(join(cmdSrc, file), destFile, { force: true });
-    copied++;
-  }
-  if (isCurrent && !force) {
-    console.log(`  ${green('✓')} ${gardenCmds.length} commands → ${dim('.claude/commands/ (unchanged)')}`);
-  } else {
-    console.log(`  ${green('✓')} ${copied} commands → ${dim('.claude/commands/')}`);
-  }
-
-  // ── 3. CLAUDE.md ──────────────────────────────────────────────────
-  installFile(dest, 'CLAUDE.md',
-    `# CLAUDE.md\n\nFollow all instructions in the root AGENTS.md file as the primary context for this repository.\n`,
-    force, dryRun);
-
-  // ── 4. .aiignore ──────────────────────────────────────────────────
-  installFile(dest, '.aiignore',
+  // ── 2. .aiignore ──────────────────────────────────────────────────
+  installFile(
+    dest,
+    ".aiignore",
     `# AI Agent Ignore File
 # Prevents AI tools from reading sensitive or irrelevant files
 
@@ -284,25 +262,26 @@ __pycache__/
 .vscode/launch.json
 .DS_Store
 `,
-    force, dryRun);
+    force,
+    dryRun,
+  );
 
-  // ── 5. Determine tool selections ──────────────────────────────────
+  // ── 3. Determine tool selections ──────────────────────────────────
   let selectedTools;
 
   if (requestedTools) {
     selectedTools = requestedTools;
   } else if (!process.stdin.isTTY) {
-    selectedTools = ['claude-code'];
+    selectedTools = detectTools(dest);
   } else {
     const detected = detectTools(dest);
     selectedTools = await promptToolSelection(detected);
   }
 
-  // ── 6. Install tool agent files ───────────────────────────────────
-  const toolsToInstall = selectedTools.filter(s => s !== 'claude-code');
+  // ── 4. Install tool agent files ───────────────────────────────────
   const toolResults = [];
 
-  for (const slug of toolsToInstall) {
+  for (const slug of selectedTools) {
     const tool = TOOLS[slug];
 
     // Create directories if needed
@@ -317,42 +296,85 @@ __pycache__/
 
     // Install agent file
     if (tool.agentFile) {
-      const written = installFile(dest, tool.agentFile.path, tool.agentFile.content, force, dryRun);
-      toolResults.push({ slug, label: tool.label, path: tool.agentFile.path, written });
+      const written = installFile(
+        dest,
+        tool.agentFile.path,
+        tool.agentFile.content,
+        force,
+        dryRun,
+      );
+      toolResults.push({
+        slug,
+        label: tool.label,
+        path: tool.agentFile.path,
+        written,
+      });
+    }
+
+    // Claude Code: also copy skill commands
+    if (slug === "claude-code") {
+      const cmdSrc = join(PKG_ROOT, ".claude", "commands");
+      const cmdDest = join(dest, ".claude", "commands");
+      const gardenCmds = readdirSync(cmdSrc).filter(
+        (f) => f.startsWith("garden-") && f.endsWith(".md"),
+      );
+      const shouldUpdateCmds = isUpgrade || force || !installedVersion;
+      let copied = 0;
+      for (const file of gardenCmds) {
+        const destFile = join(cmdDest, file);
+        if (existsSync(destFile) && !shouldUpdateCmds) continue;
+        if (!dryRun) cpSync(join(cmdSrc, file), destFile, { force: true });
+        copied++;
+      }
+      // Enrich the result with commands detail
+      const last = toolResults[toolResults.length - 1];
+      if (last && last.slug === "claude-code") {
+        last.detail = `CLAUDE.md + ${gardenCmds.length} commands`;
+      }
     }
   }
 
-  // ── 7. Write config.yaml ──────────────────────────────────────────
+  // ── 5. Write config.yaml ──────────────────────────────────────────
   if (!dryRun && freshInstall) {
     writeFileSync(configPath, defaultConfig(basename(dest)));
   }
 
   // ── Summary ───────────────────────────────────────────────────────
   if (dryRun) {
-    console.log(`\n${yellow(bold('Dry run complete'))} — nothing was written.\n`);
-    console.log(`Run without ${dim('--dry-run')} to install.\n`);
+    console.log(
+      `\n${yellow(bold("Dry run complete"))} — nothing was written.\n`,
+    );
+    console.log(`Run without ${dim("--dry-run")} to install.\n`);
   } else if (isUpgrade) {
-    console.log(`\n🌱 ${bold(`Upgrade complete!`)} ${dim(`(v${installedVersion} → v${VERSION})`)}\n`);
+    console.log(
+      `\n🌱 ${bold(`Upgrade complete!`)} ${dim(`(v${installedVersion} → v${VERSION})`)}\n`,
+    );
   } else {
-    console.log(`\n🌱 ${bold('Installation complete!')}\n`);
+    console.log(`\n🌱 ${bold("Installation complete!")}\n`);
   }
 
   // Tools configured
-  console.log(`${bold('Tools configured:')}`);
-  console.log(`  ${green('✅')} Claude Code     → ${dim(`.claude/commands/ (${gardenCmds.length} commands)`)}`);
+  console.log(`${bold("Tools configured:")}`);
   for (const r of toolResults) {
-    const icon = r.written ? green('✅') : yellow('⚠️');
-    const note = r.written ? '' : dim(' (already existed)');
-    console.log(`  ${icon} ${r.label.padEnd(15)} → ${dim(r.path)}${note}`);
+    const icon = r.written ? green("✅") : yellow("⚠️");
+    const note = r.written ? "" : dim(" (already existed)");
+    const display = r.detail || r.path;
+    console.log(`  ${icon} ${r.label.padEnd(15)} → ${dim(display)}${note}`);
   }
 
   // Next steps
   if (!dryRun) {
-    console.log(`\n${bold('Next steps:')}`);
-    console.log(`  1. Run ${green('/garden-bootstrap')} to set up AI-ready documentation`);
-    console.log(`     Creates AGENTS.md — the source of truth for all your AI tools`);
-    console.log(`  2. Run ${green('/garden-audit')} to verify accuracy`);
-    console.log(`  3. Run ${green('/garden-extend')} to add guardrails & principles`);
+    console.log(`\n${bold("Next steps:")}`);
+    console.log(
+      `  1. Run ${green("/garden-bootstrap")} to set up AI-ready documentation`,
+    );
+    console.log(
+      `     Creates AGENTS.md — the source of truth for all your AI tools`,
+    );
+    console.log(`  2. Run ${green("/garden-audit")} to verify accuracy`);
+    console.log(
+      `  3. Run ${green("/garden-extend")} to add guardrails & principles`,
+    );
   }
 
   // Garden metaphor
@@ -374,16 +396,6 @@ function runStatus() {
   }
   statusLine('Core system', coreInstalled, coreInstalled ? `v${coreVersion}` : null);
 
-  // Claude Code
-  const claudeMd = existsSync(join(dest, 'CLAUDE.md'));
-  const cmdDir = join(dest, '.claude', 'commands');
-  let cmdCount = 0;
-  if (existsSync(cmdDir)) {
-    cmdCount = readdirSync(cmdDir).filter(f => f.startsWith('garden-') && f.endsWith('.md')).length;
-  }
-  statusLine('Claude Code', claudeMd || cmdCount > 0,
-    (claudeMd || cmdCount > 0) ? `CLAUDE.md + ${cmdCount} commands` : null);
-
   // AGENTS.md
   const agentsExists = existsSync(join(dest, 'AGENTS.md'));
   console.log(`  ${agentsExists ? green('✓') : '○'} ${'AGENTS.md'.padEnd(18)} ${agentsExists ? green('present') : yellow('not yet created (run /garden-bootstrap)')}`);
@@ -393,12 +405,22 @@ function runStatus() {
 
   // Tool agents
   console.log(`\n  ${dim('Tool agents:')}`);
-  for (const [, tool] of Object.entries(TOOLS)) {
-    if (tool.alwaysInstall) continue;
+  for (const [slug, tool] of Object.entries(TOOLS)) {
     if (!tool.agentFile) continue;
     const exists = existsSync(join(dest, tool.agentFile.path));
-    const icon = exists ? green('✓') : dim('·');
-    const text = exists ? green(tool.agentFile.path) : dim('—');
+    let detail = tool.agentFile.path;
+    if (slug === "claude-code" && exists) {
+      const cmdDir = join(dest, ".claude", "commands");
+      let cmdCount = 0;
+      if (existsSync(cmdDir)) {
+        cmdCount = readdirSync(cmdDir).filter(
+          (f) => f.startsWith("garden-") && f.endsWith(".md"),
+        ).length;
+      }
+      detail = `CLAUDE.md + ${cmdCount} commands`;
+    }
+    const icon = exists ? green("✓") : dim("·");
+    const text = exists ? green(detail) : dim("—");
     console.log(`    ${icon} ${tool.label.padEnd(18)} ${text}`);
   }
 
@@ -468,35 +490,22 @@ function statusLine(label, installed, detail) {
   console.log(`  ${icon} ${label.padEnd(18)} ${text}`);
 }
 
-function safeReadJson(path) {
-  try {
-    return JSON.parse(readFileSync(path, 'utf8'));
-  } catch {
-    return null;
-  }
-}
-
 function parseToolsFlag(flagValue) {
   if (flagValue === undefined) return null;
 
   const slugs = flagValue.split(',').map(s => s.trim().toLowerCase());
   const invalid = slugs.filter(s => !TOOLS[s]);
   if (invalid.length) {
-    console.error(red(`Unknown tool(s): ${invalid.join(', ')}`));
-    console.error(`Valid tools: ${TOOL_SLUGS.join(', ')}`);
+    console.error(red(`Unknown tool(s): ${invalid.join(", ")}`));
+    console.error(`Valid tools: ${TOOL_SLUGS.join(", ")}`);
     process.exit(1);
   }
-  if (!slugs.includes('claude-code')) slugs.unshift('claude-code');
   return slugs;
 }
 
 function detectTools(dest) {
   const detected = [];
   for (const [slug, tool] of Object.entries(TOOLS)) {
-    if (tool.alwaysInstall) {
-      detected.push(slug);
-      continue;
-    }
     for (const probe of tool.detect) {
       if (existsSync(join(dest, probe))) {
         detected.push(slug);
@@ -508,7 +517,7 @@ function detectTools(dest) {
 }
 
 async function promptToolSelection(detected) {
-  const entries = OPTIONAL_SLUGS.map((slug, i) => ({
+  const entries = TOOL_SLUGS.map((slug, i) => ({
     num: i + 1,
     slug,
     tool: TOOLS[slug],
@@ -523,7 +532,7 @@ async function promptToolSelection(detected) {
     }
   }
 
-  console.log(`\n${bold('Install gardener agent for other AI tools?')}`);
+  console.log(`\n${bold("Install gardener agent for AI tools?")}`);
   console.log(dim('Each tool gets a gardener agent that loads from _gs-gardener/.\n'));
   printList();
   console.log(`\n${dim('Enter numbers to toggle (e.g. "1 3"), "all", "none", or press Enter to confirm:')}`);
@@ -532,7 +541,13 @@ async function promptToolSelection(detected) {
 
   try {
     while (true) {
-      const answer = await rl.question('> ');
+      let answer;
+      try {
+        answer = await rl.question("> ");
+      } catch {
+        console.log("\nAborted.");
+        process.exit(0);
+      }
       const trimmed = answer.trim().toLowerCase();
 
       if (trimmed === '') break;
@@ -555,11 +570,7 @@ async function promptToolSelection(detected) {
     rl.close();
   }
 
-  const result = ['claude-code'];
-  for (const e of entries) {
-    if (e.selected) result.push(e.slug);
-  }
-  return result;
+  return entries.filter((e) => e.selected).map((e) => e.slug);
 }
 
 function printGardenWelcome() {
@@ -578,7 +589,7 @@ function printGardenWelcome() {
 
 ${cmds}
 
-  Your garden is planted. Run ${green('/garden-help')} to begin. 🌻
+  Your garden is planted. Run ${green("/garden-help")} in your AI Agent to begin. 🌻
 `);
 }
 
