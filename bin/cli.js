@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { parseArgs } from 'node:util';
-import { cpSync, existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync, statSync, renameSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 
@@ -288,7 +288,15 @@ __pycache__/
     if (tool.dirs && !dryRun) {
       for (const d of tool.dirs) {
         const dirPath = join(dest, d);
-        if (!existsSync(dirPath)) {
+        if (existsSync(dirPath)) {
+          // If it's a file where we need a directory, back it up and replace
+          if (statSync(dirPath).isFile()) {
+            const bakPath = dirPath + '.bak';
+            renameSync(dirPath, bakPath);
+            console.log(`  ${yellow('⚠')} ${d} was a file — moved to ${d}.bak`);
+            mkdirSync(dirPath, { recursive: true });
+          }
+        } else {
           mkdirSync(dirPath, { recursive: true });
         }
       }
