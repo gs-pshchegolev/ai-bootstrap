@@ -5,6 +5,14 @@ All notable changes to the Garden System will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2026-02-16
+
+### Changed
+- **Renamed "Gardner Gary" to "🪴 Gary The Gardener"** - Consistent naming with emoji across all files
+- **Fixed syntax error** in CLI help output template literal
+
+---
+
 ## [1.1.0] - 2026-02-15
 
 ### Added
@@ -12,14 +20,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Contextual "What should I do next?" suggestions** - Option 6 in help menu analyzes repo state on-demand
 - **Bootstrap detection** - Help workflow detects missing AGENTS.md and guides users to bootstrap first
 - **`/garden-bootstrap` command** - First-time setup workflow (converted from ai-bootstrapper.md)
-- **[BS] Bootstrap menu item** - Conditional display in Gardner Gary when AGENTS.md is missing
+- **[BS] Bootstrap menu item** - Conditional display in 🪴 Gary The Gardener when AGENTS.md is missing
 - **Progressive disclosure** - Help menu offers option 7 to show all 9 commands
 
 ### Changed
 - **`/garden-garden` renamed to `/garden-maintain`** - Clearer command name (no longer self-referential)
 - **Workflow directory renamed** - `_gs-gardener/core/workflows/garden/` → `_gs-gardener/core/workflows/maintain/`
 - **Help workflow structure** - Now defers heavy I/O checks to contextual analysis (Phase 4)
-- **Gardner Gary menu** - Shows 9 options when AGENTS.md missing, 8 when it exists
+- **🪴 Gary The Gardener menu** - Shows 9 options when AGENTS.md missing, 8 when it exists
 - **Bootstrap integration** - ai-bootstrapper.md converted to standard garden workflow
 
 ### Fixed
@@ -38,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial release of Garden System
-- Gardner Gary 🪴 - Interactive Repository Garden Keeper subagent
+- 🪴 Gary The Gardener 🪴 - Interactive Repository Garden Keeper subagent
 - 9 maintenance skills:
   - `/garden-sync` - Sync wrappers with AGENTS.md
   - `/garden-audit` - Audit for drift between docs and code

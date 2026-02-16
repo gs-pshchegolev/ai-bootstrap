@@ -1,19 +1,19 @@
 # Garden System
 
-> Maintain AI agent configurations across repositories with Gardner Gary 🪴
+> Maintain AI agent configurations across repositories with 🪴 Gary The Gardener 🪴
 
 ## What is it?
 
 The Garden System provides AI agent maintenance for repositories using AGENTS.md configuration:
 
-- **Gardner Gary** 🪴 - Interactive Repository Garden Keeper subagent (v1.1.0)
+- **🪴 Gary The Gardener** 🪴 - Interactive Repository Garden Keeper subagent (v1.1.0)
 - **10 maintenance skills** - Individual operations for keeping AI configs healthy
 
 The system follows a "gardening" philosophy: documentation needs regular care, pruning, and attention to stay healthy.
 
 ## Components
 
-### Gardner Gary (Interactive Subagent)
+### 🪴 Gary The Gardener (Interactive Subagent)
 
 Your friendly Repository Garden Keeper with a menu-driven interface for all maintenance tasks.
 

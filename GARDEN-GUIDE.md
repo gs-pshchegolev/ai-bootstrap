@@ -37,7 +37,7 @@ Gary will:
 ```
 User: /garden-agent-gardener
 
-Gary: 🪴 Hello! I'm Gardner Gary (v1.2.0)...
+Gary: 🪴 Hello! I'm 🪴 Gary The Gardener (v1.2.0)...
       [Shows health status]
       [Shows maintenance menu]
 
@@ -225,7 +225,7 @@ your-repo/
 │   ├── core/
 │   │   ├── config.yaml                    # Configuration
 │   │   ├── agents/
-│   │   │   └── gardener.md                # Gardner Gary definition
+│   │   │   └── gardener.md                # 🪴 Gary The Gardener definition
 │   │   └── workflows/
 │   │       ├── add-tool/workflow.md
 │   │       ├── audit/workflow.md
@@ -377,7 +377,7 @@ cat _gs-gardener/VERSION
 ## Support
 
 - **Issues:** Report at [ai-bootstrap repository](https://github.com/your-org/ai-bootstrap/issues)
-- **Questions:** Ask Gardner Gary! `claude /garden-agent-gardener`
+- **Questions:** Ask 🪴 Gary The Gardener! `claude /garden-agent-gardener`
 - **Updates:** Watch ai-bootstrap repository for new releases
 
 ---

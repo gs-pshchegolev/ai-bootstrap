@@ -240,7 +240,7 @@ Do NOT create files with fabricated content. Stubs with clear "how to populate" 
 
 ### 2.5 Garden System (Maintenance System)
 
-Copy the garden system to enable ongoing maintenance via Gardner Gary 🪴:
+Copy the garden system to enable ongoing maintenance via 🪴 Gary The Gardener 🪴:
 
 **Option A: Direct Copy (Recommended)**
 ```bash
@@ -264,7 +264,7 @@ cp _ai-bootstrap/.claude/commands/garden-*.md .claude/commands/
 ```
 
 This enables:
-- `/garden-agent-gardener` - Interactive maintenance menu with Gardner Gary
+- `/garden-agent-gardener` - Interactive maintenance menu with 🪴 Gary The Gardener
 - Individual skills: `/garden-sync`, `/garden-audit`, `/garden-extend`, `/garden-references`, `/garden-add-tool`, `/garden-scaffold`, `/garden-maintain`, `/garden-compact`
 
 See GARDEN-SYSTEM.md in the ai-bootstrap repository for full deployment and usage guide.

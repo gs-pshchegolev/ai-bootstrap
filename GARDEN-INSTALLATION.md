@@ -204,7 +204,7 @@ claude /gardener
 ### Expected Output
 
 ```
-🪴 Hello! I'm Gardner Gary (v1.1.0), your Repository Garden Keeper.
+🪴 Hello! I'm 🪴 Gary The Gardener (v1.1.0), your Repository Garden Keeper.
 
 ## 🌱 Garden Health Status
 
@@ -221,7 +221,7 @@ claude /gardener
 ...
 ```
 
-If you see Gardner Gary's menu, installation was successful! 🎉
+If you see 🪴 Gary The Gardener's menu, installation was successful! 🎉
 
 ## Configuration
 

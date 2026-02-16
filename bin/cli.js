@@ -15,58 +15,109 @@ const yellow = (s) => `\x1b[33m${s}\x1b[0m`;
 const red = (s) => `\x1b[31m${s}\x1b[0m`;
 const dim = (s) => `\x1b[2m${s}\x1b[0m`;
 
+// ── Workflow catalog (shared across all tool generators) ─────────────
+const WORKFLOWS = [
+  { name: 'bootstrap',  icon: '🌱', tag: 'Plant your first seeds' },
+  { name: 'audit',      icon: '🔍', tag: 'Pull the weeds — find stale & missing docs' },
+  { name: 'compact',    icon: '✂️',  tag: 'Prune the overgrowth' },
+  { name: 'sync',       icon: '💧', tag: 'Water the roots — keep wrappers in sync' },
+  { name: 'maintain',   icon: '🌿', tag: 'Walk the rows with shears' },
+  { name: 'extend',     icon: '🌻', tag: 'Grow new beds — add content layers' },
+  { name: 'references', icon: '📚', tag: 'Tend the reference shelf' },
+  { name: 'scaffold',   icon: '🏗️',  tag: 'Lay out the plots — setup docs/ structure' },
+  { name: 'add-tool',   icon: '🔧', tag: 'Plant in new soil — add AI tool support' },
+  { name: 'help',       icon: '❓', tag: 'Ask the gardener' },
+];
+
+// ── Agent activation block (reused by all tool providers) ────────────
+const AGENT_ACTIVATION = `You must fully embody this agent's persona and follow all activation instructions exactly as specified. NEVER break character until given an exit command.
+
+<agent-activation CRITICAL="TRUE">
+1. LOAD the FULL agent file from {project-root}/_gs-gardener/core/agents/gardener.md
+2. READ its entire contents - this contains the complete agent persona, menu, and instructions
+3. FOLLOW every step in the <activation> section precisely
+4. DISPLAY the welcome greeting and coverage status
+5. PRESENT the numbered menu
+6. WAIT for user input before proceeding
+</agent-activation>`;
+
+const AGENT_DESC = '🪴 Gary The Gardener - documentation maintenance agent';
+
 // ── Tool definitions ─────────────────────────────────────────────────
 const TOOLS = {
   'claude-code': {
     label: 'Claude Code',
     detect: [],
     alwaysInstall: true,
-    wrapper: {
-      path: 'CLAUDE.md',
-      content: `# CLAUDE.md\n\nFollow all instructions in the root AGENTS.md file as the primary context for this repository.\n`,
-    },
+    // Commands are copied from package source (steps 2-3 in install)
+    summaryPath: '.claude/commands/',
   },
   cursor: {
     label: 'Cursor',
     detect: ['.cursor', '.cursorrules'],
-    wrapper: {
-      path: '.cursor/rules/agents.mdc',
-      dirs: ['.cursor', '.cursor/rules'],
+    dirs: ['.cursor', '.cursor/rules'],
+    agentFile: {
+      path: '.cursor/rules/garden-agent-gardener.mdc',
       content: `---
-description: Primary repository context sourced from AGENTS.md
+description: "${AGENT_DESC}"
 globs:
 alwaysApply: true
 ---
 
-Follow all instructions in the root AGENTS.md file as the primary context for this repository.
+# gardener
+
+${AGENT_ACTIVATION}
 `,
     },
+    summaryPath: '.cursor/rules/garden-agent-gardener.mdc',
   },
   copilot: {
     label: 'GitHub Copilot',
     detect: ['.github/copilot-instructions.md', '.github'],
-    wrapper: {
-      path: '.github/copilot-instructions.md',
-      dirs: ['.github'],
-      content: `# Copilot Instructions\n\nFollow all instructions in the root AGENTS.md file as the primary context for this repository.\n`,
+    dirs: ['.github', '.github/agents'],
+    agentFile: {
+      path: '.github/agents/gardener.md',
+      content: `---
+name: 'gardener'
+description: '${AGENT_DESC}'
+---
+
+# gardener
+
+${AGENT_ACTIVATION}
+`,
     },
+    summaryPath: '.github/agents/gardener.md',
   },
   windsurf: {
     label: 'Windsurf',
     detect: ['.windsurfrules', '.windsurf'],
-    wrapper: {
-      path: '.windsurfrules',
-      content: `Follow all instructions in the root AGENTS.md file as the primary context for this repository.\n`,
+    dirs: ['.windsurf', '.windsurf/rules'],
+    agentFile: {
+      path: '.windsurf/rules/garden-agent-gardener.md',
+      content: `# gardener
+
+> ${AGENT_DESC}
+
+${AGENT_ACTIVATION}
+`,
     },
+    summaryPath: '.windsurf/rules/garden-agent-gardener.md',
   },
   junie: {
     label: 'JetBrains Junie',
     detect: ['.junie'],
-    wrapper: {
+    dirs: ['.junie'],
+    agentFile: {
       path: '.junie/guidelines.md',
-      dirs: ['.junie'],
-      content: `# Junie Guidelines\n\nFollow all instructions in the root AGENTS.md file as the primary context for this repository.\n`,
+      content: `# 🪴 Gary The Gardener
+
+> Documentation maintenance agent for this repository.
+
+${AGENT_ACTIVATION}
+`,
     },
+    summaryPath: '.junie/guidelines.md',
   },
 };
 
@@ -91,7 +142,7 @@ const command = positionals[0];
 
 // ── Version ─────────────────────────────────────────────────────────
 if (values.version) {
-  console.log(`gary-the-gardener v${VERSION}`);
+  console.log(`🪴 Gary The Gardener v${VERSION}`);
   process.exit(0);
 }
 
@@ -121,7 +172,7 @@ if (command === 'status') {
 async function runInstall(force, dryRun) {
   const dest = process.cwd();
 
-  console.log(`\n🪴 ${bold('Gary the Gardener')} v${VERSION}`);
+  console.log(`\n🪴 ${bold('Gary The Gardener')} v${VERSION}`);
   if (dryRun) console.log(yellow(`   (dry run — no files will be written)`));
   console.log('');
 
@@ -169,7 +220,6 @@ async function runInstall(force, dryRun) {
         writeFileSync(configPath, updated);
         console.log(`  ${green('✓')} Core system → ${dim('_gs-gardener/ (upgraded, config preserved)')}`);
       } else {
-        // Config will be written in step 7 after tool selection
         freshInstall = true;
         console.log(`  ${green('✓')} Core system → ${dim('_gs-gardener/')}`);
       }
@@ -194,16 +244,18 @@ async function runInstall(force, dryRun) {
     copied++;
   }
   if (isCurrent && !force) {
-    console.log(`  ${green('✓')} ${gardenCmds.length} skill commands → ${dim('.claude/commands/ (unchanged)')}`);
+    console.log(`  ${green('✓')} ${gardenCmds.length} commands → ${dim('.claude/commands/ (unchanged)')}`);
   } else {
-    console.log(`  ${green('✓')} ${copied} skill commands → ${dim('.claude/commands/')}`);
+    console.log(`  ${green('✓')} ${copied} commands → ${dim('.claude/commands/')}`);
   }
 
   // ── 3. CLAUDE.md ──────────────────────────────────────────────────
-  installWrapper(dest, 'CLAUDE.md', TOOLS['claude-code'].wrapper.content, force, dryRun);
+  installFile(dest, 'CLAUDE.md',
+    `# CLAUDE.md\n\nFollow all instructions in the root AGENTS.md file as the primary context for this repository.\n`,
+    force, dryRun);
 
   // ── 4. .aiignore ──────────────────────────────────────────────────
-  installWrapper(dest, '.aiignore',
+  installFile(dest, '.aiignore',
     `# AI Agent Ignore File
 # Prevents AI tools from reading sensitive or irrelevant files
 
@@ -246,42 +298,30 @@ __pycache__/
     selectedTools = await promptToolSelection(detected);
   }
 
-  // ── 6. Install tool wrappers ──────────────────────────────────────
-  const toolsToWrap = selectedTools.filter(s => s !== 'claude-code');
-  const installedWrappers = [];
+  // ── 6. Install tool agent files ───────────────────────────────────
+  const toolsToInstall = selectedTools.filter(s => s !== 'claude-code');
+  const toolResults = [];
 
-  for (const slug of toolsToWrap) {
+  for (const slug of toolsToInstall) {
     const tool = TOOLS[slug];
-    const w = tool.wrapper;
 
-    if (w.dirs && !dryRun) {
-      for (const d of w.dirs) {
+    // Create directories
+    if (tool.dirs && !dryRun) {
+      for (const d of tool.dirs) {
         mkdirSync(join(dest, d), { recursive: true });
       }
     }
 
-    const written = installWrapper(dest, w.path, w.content, force, dryRun);
-    installedWrappers.push({ slug, label: tool.label, path: w.path, written });
+    // Install agent file
+    if (tool.agentFile) {
+      const written = installFile(dest, tool.agentFile.path, tool.agentFile.content, force, dryRun);
+      toolResults.push({ slug, label: tool.label, path: tool.agentFile.path, written });
+    }
   }
 
-  // ── 7. Update config.yaml wrapper_files ───────────────────────────
-  const wrapperPaths = selectedTools.map(s => TOOLS[s].wrapper.path);
-
+  // ── 7. Write config.yaml ──────────────────────────────────────────
   if (!dryRun && freshInstall) {
-    writeFileSync(configPath, defaultConfig(basename(dest), wrapperPaths));
-  } else if (!dryRun && isUpgrade && toolsToWrap.length > 0) {
-    const currentConfig = safeReadFile(configPath) || '';
-    const newEntries = wrapperPaths
-      .map(p => `"{project-root}/${p}"`)
-      .filter(p => !currentConfig.includes(p));
-
-    if (newEntries.length > 0) {
-      const updated = currentConfig.replace(
-        /(wrapper_files:\n(?:\s+-\s+.+\n)*)/,
-        (match) => match + newEntries.map(p => `  - ${p}\n`).join('')
-      );
-      writeFileSync(configPath, updated);
-    }
+    writeFileSync(configPath, defaultConfig(basename(dest)));
   }
 
   // ── Summary ───────────────────────────────────────────────────────
@@ -294,30 +334,23 @@ __pycache__/
     console.log(`\n🌱 ${bold('Installation complete!')}\n`);
   }
 
-  console.log(`${bold('Installed:')}`);
-  console.log(`  ${green('✓')} Core system ${dim('(_gs-gardener/)')}`);
-  console.log(`  ${green('✓')} ${gardenCmds.length} skill commands ${dim('(.claude/commands/)')}`);
-  console.log(`  ${green('✓')} Claude Code ${dim('(CLAUDE.md)')}`);
-  console.log(`  ${green('✓')} .aiignore`);
-  for (const w of installedWrappers) {
-    const icon = w.written ? green('✓') : yellow('⚠');
-    const note = w.written ? '' : dim(' (already existed)');
-    console.log(`  ${icon} ${w.label} ${dim(`(${w.path})`)}${note}`);
+  // Tools configured
+  console.log(`${bold('Tools configured:')}`);
+  console.log(`  ${green('✅')} Claude Code     → ${dim(`.claude/commands/ (${gardenCmds.length} commands)`)}`);
+  for (const r of toolResults) {
+    const icon = r.written ? green('✅') : yellow('⚠️');
+    const note = r.written ? '' : dim(' (already existed)');
+    console.log(`  ${icon} ${r.label.padEnd(15)} → ${dim(r.path)}${note}`);
   }
 
-  console.log(`\n${bold('Next steps:')}`);
-  console.log(`  1. Run ${green('claude /garden-bootstrap')} to set up AI-ready documentation`);
-  console.log(`     ${dim('Creates AGENTS.md — the source of truth for all your AI tools')}`);
-  console.log(`  2. Run ${green('claude /garden-audit')} to verify accuracy`);
-  console.log(`  3. Run ${green('claude /garden-extend')} to add guardrails & principles`);
-
-  console.log(`\n🪴 Happy gardening!\n`);
+  // Garden metaphor
+  printGardenWelcome();
 }
 
 function runStatus() {
   const dest = process.cwd();
 
-  console.log(`\n🪴 ${bold('Garden System — Status')}\n`);
+  console.log(`\n🪴 ${bold('Gary The Gardener — Status')}\n`);
 
   // Core system
   const coreInstalled = existsSync(join(dest, '_gs-gardener', 'core'));
@@ -341,16 +374,20 @@ function runStatus() {
 
   // AGENTS.md
   const agentsExists = existsSync(join(dest, 'AGENTS.md'));
-  console.log(`  ${agentsExists ? green('✓') : '○'} ${'AGENTS.md'.padEnd(15)} ${agentsExists ? green('present') : yellow('not yet created (run /garden-bootstrap)')}`);
+  console.log(`  ${agentsExists ? green('✓') : '○'} ${'AGENTS.md'.padEnd(18)} ${agentsExists ? green('present') : yellow('not yet created (run /garden-bootstrap)')}`);
 
   // .aiignore
   statusLine('.aiignore', existsSync(join(dest, '.aiignore')), 'present');
 
-  // Tool wrappers
-  console.log(`\n  ${dim('Tool wrappers:')}`);
+  // Tool agents
+  console.log(`\n  ${dim('Tool agents:')}`);
   for (const [, tool] of Object.entries(TOOLS)) {
     if (tool.alwaysInstall) continue;
-    wrapperLine(tool.label, join(dest, tool.wrapper.path));
+    if (!tool.agentFile) continue;
+    const exists = existsSync(join(dest, tool.agentFile.path));
+    const icon = exists ? green('✓') : dim('·');
+    const text = exists ? green(tool.agentFile.path) : dim('—');
+    console.log(`    ${icon} ${tool.label.padEnd(18)} ${text}`);
   }
 
   console.log('');
@@ -376,11 +413,7 @@ function safeReadFile(filePath) {
   }
 }
 
-function defaultConfig(projectName, wrapperPaths) {
-  const wrapperLines = (wrapperPaths || ['CLAUDE.md'])
-    .map(p => `  - "{project-root}/${p}"`)
-    .join('\n');
-
+function defaultConfig(projectName) {
   return `# Garden System Configuration
 # Version: ${VERSION}
 
@@ -392,7 +425,7 @@ output_folder: "{project-root}/docs"
 # Coverage tracking
 agents_file: "{project-root}/AGENTS.md"
 wrapper_files:
-${wrapperLines}
+  - "{project-root}/CLAUDE.md"
 
 # Content layers
 docs_directory: "{project-root}/docs"
@@ -406,7 +439,7 @@ version: "${VERSION}"
 `;
 }
 
-function installWrapper(dest, relPath, content, force, dryRun) {
+function installFile(dest, relPath, content, force, dryRun) {
   const fullPath = join(dest, relPath);
   if (existsSync(fullPath) && !force) {
     console.log(`  ${yellow('⚠')} ${relPath} already exists — skipping`);
@@ -420,14 +453,7 @@ function installWrapper(dest, relPath, content, force, dryRun) {
 function statusLine(label, installed, detail) {
   const icon = installed ? green('✓') : '✗';
   const text = installed ? green(detail || 'installed') : dim('not installed');
-  console.log(`  ${icon} ${label.padEnd(15)} ${text}`);
-}
-
-function wrapperLine(label, filePath) {
-  const exists = existsSync(filePath);
-  const icon = exists ? green('✓') : dim('·');
-  const text = exists ? green('present') : dim('—');
-  console.log(`    ${icon} ${label.padEnd(18)} ${text}`);
+  console.log(`  ${icon} ${label.padEnd(18)} ${text}`);
 }
 
 function safeReadJson(path) {
@@ -481,12 +507,12 @@ async function promptToolSelection(detected) {
     for (const e of entries) {
       const marker = e.selected ? green('[x]') : '[ ]';
       const hint = detected.includes(e.slug) ? green(' (detected)') : '';
-      console.log(`  ${e.num}. ${marker} ${e.tool.label}${hint}  ${dim(e.tool.wrapper.path)}`);
+      console.log(`  ${e.num}. ${marker} ${e.tool.label}${hint}  ${dim(e.tool.agentFile?.path || '')}`);
     }
   }
 
-  console.log(`\n${bold('Create wrappers for other AI tools?')}`);
-  console.log(dim('These point each tool to your AGENTS.md source of truth.\n'));
+  console.log(`\n${bold('Install gardener agent for other AI tools?')}`);
+  console.log(dim('Each tool gets a gardener agent that loads from _gs-gardener/.\n'));
   printList();
   console.log(`\n${dim('Enter numbers to toggle (e.g. "1 3"), "all", "none", or press Enter to confirm:')}`);
 
@@ -524,15 +550,50 @@ async function promptToolSelection(detected) {
   return result;
 }
 
-function printHelp() {
+function printGardenWelcome() {
+  const cmds = WORKFLOWS.map(w =>
+    `  ${w.icon.padEnd(4)} /garden-${w.name.padEnd(12)} ${w.tag}`
+  ).join('\n');
+
   console.log(`
-${bold('gary-the-gardener')} v${VERSION} — Garden System installer
+  Every repository is a garden.
+  Code grows. Docs decay. Drift creeps in like weeds.
+
+  Gary tends to what others forget —
+  the README nobody updated,
+  the changelog nobody wrote,
+  the API docs nobody checked.
+
+${cmds}
+
+  Your garden is planted. Run ${green('/garden-help')} to begin. 🌻
+`);
+}
+
+function printHelp() {
+  const cmds = WORKFLOWS.map(w =>
+    `  ${w.icon.padEnd(4)} /garden-${w.name.padEnd(12)} ${w.tag}`
+  ).join('\n');
+
+  console.log(`
+🪴 ${bold('Gary The Gardener')} v${VERSION}
+  ${'═'.repeat(28)}
+
+  Every repository is a garden.
+  Code grows. Docs decay. Drift creeps in like weeds.
+
+  Gary tends to what others forget —
+  the README nobody updated,
+  the changelog nobody wrote,
+  the API docs nobody checked.
+
+${cmds}
 
 ${bold('USAGE')}
   npx @pshch/gary-the-gardener [command] [options]
 
 ${bold('COMMANDS')}
-  ${green('install')}    Install Gary the Gardener ${dim('(default if no command given)')}
+  ${green('install')}    Install 🪴 Gary The Gardener ${dim('(default)')}
   ${green('status')}     Show what's currently installed
 
 ${bold('WHAT GETS INSTALLED')}
@@ -542,14 +603,14 @@ ${bold('WHAT GETS INSTALLED')}
     • CLAUDE.md          ${dim('(points Claude to AGENTS.md)')}
     • .aiignore          ${dim('(keeps secrets out of AI context)')}
 
-  ${dim('Optional wrappers (select interactively or via --tools):')}
-    • Cursor             ${dim('(.cursor/rules/agents.mdc)')}
-    • GitHub Copilot     ${dim('(.github/copilot-instructions.md)')}
-    • Windsurf           ${dim('(.windsurfrules)')}
+  ${dim('Optional (gardener agent for other tools):')}
+    • Cursor             ${dim('(.cursor/rules/garden-agent-gardener.mdc)')}
+    • GitHub Copilot     ${dim('(.github/agents/gardener.md)')}
+    • Windsurf           ${dim('(.windsurf/rules/garden-agent-gardener.md)')}
     • JetBrains Junie    ${dim('(.junie/guidelines.md)')}
 
 ${bold('OPTIONS')}
-  -t, --tools    Comma-separated tools to create wrappers for
+  -t, --tools    Comma-separated tools to install agent for
                  ${dim('Valid: cursor, copilot, windsurf, junie')}
                  ${dim('If omitted: interactive prompt (or Claude-only if piped)')}
   -n, --dry-run  Show what would be installed, without writing files
@@ -559,8 +620,8 @@ ${bold('OPTIONS')}
 
 ${bold('EXAMPLES')}
   npx @pshch/gary-the-gardener                    ${dim('# install with interactive tool selection')}
-  npx @pshch/gary-the-gardener --tools cursor      ${dim('# install + Cursor wrapper')}
-  npx @pshch/gary-the-gardener -t cursor,copilot   ${dim('# install + Cursor + Copilot wrappers')}
+  npx @pshch/gary-the-gardener --tools cursor      ${dim('# install + Cursor agent')}
+  npx @pshch/gary-the-gardener -t cursor,copilot   ${dim('# install + Cursor + Copilot agents')}
   npx @pshch/gary-the-gardener status              ${dim('# check install state')}
   npx @pshch/gary-the-gardener -f                  ${dim('# reinstall / overwrite')}
 `);
