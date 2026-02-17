@@ -7,26 +7,42 @@ Gary The Gardener is an npm-distributed CLI tool that installs and maintains AI 
 1. **As a CLI installer** — `npx @pshch/gary-the-gardener` copies the garden system into target repos
 2. **As a runtime agent system** — the installed garden system provides maintenance workflows via AI tool commands
 
+## Self-Hosting (Dogfooding)
+
+This repository is self-hosted: Gary The Gardener maintains its own source code. Like a compiler written in the language it compiles, or a text editor used to develop itself, the garden system is installed into the very repo that defines it.
+
+Concretely this means:
+- The `AGENTS.md`, `CLAUDE.md`, and other wrapper files in this repo are maintained **by** the garden workflows they ship
+- Running `/garden-audit` here audits the gardener's own documentation against its own code
+- Running `/garden-sync` here syncs the gardener's own wrapper files
+- Any bug in a workflow surfaces immediately because the workflow runs on itself
+
+This creates a tight feedback loop: if a workflow produces bad output, the developers experience it firsthand before any user does. It also serves as a living integration test — if the garden system can keep its own repo healthy, it can keep yours healthy too.
+
 ## Entry Point
 
-`bin/cli.js` is the sole entry point. It uses Node.js built-ins only (no dependencies).
+`bin/cli.js` is the sole entry point. Uses `@inquirer/prompts` for interactive UI (select menu, checkbox).
 
 ### Commands
 
 | Command | Purpose |
 |---------|---------|
-| `install` (default) | Copy garden system, install tool agents, create `.aiignore` |
+| _(none)_ | Interactive menu — pick install, update, status, or doctor |
+| `install` | First-time setup — copy garden system, install tool agents, create `.aiignore` |
+| `update` | Upgrade existing installation to latest version |
 | `status` | Report installed components |
+| `doctor` | Verify installation health (version, required files, workflows) |
 
-### Install Flow
+### Install / Update Flow
 
-1. Detect existing installation and version
-2. Copy `_gs-gardener/` to target (preserving config on upgrade)
-3. Create `.aiignore` if missing
-4. Detect or prompt for AI tool selection
-5. Install tool-specific agent files
-6. For Claude Code: also copy skill command files (`.claude/commands/garden-*.md`)
-7. Write `config.yaml` for fresh installs
+1. Guard: `install` rejects if already installed (suggests `update`); `update` rejects if not installed (suggests `install`)
+2. Detect existing installation and version
+3. Copy `_gs-gardener/` to target (preserving config on upgrade)
+4. Create `.aiignore` if missing
+5. Detect or prompt for AI tool selection (inquirer checkbox)
+6. Install tool-specific agent files
+7. For Claude Code: also copy skill command files (`.claude/commands/garden-*.md`)
+8. Write `config.yaml` for fresh installs
 
 ## Garden System (`_gs-gardener/`)
 

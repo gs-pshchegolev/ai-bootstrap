@@ -3,12 +3,12 @@
 import { parseArgs } from 'node:util';
 import { cpSync, existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync, statSync, renameSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
-import { createInterface } from 'node:readline/promises';
+import { checkbox, select } from '@inquirer/prompts';
 
 const PKG_ROOT = resolve(import.meta.dirname, '..');
 const VERSION = readFileSync(join(PKG_ROOT, '_gs-gardener', 'VERSION'), 'utf8').trim();
 
-// ── Colors (no dependencies) ────────────────────────────────────────
+// ── Colors ───────────────────────────────────────────────────────────
 const bold = (s) => `\x1b[1m${s}\x1b[0m`;
 const green = (s) => `\x1b[32m${s}\x1b[0m`;
 const yellow = (s) => `\x1b[33m${s}\x1b[0m`;
@@ -47,6 +47,7 @@ const AGENT_DESC = '🪴 Gary The Gardener - documentation maintenance agent';
 const TOOLS = {
   "claude-code": {
     label: "Claude Code",
+    required: true,
     detect: [".claude"],
     dirs: [".claude", ".claude/commands"],
     agentFile: {
@@ -141,6 +142,7 @@ const { values, positionals } = parseArgs({
 });
 
 const command = positionals[0];
+const dryRun = values['dry-run'];
 
 // ── Version ─────────────────────────────────────────────────────────
 if (values.version) {
@@ -155,23 +157,107 @@ if (values.help) {
 }
 
 // ── Route commands ──────────────────────────────────────────────────
-const dryRun = values['dry-run'];
+const COMMANDS = {
+  install: () => runInstall(values.force, dryRun),
+  update:  () => runUpdate(values.force, dryRun),
+  status:  () => runStatus(),
+  doctor:  () => runDoctor(),
+};
 
-if (command === 'status') {
-  runStatus();
-} else if (command === 'install' || !command) {
-  await runInstall(values.force, dryRun);
-} else {
+if (command && COMMANDS[command]) {
+  await COMMANDS[command]();
+} else if (command) {
   console.error(red(`Unknown command: ${command}`));
   console.error('Run "npx @pshch/gary-the-gardener --help" for usage.');
   process.exit(1);
+} else {
+  await runInteractiveMenu();
 }
 
 // ═══════════════════════════════════════════════════════════════════
 // ── Core functions ────────────────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════════
 
+async function runInteractiveMenu() {
+  const dest = process.cwd();
+  const installedVersion = readInstalledVersion(join(dest, '_gs-gardener'));
+  const isInstalled = !!installedVersion;
+
+  // Non-TTY fallback: auto-detect action
+  if (!process.stdin.isTTY) {
+    if (isInstalled) {
+      await runUpdate(false, dryRun);
+    } else {
+      await runInstall(false, dryRun);
+    }
+    return;
+  }
+
+  console.log(`\n🪴 ${bold('Gary The Gardener')} v${VERSION}\n`);
+
+  const choices = [
+    {
+      name: `Install  ${dim('— fresh garden setup')}`,
+      value: 'install',
+      disabled: isInstalled ? `already installed v${installedVersion} — use Update` : false,
+    },
+    {
+      name: `Update   ${dim('— upgrade existing installation')}`,
+      value: 'update',
+      disabled: !isInstalled ? 'not yet installed — use Install' : false,
+    },
+    {
+      name: `Status   ${dim('— check what\'s installed')}`,
+      value: 'status',
+    },
+    {
+      name: `Doctor   ${dim('— verify installation health')}`,
+      value: 'doctor',
+      disabled: !isInstalled ? 'not yet installed' : false,
+    },
+  ];
+
+  const action = await select({
+    message: 'What would you like to do?',
+    choices,
+    default: isInstalled ? 'update' : 'install',
+  });
+
+  switch (action) {
+    case 'install': await runInstall(values.force, dryRun); break;
+    case 'update':  await runUpdate(values.force, dryRun); break;
+    case 'status':  runStatus(); break;
+    case 'doctor':  runDoctor(); break;
+  }
+}
+
 async function runInstall(force, dryRun) {
+  const dest = process.cwd();
+  const installedVersion = readInstalledVersion(join(dest, '_gs-gardener'));
+
+  if (installedVersion && !force) {
+    console.log(`\n  Garden system already installed ${dim(`(v${installedVersion})`)}.`);
+    console.log(`  Use ${green('update')} to upgrade, or ${dim('--force')} to reinstall.\n`);
+    process.exit(0);
+  }
+
+  await runSetup('install', force, dryRun);
+}
+
+async function runUpdate(force, dryRun) {
+  const dest = process.cwd();
+  const installedVersion = readInstalledVersion(join(dest, '_gs-gardener'));
+
+  if (!installedVersion) {
+    console.log(`\n  Garden system not found in this directory.`);
+    console.log(`  Use ${green('install')} for first-time setup.\n`);
+    process.exit(0);
+  }
+
+  await runSetup('update', force, dryRun);
+}
+
+async function runSetup(mode, force, dryRun) {
   const dest = process.cwd();
 
   console.log(`\n🪴 ${bold("Gary The Gardener")} v${VERSION}`);
@@ -267,6 +353,10 @@ __pycache__/
   );
 
   // ── 3. Determine tool selections ──────────────────────────────────
+  const requiredTools = Object.entries(TOOLS)
+    .filter(([, t]) => t.required)
+    .map(([slug]) => slug);
+
   let selectedTools;
 
   if (requestedTools) {
@@ -276,6 +366,11 @@ __pycache__/
   } else {
     const detected = detectTools(dest);
     selectedTools = await promptToolSelection(detected);
+  }
+
+  // Always include required tools
+  for (const slug of requiredTools) {
+    if (!selectedTools.includes(slug)) selectedTools.unshift(slug);
   }
 
   // ── 4. Install tool agent files ───────────────────────────────────
@@ -352,11 +447,13 @@ __pycache__/
     console.log(
       `\n${yellow(bold("Dry run complete"))} — nothing was written.\n`,
     );
-    console.log(`Run without ${dim("--dry-run")} to install.\n`);
-  } else if (isUpgrade) {
+    console.log(`Run without ${dim("--dry-run")} to ${mode}.\n`);
+  } else if (mode === 'update' && isUpgrade) {
     console.log(
-      `\n🌱 ${bold(`Upgrade complete!`)} ${dim(`(v${installedVersion} → v${VERSION})`)}\n`,
+      `\n🌱 ${bold(`Update complete!`)} ${dim(`(v${installedVersion} → v${VERSION})`)}\n`,
     );
+  } else if (mode === 'update') {
+    console.log(`\n🌱 ${bold("Already up to date!")}\n`);
   } else {
     console.log(`\n🌱 ${bold("Installation complete!")}\n`);
   }
@@ -371,7 +468,7 @@ __pycache__/
   }
 
   // Next steps
-  if (!dryRun) {
+  if (!dryRun && mode === 'install') {
     console.log(`\n${bold("Next steps:")}`);
     console.log(
       `  1. Run ${green("/garden-bootstrap")} to set up AI-ready documentation`,
@@ -433,6 +530,85 @@ function runStatus() {
   }
 
   console.log('');
+}
+
+function runDoctor() {
+  const dest = process.cwd();
+  let issues = 0;
+
+  console.log(`\n🪴 ${bold('Gary The Gardener — Doctor')}\n`);
+
+  // 1. Check core system exists
+  const coreDest = join(dest, '_gs-gardener');
+  const coreExists = existsSync(join(coreDest, 'core'));
+  if (!coreExists) {
+    console.log(`  ${red('✗')} Core system not found`);
+    console.log(`\n  Run ${green('npx @pshch/gary-the-gardener install')} to set up.\n`);
+    return;
+  }
+  console.log(`  ${green('✓')} Core system present`);
+
+  // 2. Check version consistency
+  const installedVersion = readInstalledVersion(coreDest);
+  if (installedVersion !== VERSION) {
+    console.log(`  ${yellow('!')} Version mismatch: installed ${dim(`v${installedVersion}`)}, latest ${green(`v${VERSION}`)}`);
+    issues++;
+  } else {
+    console.log(`  ${green('✓')} Version up to date ${dim(`(v${VERSION})`)}`);
+  }
+
+  // 3. Check config.yaml exists
+  const configPath = join(coreDest, 'core', 'config.yaml');
+  if (!existsSync(configPath)) {
+    console.log(`  ${red('✗')} config.yaml missing`);
+    issues++;
+  } else {
+    console.log(`  ${green('✓')} config.yaml present`);
+  }
+
+  // 4. Check AGENTS.md
+  if (!existsSync(join(dest, 'AGENTS.md'))) {
+    console.log(`  ${yellow('!')} AGENTS.md not found — run ${green('/garden-bootstrap')} to create it`);
+    issues++;
+  } else {
+    console.log(`  ${green('✓')} AGENTS.md present`);
+  }
+
+  // 5. Check .aiignore
+  if (!existsSync(join(dest, '.aiignore'))) {
+    console.log(`  ${yellow('!')} .aiignore missing`);
+    issues++;
+  } else {
+    console.log(`  ${green('✓')} .aiignore present`);
+  }
+
+  // 6. Check tool agent files
+  for (const [, tool] of Object.entries(TOOLS)) {
+    if (!tool.agentFile) continue;
+    const exists = existsSync(join(dest, tool.agentFile.path));
+    if (exists) {
+      console.log(`  ${green('✓')} ${tool.label} agent`);
+    }
+  }
+
+  // 7. Check workflow files
+  const workflowDir = join(coreDest, 'core', 'workflows');
+  if (existsSync(workflowDir)) {
+    const workflows = readdirSync(workflowDir).filter(
+      (f) => statSync(join(workflowDir, f)).isDirectory(),
+    );
+    console.log(`  ${green('✓')} ${workflows.length} workflows available`);
+  } else {
+    console.log(`  ${red('✗')} Workflows directory missing`);
+    issues++;
+  }
+
+  // Summary
+  if (issues === 0) {
+    console.log(`\n  ${green('Garden is healthy.')} 🌻\n`);
+  } else {
+    console.log(`\n  ${yellow(`${issues} issue(s) found.`)}\n`);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -525,60 +701,27 @@ function detectTools(dest) {
 }
 
 async function promptToolSelection(detected) {
-  const entries = TOOL_SLUGS.map((slug, i) => ({
-    num: i + 1,
-    slug,
-    tool: TOOLS[slug],
-    selected: detected.includes(slug),
-  }));
+  console.log(dim('\n  Each tool gets a gardener agent that loads from _gs-gardener/.\n'));
 
-  function printList() {
-    for (const e of entries) {
-      const marker = e.selected ? green('[x]') : '[ ]';
-      const hint = detected.includes(e.slug) ? green(' (detected)') : '';
-      console.log(`  ${e.num}. ${marker} ${e.tool.label}${hint}  ${dim(e.tool.agentFile?.path || '')}`);
-    }
-  }
+  const choices = TOOL_SLUGS.map((slug) => {
+    const tool = TOOLS[slug];
+    const isRequired = !!tool.required;
+    const isDetected = detected.includes(slug);
 
-  console.log(`\n${bold("Install gardener agent for AI tools?")}`);
-  console.log(dim('Each tool gets a gardener agent that loads from _gs-gardener/.\n'));
-  printList();
-  console.log(`\n${dim('Enter numbers to toggle (e.g. "1 3"), "all", "none", or press Enter to confirm:')}`);
+    return {
+      name: `${tool.label}  ${dim(tool.agentFile?.path || '')}${isDetected && !isRequired ? green(' (detected)') : ''}`,
+      value: slug,
+      checked: isRequired || isDetected,
+      disabled: isRequired ? '(required)' : false,
+    };
+  });
 
-  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  const selectedTools = await checkbox({
+    message: 'Which AI tools should get the gardener agent?',
+    choices,
+  });
 
-  try {
-    while (true) {
-      let answer;
-      try {
-        answer = await rl.question("> ");
-      } catch {
-        console.log("\nAborted.");
-        process.exit(0);
-      }
-      const trimmed = answer.trim().toLowerCase();
-
-      if (trimmed === '') break;
-
-      if (trimmed === 'all') {
-        for (const e of entries) e.selected = true;
-      } else if (trimmed === 'none' || trimmed === 'skip') {
-        for (const e of entries) e.selected = false;
-      } else {
-        const nums = trimmed.split(/[\s,]+/).map(Number).filter(n => n >= 1 && n <= entries.length);
-        for (const n of nums) {
-          entries[n - 1].selected = !entries[n - 1].selected;
-        }
-      }
-
-      printList();
-      console.log(dim('Enter numbers to toggle, or press Enter to confirm:'));
-    }
-  } finally {
-    rl.close();
-  }
-
-  return entries.filter((e) => e.selected).map((e) => e.slug);
+  return selectedTools;
 }
 
 function printGardenWelcome() {
@@ -624,8 +767,12 @@ ${bold('USAGE')}
   npx @pshch/gary-the-gardener [command] [options]
 
 ${bold('COMMANDS')}
-  ${green('install')}    Install 🪴 Gary The Gardener ${dim('(default)')}
+  ${green('install')}    Install the garden system ${dim('(first-time setup)')}
+  ${green('update')}     Update an existing installation to latest version
   ${green('status')}     Show what's currently installed
+  ${green('doctor')}     Verify installation health
+
+  When no command is given, an interactive menu is shown.
 
 ${bold('WHAT GETS INSTALLED')}
   ${dim('Always (Claude Code — the agent host):')}
@@ -650,10 +797,13 @@ ${bold('OPTIONS')}
   -h, --help     Show this help
 
 ${bold('EXAMPLES')}
-  npx @pshch/gary-the-gardener                    ${dim('# install with interactive tool selection')}
-  npx @pshch/gary-the-gardener --tools cursor      ${dim('# install + Cursor agent')}
-  npx @pshch/gary-the-gardener -t cursor,copilot   ${dim('# install + Cursor + Copilot agents')}
-  npx @pshch/gary-the-gardener status              ${dim('# check install state')}
-  npx @pshch/gary-the-gardener -f                  ${dim('# reinstall / overwrite')}
+  npx @pshch/gary-the-gardener                      ${dim('# interactive menu')}
+  npx @pshch/gary-the-gardener install               ${dim('# fresh install with tool selection')}
+  npx @pshch/gary-the-gardener update                ${dim('# upgrade existing installation')}
+  npx @pshch/gary-the-gardener status                ${dim('# check install state')}
+  npx @pshch/gary-the-gardener doctor                ${dim('# verify installation health')}
+  npx @pshch/gary-the-gardener install -t cursor     ${dim('# install + Cursor agent')}
+  npx @pshch/gary-the-gardener install -f            ${dim('# force reinstall')}
+  npx @pshch/gary-the-gardener install --dry-run     ${dim('# preview without writing')}
 `);
 }

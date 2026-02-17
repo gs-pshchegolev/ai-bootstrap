@@ -4,7 +4,7 @@
 
 ## What is it?
 
-The Garden System provides AI agent maintenance for repositories using AGENTS.md configuration:
+The Garden System provides AI agent maintenance for repositories using AGENTS.md configuration. This repository is itself maintained by the garden system it ships — a self-hosting arrangement that serves as both dogfooding and a living integration test.
 
 - **🪴 Gary The Gardener** 🪴 - Interactive Repository Garden Keeper subagent (v1.1.0)
 - **10 maintenance skills** - Individual operations for keeping AI configs healthy

@@ -1,16 +1,18 @@
 # Gary The Gardener
 
 > CLI tool and AI agent system that maintains documentation and configuration for AI coding tools (Claude, Copilot, Cursor, Codex, Junie, Windsurf).
+>
+> **This repo is self-hosted** — Gary The Gardener maintains its own source code, like a compiler written in the language it compiles.
 
 ## Tech Stack
 
-JavaScript (Node.js ESM) · Zero dependencies · npm
+JavaScript (Node.js ESM) · @inquirer/prompts · npm
 Node.js >= 20.11.0
 
 ## Project Structure
 
 ```
-bin/cli.js                    # CLI entry point (install, status)
+bin/cli.js                    # CLI entry point (install, update, status, doctor)
 _gs-gardener/                 # Garden system (core product)
   core/
     agents/gardener.md        # Gardener agent persona
@@ -35,20 +37,26 @@ GARDEN-*.md                   # System documentation
 |------|---------|
 | Run CLI | `node bin/cli.js` |
 | Run via npx | `npx @pshch/gary-the-gardener` |
-| Install (default) | `gary-the-gardener install` |
+| Install | `gary-the-gardener install` |
+| Update | `gary-the-gardener update` |
 | Status check | `gary-the-gardener status` |
-| Dry run | `gary-the-gardener --dry-run` |
-| Force reinstall | `gary-the-gardener -f` |
+| Doctor | `gary-the-gardener doctor` |
+| Dry run | `gary-the-gardener install --dry-run` |
+| Force reinstall | `gary-the-gardener install -f` |
 
 No build, test, or lint steps. The package ships source directly.
 Publish requires `NPM_TOKEN` environment variable.
 
 ## Architecture
 
-The CLI (`bin/cli.js`) is the sole entry point with two commands:
+The CLI (`bin/cli.js`) is the sole entry point with four commands:
 
-- **install** (default): Copies `_gs-gardener/` into target repo, creates `.aiignore`, installs tool-specific agent files, and writes garden skill commands
+- **install**: First-time setup — copies `_gs-gardener/` into target repo, creates `.aiignore`, installs tool-specific agent files, and writes garden skill commands
+- **update**: Upgrades an existing installation to the latest version
 - **status**: Reports which garden components are installed in the current directory
+- **doctor**: Validates installation health (version consistency, required files)
+
+When no command is given, an interactive menu is shown (using `@inquirer/prompts`).
 
 The **Garden System** (`_gs-gardener/core/`) is the core product:
 - **Workflows** (10): bootstrap, audit, sync, compact, extend, maintain, references, scaffold, add-tool, help
@@ -60,7 +68,7 @@ Supported AI tools: Claude Code, Cursor, GitHub Copilot, Windsurf, JetBrains Jun
 ## Key Conventions
 
 - Published as `@pshch/gary-the-gardener` on npm
-- Zero runtime dependencies — uses only Node.js built-ins (`node:util`, `node:fs`, `node:path`, `node:readline`)
+- Single runtime dependency (`@inquirer/prompts`) for interactive CLI UI
 - Garden system version tracked in `_gs-gardener/VERSION` (currently 1.5.0)
 - Commands distributed as `.md` files in tool-specific directories
 - AGENTS.md max line limit: 150 lines (enforced by garden system)

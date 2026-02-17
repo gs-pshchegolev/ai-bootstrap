@@ -5,6 +5,25 @@ All notable changes to the Garden System will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-02-17
+
+### Changed
+- **Migrated interactive prompts to @inquirer/prompts** — replaced custom readline-based tool selection with standard `checkbox` UI; default invocation now shows a `select` menu
+- **Restructured CLI into explicit commands** — `install`, `update`, `status`, `doctor` instead of defaulting to install
+- **Split install/update logic** — `install` is for first-time setup (rejects if already installed), `update` is for upgrades (rejects if not installed); shared core via `runSetup()`
+- **Updated "Zero Dependencies" core belief** — now "Minimal Dependencies" to reflect the single `@inquirer/prompts` dependency
+
+### Added
+- **`update` command** — explicit upgrade path, separated from `install`
+- **`doctor` command** — validates installation health (core system, version consistency, config.yaml, AGENTS.md, .aiignore, workflows)
+- **Interactive menu** — when no command is given, shows a context-aware select prompt (smart default based on install state)
+- **Non-TTY smart fallback** — piped invocations auto-detect whether to install or update
+
+### Removed
+- **Custom readline prompt loop** — replaced by @inquirer/prompts checkbox with standard keyboard navigation (arrow keys, space to toggle)
+
+---
+
 ## [1.5.0] - 2026-02-16
 
 ### Changed
