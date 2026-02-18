@@ -19,10 +19,10 @@ This workflow is **tool-agnostic** — it describes operations, not specific too
 
 ## Phases
 
-1. Load — read or create garden state
-2. Decide — check snapshot cache
-3. Render — build compact markdown map
-4. Display — output Gary Block with garden map
+1. Fast Path — check if `garden.md` exists; if yes, skip to Phase 4 immediately
+2. Load — read or create garden state (only if garden.md missing)
+3. Decide & Render — check hash, re-render if stale
+4. Display — output Gary Block with garden map and passive shortcut footer
 
 ## File Paths
 
@@ -31,22 +31,28 @@ This workflow is **tool-agnostic** — it describes operations, not specific too
 - **Snapshot**: `{project-root}/_gs-gardener/data/garden.md`
 - **Config**: `{project-root}/_gs-gardener/core/config.yaml`
 
-## Phase 1: Load
+## Phase 1: Fast Path
+
+Check if `garden.md` exists. If it does, **read it and jump directly to Phase 4** — no docsmap loading, no hash verification. This is the observe path: the user just wants to see the map.
+
+Only proceed to Phase 2 if `garden.md` is absent.
+
+## Phase 2: Load
 
 Check if `docsmap.yaml` exists. If it does, read and parse it. If not, enter the **Plant the Garden** sub-flow (see below).
 
 After loading, validate `version === 2`. If mismatched, warn and re-plant.
 
-## Phase 2: Decide
+## Phase 3: Decide & Render
 
 Read the `hash` field from `docsmap.yaml`: `v2-{entityCount}-{DD-MM-YYYY}`.
 
 Read `garden.md` if it exists. Check for a `hash:` line in its header.
 
-- **Cache hit** (hashes match): skip to Phase 4, display existing `garden.md`.
-- **Cache miss** (hashes differ or no garden.md): proceed to Phase 3.
+- **Cache hit** (hashes match): proceed to Phase 4 with existing `garden.md`.
+- **Cache miss** (hashes differ or no garden.md): re-render below.
 
-## Phase 3: Render
+### Render
 
 Build compact markdown for each area in `docsmap.yaml`. Follow the **Rendering Contract** below.
 
@@ -74,7 +80,7 @@ Write `garden.md`:
 Output the Gary Block. **Display shows all areas** (both primary and secondary).
 
 ```
-🪴 **Gary The Gardener** v{version} | 🗺️ Garden Map
+🪴 **Gary The Gardener** v{version} | 🏞️ Garden Map
 
 Your documentation ecosystem at a glance
 
@@ -82,21 +88,42 @@ Your documentation ecosystem at a glance
 
 <garden.md content — all areas>
 
-📊 {X} entities across {N} areas — 🌳 {M} mature, 🌿 {Gr} grown, 🌱  {Sm} small, 🫘 {Se} seeds
+📊 {X} entities across {N} areas — 🌳 {M} mature, 🌿 {Gr} grown, 🌱 {Sm} small, 🫘 {Se} seeds
 
 🌱 *Did you know? <fun gardening fact>*
 ```
 
-Footer: use `AskUserQuestion` with options (max 4):
-- Browse area (drill into one area — see full entity table with paths)
-- Update garden (discover new files, refresh readiness, preserve layout)
-- Re-plant garden (full rebuild from scratch)
-- Done
+**Footer — passive shortcut line. Do NOT call AskUserQuestion here.**
+
+```
+↘️ **[B]** Browse area · **[S]** Summary & suggestions · **[U]** Update · **[D]** Done
+```
+
+Turn ends. Gary waits for the user to follow up.
+
+### Shortcut Handling
+
+When the user replies with a shortcut or intent, Gary acts:
+
+| User says | Gary does |
+|-----------|-----------|
+| `B` / `browse` | Asks which area via `AskUserQuestion`, then runs Browse area flow |
+| `S` / `summary` | Runs Summary & Suggestions sub-flow |
+| `U` / `update` | Runs Update Garden sub-flow |
+| `D` / `done` | Signs off with a brief closing line |
 
 **"Browse area"** flow:
-1. Present an `AskUserQuestion` listing all areas as options (e.g., "Garden", "Greenhouse", "Shed", ...)
-2. For the selected area, output a table: entity label, readiness emoji, and full file path
-3. Return to the footer.
+1. Output a passive area list — no `AskUserQuestion` (avoids the 4-option cap and overlay):
+   ```
+   Pick an area: **[1]** Core Docs · **[2]** Knowledge Base · **[3]** Wrappers · ...
+   ```
+   Number each area in order from `docsmap.yaml`. User replies with number or name.
+2. For the selected area, read each entity's file (first 30 lines only) to extract a short "about" phrase (≤10 words describing the document's purpose)
+3. Output a 4-column table: **Label | Readiness | Path | About**
+4. Output a **passive shortcut footer** — no AskUserQuestion:
+   ```
+   ↘️ **[B]** Browse another area · **[S]** Summary · **[U]** Update · **[D]** Done
+   ```
 
 ## Rendering Contract
 
@@ -306,6 +333,52 @@ Then ask the user (via `AskUserQuestion`):
 - Ignore (skip — files remain untracked)
 
 If no untracked files, return directly to the Phase 4 footer options.
+
+## Sub-flow: Summary & Suggestions
+
+Read all tracked entities and produce a structured documentation summary (~140–180 lines) followed by 3 prioritised improvement suggestions.
+
+### Step 1: Read Entities
+
+For each entity in `docsmap.yaml`, read the file (up to 60 lines). Note: title/purpose, key topics covered, and any quality signals (stubs, TODOs, missing sections, very short content).
+
+### Step 2: Write Summary Block
+
+Output a structured markdown summary grouped by area. Format:
+
+```
+## Documentation Summary — {DD-MM-YYYY}
+
+### {area.emoji} {area.label}
+| Doc | Readiness | About |
+|-----|-----------|-------|
+| {label} | {emoji} | {1-2 sentence description} |
+...
+
+### {next area...}
+```
+
+One table per area. Descriptions are 1–2 sentences — what the doc covers and whether it feels complete or thin. Target output: ~140–180 lines total.
+
+### Step 3: Generate 3 Suggestions
+
+Based on patterns observed (seeds, thin grown docs, missing areas, duplicate coverage, no cross-references), produce exactly 3 actionable improvement suggestions:
+
+```
+1️⃣ **{Action verb + target}** — {why it matters and what to do}
+2️⃣ **{Action verb + target}** — {why it matters and what to do}
+3️⃣ **{Action verb + target}** — {why it matters and what to do}
+```
+
+Prioritise by impact. Name specific files or areas where possible.
+
+### Step 4: Footer
+
+End with `AskUserQuestion`:
+- Run suggestion #1 (label it with the specific action)
+- Browse an area
+- Update garden
+- Done
 
 ## Rules
 

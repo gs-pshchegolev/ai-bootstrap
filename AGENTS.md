@@ -21,12 +21,12 @@ _gs-gardener/                 # Garden system (core product)
   _config/                    # Config templates
   VERSION, CHANGELOG.md
 _bmad/                        # BMAD multi-agent system (separate)
-.claude/commands/ (87 files)  # Claude Code skill commands
+.claude/commands/ (84 files)  # Claude Code skill commands
 .cursor/
-  commands/ (20 files)        # Cursor commands
+  commands/ (76 files)        # Cursor commands
   rules/                      # Cursor rules
 .github/agents/ (21 files)    # GitHub Copilot agents
-.codex/prompts/ (20 files)    # Codex prompts
+.codex/prompts/ (76 files)    # Codex prompts
 templates/wrappers/           # Wrapper templates
 GARDEN-*.md                   # System documentation
 ```
@@ -59,17 +59,17 @@ The CLI (`bin/cli.js`) is the sole entry point with four commands:
 When no command is given, an interactive menu is shown (using `@inquirer/prompts`).
 
 The **Garden System** (`_gs-gardener/core/`) is the core product:
-- **Workflows** (10): bootstrap, audit, sync, compact, extend, maintain, references, scaffold, add-tool, help
+- **Workflows** (7): audit, compact, extend, health, references, setup, visualise
 - **Agent**: `gardener.md` — the interactive gardener persona
 - **Config**: `config.yaml` — project settings, coverage tracking, constraints
 
-Supported AI tools: Claude Code, Cursor, GitHub Copilot, Windsurf, JetBrains Junie.
+Supported AI tools: Claude Code, Cursor, GitHub Copilot, JetBrains Junie.
 
 ## Key Conventions
 
 - Published as `@pshch/gary-the-gardener` on npm
 - Single runtime dependency (`@inquirer/prompts`) for interactive CLI UI
-- Garden system version tracked in `_gs-gardener/VERSION` (currently 1.5.0)
+- Garden system version tracked in `_gs-gardener/VERSION` (currently 3.2.0)
 - Commands distributed as `.md` files in tool-specific directories
 - AGENTS.md max line limit: 150 lines (enforced by garden system)
 - `.npmrc` contains auth token reference — never commit actual tokens

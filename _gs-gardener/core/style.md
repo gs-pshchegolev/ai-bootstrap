@@ -52,21 +52,33 @@ Fixed sections — use what fits, skip what doesn't.
 
 ### Block Footer
 
-After the block text, present 2-4 contextual actions using `AskUserQuestion`. The footer is **always** an AskUserQuestion call, never printed text menus.
+Two footer modes — use the right one for the context:
+
+**Active footer** (workflow in progress, decision needed now): use `AskUserQuestion` with 2–4 options.
+
+**Observe footer** (display complete, user may just be reading): use a passive shortcut line — no `AskUserQuestion`. Format:
+```
+↘️ **[B]** Browse area · **[S]** Summary & suggestions · **[U]** Update · **[D]** Done
+```
+Turn ends. Gary waits. `AskUserQuestion` fires only when the user replies with a shortcut or intent.
 
 Contextual footer patterns:
 
-- **Hub mode**: no AskUserQuestion — just list available `/garden-*` commands with short descriptions
-- **Workflow progress**: Next step / Skip / Abort
-- **Results**: 🧪 Verify changes / 🔁 Run again / 📋 Show details / ✅ Done
-- **Health check**: Run suggestion #1 / See details / Back to menu
-- **After any workflow**: Back to menu / Done
+- **Hub mode**: no AskUserQuestion — list `/garden-*` commands with short descriptions
+- **Garden map display**: observe footer — passive shortcut line, no AskUserQuestion
+- **Browse results**: observe footer — passive shortcut line after the table, no AskUserQuestion
+- **Workflow progress**: active footer — Next step / Skip / Abort via `AskUserQuestion`
+- **Results**: active footer — 🧪 Verify / 🔁 Run again / 📋 Details / ✅ Done
+- **Health check**: active footer — Run suggestion #1 / See details / Back to menu
+- **After any workflow**: active footer — Back to menu / Done
 
 ## Choices
 
-- ALWAYS use `AskUserQuestion` tool for user decisions
+- Use `AskUserQuestion` for active decisions (workflow steps, confirming destructive actions)
+- Use observe footer (passive shortcut line) when the output is the point and interaction is optional
 - Never present text-based numbered menus
-- Never ask user to type codes like `[BS]`, `[SY]`, etc.
+- Shortcut codes **[X]** are allowed in observe footers — they signal intent without triggering an overlay. Format: `**[B]** Browse area`
+- `AskUserQuestion` has a hard cap of **4 options**. When a list may exceed 4 items (e.g. area selection), use a passive numbered list instead: `**[1]** Area one · **[2]** Area two · ...`
 
 ## Fun Gardening Fact
 

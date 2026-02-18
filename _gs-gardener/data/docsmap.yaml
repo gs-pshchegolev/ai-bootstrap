@@ -1,0 +1,264 @@
+version: 2
+generated: "18-02-2026"
+hash: "v2-15-18-02-2026"
+
+areas:
+  core-docs:
+    label: Core Docs
+    emoji: "📁"
+    description: Root-level project documentation
+    display: primary
+    granularity: file
+    include:
+      - "*.md"
+    readiness_emojis:
+      mature: "\U0001F333"
+      grown: "\U0001F33F"
+      small: "\U0001F331"
+      seed: "\U0001FAD8"
+      issue: "\U0001FAB1"
+    grid:
+      cols: 18
+      rows:
+        - label: "root"
+          entities:
+            - agents-md
+            - readme-md
+            - garden-guide-md
+            - garden-installation-md
+            - garden-system-md
+
+  knowledge-base:
+    label: Knowledge Base
+    emoji: "📚"
+    description: docs/ directory
+    display: primary
+    granularity: file
+    include:
+      - "docs/**/*.md"
+    readiness_emojis:
+      mature: "\U0001F333"
+      grown: "\U0001F33F"
+      small: "\U0001F331"
+      seed: "\U0001FAD8"
+      issue: "\U0001FAB1"
+    grid:
+      cols: 18
+      rows:
+        - label: "docs/"
+          entities:
+            - docs-architecture-md
+            - docs-core-beliefs-md
+
+  wrappers:
+    label: Wrappers
+    emoji: "🔌"
+    description: AI tool sync wrappers
+    display: secondary
+    granularity: file
+    include:
+      - "CLAUDE.md"
+      - ".github/copilot-instructions.md"
+      - ".github/agents/gardener.md"
+      - ".junie/guidelines.md"
+    readiness_emojis:
+      mature: "\U0001F333"
+      grown: "\U0001F33F"
+      small: "\U0001F331"
+      seed: "\U0001FAD8"
+      issue: "\U0001FAB1"
+    grid:
+      cols: 18
+      rows:
+        - label: "root"
+          entities:
+            - claude-md
+        - label: ".github/"
+          entities:
+            - github-copilot-instructions-md
+            - github-agents-gardener-md
+        - label: ".junie/"
+          entities:
+            - junie-guidelines-md
+
+  output-artifacts:
+    label: Output Artifacts
+    emoji: "📋"
+    description: Generated planning and test artifacts
+    display: secondary
+    granularity: file
+    include:
+      - "_bmad-output/**/*.md"
+    readiness_emojis:
+      mature: "\U0001F333"
+      grown: "\U0001F33F"
+      small: "\U0001F331"
+      seed: "\U0001FAD8"
+      issue: "\U0001FAB1"
+    grid:
+      cols: 18
+      rows:
+        - label: "_bmad-output/"
+          entities:
+            - bmad-output-test-design-architecture-md
+            - bmad-output-test-design-qa-md
+        - label: "_bmad-output/implementation-artifacts/"
+          entities:
+            - bmad-output-implementation-artifacts-tech-spec-md
+
+  tests:
+    label: Tests
+    emoji: "🧪"
+    description: Test documentation
+    display: secondary
+    granularity: file
+    include:
+      - "tests/**/*.md"
+    readiness_emojis:
+      mature: "\U0001F333"
+      grown: "\U0001F33F"
+      small: "\U0001F331"
+      seed: "\U0001FAD8"
+      issue: "\U0001FAB1"
+    grid:
+      cols: 18
+      rows:
+        - label: "tests/"
+          entities:
+            - tests-readme-md
+
+entities:
+  agents-md:
+    path: "AGENTS.md"
+    type: instructions
+    area: core-docs
+    readiness: grown
+    label: AGENTS.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  readme-md:
+    path: "README.md"
+    type: doc
+    area: core-docs
+    readiness: mature
+    label: README.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  garden-guide-md:
+    path: "GARDEN-GUIDE.md"
+    type: doc
+    area: core-docs
+    readiness: mature
+    label: GARDEN-GUIDE.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  garden-installation-md:
+    path: "GARDEN-INSTALLATION.md"
+    type: doc
+    area: core-docs
+    readiness: mature
+    label: GARDEN-INSTALLATION.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  garden-system-md:
+    path: "GARDEN-SYSTEM.md"
+    type: doc
+    area: core-docs
+    readiness: grown
+    label: GARDEN-SYSTEM.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  docs-architecture-md:
+    path: "docs/ARCHITECTURE.md"
+    type: doc
+    area: knowledge-base
+    readiness: grown
+    label: ARCHITECTURE.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  docs-core-beliefs-md:
+    path: "docs/core-beliefs.md"
+    type: doc
+    area: knowledge-base
+    readiness: grown
+    label: core-beliefs.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  claude-md:
+    path: "CLAUDE.md"
+    type: wrapper
+    area: wrappers
+    readiness: seed
+    label: CLAUDE.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  github-copilot-instructions-md:
+    path: ".github/copilot-instructions.md"
+    type: wrapper
+    area: wrappers
+    readiness: seed
+    label: copilot-instructions.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  github-agents-gardener-md:
+    path: ".github/agents/gardener.md"
+    type: wrapper
+    area: wrappers
+    readiness: small
+    label: gardener.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  junie-guidelines-md:
+    path: ".junie/guidelines.md"
+    type: wrapper
+    area: wrappers
+    readiness: seed
+    label: guidelines.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  bmad-output-test-design-architecture-md:
+    path: "_bmad-output/test-design-architecture.md"
+    type: artifact
+    area: output-artifacts
+    readiness: mature
+    label: test-design-architecture.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  bmad-output-test-design-qa-md:
+    path: "_bmad-output/test-design-qa.md"
+    type: artifact
+    area: output-artifacts
+    readiness: mature
+    label: test-design-qa.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  bmad-output-implementation-artifacts-tech-spec-md:
+    path: "_bmad-output/implementation-artifacts/tech-spec-revise-ai-bootstrapper-prompt.md"
+    type: artifact
+    area: output-artifacts
+    readiness: mature
+    label: tech-spec-revise-ai-bootstrapper-prompt.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  tests-readme-md:
+    path: "tests/README.md"
+    type: doc
+    area: tests
+    readiness: grown
+    label: README.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"

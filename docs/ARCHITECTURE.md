@@ -54,16 +54,13 @@ Each workflow is a self-contained set of instructions for an AI agent:
 
 | Workflow | Purpose |
 |----------|---------|
-| `bootstrap` | First-time AGENTS.md generation |
-| `audit` | Detect drift between docs and code |
-| `sync` | Keep wrapper files aligned with AGENTS.md |
-| `compact` | Reduce AGENTS.md verbosity (target: 150 lines) |
-| `extend` | Add content layers (guardrails, principles, style) |
-| `maintain` | Find and fix documentation issues |
-| `references` | Fetch llms.txt for dependencies |
-| `scaffold` | Set up docs/ knowledge base structure |
-| `add-tool` | Add support for new AI tools |
-| `help` | Guide users to the right workflow |
+| `audit` | Deep scan for drift, quality issues, and wrapper sync problems |
+| `compact` | Compress AGENTS.md while preserving all facts (target: under 150 lines) |
+| `extend` | Add content layers (guardrails, principles, style, domain knowledge) |
+| `health` | Scan the full docs ecosystem and produce 3 actionable suggestions |
+| `references` | Fetch and manage dependency reference documentation (llms.txt files) |
+| `setup` | Bootstrap AGENTS.md, scaffold docs/, or add tool wrappers |
+| `visualise` | Full-repo discovery — renders documentation as a compact garden map |
 
 ### Agent (`core/agents/gardener.md`)
 
@@ -82,7 +79,6 @@ The CLI generates tool-specific files that reference the garden system:
 | Claude Code | `CLAUDE.md` | `.claude/commands/garden-*.md` (11 skills) |
 | Cursor | `.cursor/rules/garden-agent-gardener.mdc` | `.cursor/commands/` |
 | GitHub Copilot | `.github/agents/gardener.md` | `.github/agents/` |
-| Windsurf | `.windsurf/rules/garden-agent-gardener.md` | — |
 | JetBrains Junie | `.junie/guidelines.md` | — |
 
 ## Distribution
