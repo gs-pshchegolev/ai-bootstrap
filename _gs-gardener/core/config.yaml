@@ -1,6 +1,7 @@
 # Garden System Configuration
 
-project_name: ai-bootstrap
+# Leave empty — Gary auto-detects from git remote URL, package.json name, or directory name
+project_name: ""
 user_name: User
 communication_language: English
 output_folder: "{project-root}/docs"
@@ -11,13 +12,9 @@ agents_file: "{project-root}/AGENTS.md"
 # Shed — agentic infrastructure files (AI instructions, tool configs, skills, agent definitions)
 # These always form one dedicated "Shed" area in the garden.
 # shed_files: explicit list for this project (add any tool-specific files here)
-shed_files:
-  - "{project-root}/CLAUDE.md"
-  - "{project-root}/.github/copilot-instructions.md"
-  - "{project-root}/.cursor/rules/agents.mdc"
-  - "{project-root}/.junie/guidelines.md"
-  - "{project-root}/.cursor/rules/garden-agent-gardener.mdc"
-  - "{project-root}/.github/agents/gardener.md"
+shed_files: []
+  # Populated by /garden-setup based on which AI tools are installed in this project.
+  # Gary discovers files via shed_patterns and registers confirmed ones here.
 
 # shed_patterns: glob patterns used during auto-discovery to find agentic files
 # Gary scans these during Plant the Garden and Update to detect new AI tool configs
@@ -56,8 +53,6 @@ snapshot_file: "{project-root}/_gs-gardener/data/garden.md"
 # Discovery exclusions (directories skipped during full-repo scan)
 discovery_exclude:
   - "node_modules/"
-  - ".next/"
-  - ".next-docs/"
 
 # Constraints
 agents_max_lines: 150

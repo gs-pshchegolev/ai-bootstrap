@@ -12,12 +12,11 @@
 
 Check all ecosystem files using Glob and Read. Track status for each:
 
-**Wrapper files**:
+**Shed files**:
 - `{project-root}/AGENTS.md` — exists? line count? (flag if > 140)
-- `{project-root}/CLAUDE.md` — exists?
-- `{project-root}/.github/copilot-instructions.md` — exists?
-- `{project-root}/.cursor/rules/agents.mdc` — exists?
 - `{project-root}/.aiignore` — exists?
+- Read `config.yaml → shed_files` — check each listed file: exists?
+- Scan `shed_patterns` on disk — any agentic files present but not yet in `shed_files`?
 
 **Docs directory**:
 - `{project-root}/docs/ARCHITECTURE.md` — exists? non-stub?
@@ -28,7 +27,7 @@ Check all ecosystem files using Glob and Read. Track status for each:
 
 **References**:
 - `{project-root}/docs/references/` — directory exists? any llms.txt files?
-- Completeness vs actual dependencies in package.json
+- Completeness vs actual dependencies — check whichever manifest exists: package.json, requirements.txt / pyproject.toml, Cargo.toml, go.mod, pom.xml, Gemfile, etc.
 
 **Garden state** (optional):
 - `{project-root}/_gs-gardener/data/docsmap.yaml` — exists? If yes, read entity count and count seeds vs plants across all areas
@@ -45,7 +44,7 @@ From the scan results, build a ranked list of improvement opportunities:
 
 | Condition | Suggestion | Command |
 |-----------|-----------|---------|
-| Missing wrapper file | Add wrapper for that tool | `/garden-setup` |
+| Missing shed file | Add shed file for that tool | `/garden-setup` |
 | AGENTS.md > 140 lines | Compress to stay under limit | `/garden-compact` |
 | Empty or no references/ | Fetch reference docs for dependencies | `/garden-references` |
 | Missing content layers | Extend with new layer | `/garden-extend` |

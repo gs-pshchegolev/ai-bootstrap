@@ -5,6 +5,81 @@ All notable changes to the Garden System will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.5.0] - 2026-02-19
+
+### Changed
+- **Three-bucket garden structure** — the garden now always has exactly three fixed top-level sections: **Shed** (agentic files), **Documentation** (`/docs` + root `.md` files), and **Codebase** (source directories). These are structural, not user-defined.
+- **Plant the Garden Step 1** — renamed "Full Repository Discovery — Three Buckets"; restructured into three explicit sub-steps: 1a (Shed via `shed_patterns`), 1b (Documentation via `docs/` + root `.md`), 1c (Codebase via `git ls-files` analysis)
+- **Granularity Calibration (Step 1.5)** — scoped to **Codebase bucket only**; repo summary now shows all three buckets upfront; the user question is specifically about Codebase depth. Shed and Documentation are always single fixed areas.
+- **Step 1.5 preview format** — updated to show "Fixed:" section (Shed + Documentation) above the Codebase area list, so the user sees the full garden shape at calibration time
+- **Carry-forward rules (Step 2)** — explicitly state the three-bucket enforcement: Shed = 1 area, Documentation = 1 area (or optionally split into Core Docs + docs/ if both substantial), Codebase = 1-N areas
+- **Rendering Contract example** — updated table example to show realistic three-bucket layout (Shed row, Documentation row, Codebase area rows)
+
+---
+
+## [4.4.0] - 2026-02-18
+
+### Added
+- **gitignore support** — `git ls-files` replaces manual directory walk as primary file enumeration; automatically respects `.gitignore`, `.gitmodules`, and submodules. `find` fallback used only for non-git repos with `discovery_exclude` applied manually
+- **Granularity Calibration (Step 1.5)** — new step in Plant the Garden: after directory analysis, Gary shows real repo stats (file counts, subdirs per top-level dir) and presents three concrete options (Shallow / Standard / Deep) with actual computed area counts — not abstract labels
+- **CLI-based directory analysis** — three shell commands run after enumeration: level-1 breakdown (top dirs by file count), level-2 breakdown (large dirs with meaningful subdirs), per-dir drill for dirs with >50 files
+- **Split-candidate rule** — a directory is a split candidate if it has ≥3 subdirectories each containing ≥5 files; used to compute Standard and Deep option area counts
+- **Execution Hints table** — added `git ls-files` row for file enumeration
+- **Update Scan C uses git ls-files** — uncovered code dir detection in Update Garden now uses `git ls-files` instead of manual walk
+
+### Changed
+- **Plant the Garden Step 2** — simplified to confirmation-only step; area groupings are now determined in Step 1.5 (Granularity Calibration), not proposed fresh in Step 2
+- **`discovery_exclude`** — now only supplements `.gitignore` for non-git repos or additional project-specific paths; in git repos, `git ls-files` handles exclusions entirely
+
+---
+
+## [4.3.0] - 2026-02-18
+
+### Changed
+- **Update Garden Scan C** — made even more explicitly mandatory with stronger language; no longer presented as an "also" clause — it is a required scan every Update run
+- **Update Garden Step 7** — replaced `[R]` re-plant action with `[A]` direct area addition: Gary proposes label/emoji, confirms with user, then appends the new empty area directly to `docsmap.yaml` without destroying existing garden state
+
+---
+
+## [4.2.0] - 2026-02-18
+
+### Added
+- **`shed_patterns`** — 13 glob patterns in `config.yaml` for auto-discovery of agentic files: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.claude/commands/**/*.md`, `.claude/hooks/**/*`, `.cursor/rules/**/*.mdc`, `.cursor/rules/**/*.md`, `.github/copilot-instructions.md`, `.github/agents/**/*.md`, `.junie/**/*.md`, `.windsurf/rules/**/*`, `.aider/**/*`
+- **Shed discovery in Plant the Garden** — Step 1 now scans `shed_patterns` + `shed_files` to find all agentic infrastructure files before proposing areas
+- **Untracked Shed file detection in Audit** — audit workflow checks for files on disk matching `shed_patterns` that are not yet in `config.yaml → shed_files` and offers to register them
+
+### Changed
+- **Audit workflow** — "Wrappers" section renamed to "Shed (sync correctness)"; added rule: never modify `AGENTS.md` itself during Shed sync
+- **`docsmap.yaml`** — area `wrappers` → `shed`, label "Shed", all entity `type: wrapper` → `type: shed`, all `area: wrappers` → `area: shed`
+- **`garden.md`** — "Wrappers" row renamed to "Shed"
+- **`config.yaml`** — `wrapper_files` → `shed_files`
+
+---
+
+## [4.1.0] - 2026-02-18
+
+### Added
+- **Code-directory-centric areas** — garden areas are now derived from CODE directory structure, not doc file locations; most areas will have no documentation by design — the garden is a coverage map
+- **0-entity areas** — areas with no entities are first-class garden citizens: rendered with `—` in Plants and Total columns; excluded from Season Mood Line percentage calculation
+- **Shed concept** — "Wrappers" renamed to "Shed" throughout: agentic infrastructure (AI instructions, tool configs, skills, agent definitions). All terminology updated across workflows, config, and data files
+- **Update Garden three-scan structure** — Step 1 restructured into three explicitly named mandatory scans: A (existing area globs), B (untracked `.md` files), C (uncovered code directories)
+- **Plant the Garden triggered from Setup** — Full Setup path now runs Plant the Garden sub-flow as Step 4 after generating files
+
+### Changed
+- **Plant the Garden Step 1** — now labeled "Code Directory Discovery"; discovers code dirs as area candidates, not just documentation files
+- **Plant the Garden Step 2** — "Propose Groupings" replaces the old Documentation Coverage Gaps step (Step 1b removed as redundant — undocumented dirs ARE the areas)
+- **Setup workflow** — all "wrapper" terminology → "Shed"; "Add Tool Wrapper Path" → "Add Shed File Path"; commit message updated
+
+---
+
+## [4.0.0] - 2026-02-18
+
+### Changed (Breaking)
+- **Worms and dead leaves redefined** — no longer measure code quality in source files; now exclusively track doc-vs-codebase drift (stale references, outdated architecture descriptions, missing sections in existing docs). Source file scanning removed
+- **Consistency audit** — multiple cross-workflow inconsistencies fixed; terminology and rules aligned across all workflow files
+
+---
+
 ## [3.1.0] - 2026-02-18
 
 ### Added

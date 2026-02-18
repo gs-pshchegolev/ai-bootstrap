@@ -141,11 +141,11 @@ One row per area. Five columns.
 ```markdown
 | Area | Plants | Worms | Dead leaves | Total |
 |------|--------|-------|-------------|-------|
-| 🌿 **Core Docs** | 🌿 🌿 🌳 🌳 🌿 | 🪱×2 | 🍂×1 | 🌳×2 🌿×3 🪱×2 🍂×1 |
-| 🌿 **Knowledge Base** | 🌿 🌱 | — | — | 🌿×1 🌱×1 |
-| 🫘 **Shed** | 🫘 🫘 🌿 🫘 | — | 🍂×3 | 🌿×1 🫘×3 🍂×3 |
-| 🌳 **Artifacts** | 🌳 🌳 🌳 | — | — | 🌳×3 |
-| 🌿 **Tests** | 🌿 | — | — | 🌿×1 |
+| 🛖 **Shed** | 🌿 🌿 🫘 🌿 🫘 | — | 🍂×1 | 🌿×3 🫘×2 🍂×1 |
+| 🌿 **Documentation** | 🌿 🌿 🌳 🌳 🌿 | 🪱×2 | 🍂×1 | 🌳×2 🌿×3 🪱×2 🍂×1 |
+| 🫘 **src/auth/** | — | — | — | — |
+| 🌿 **src/api/** | 🌿 | — | — | 🌿×1 |
+| 🌳 **tests/** | 🌳 🌳 🌳 | — | — | 🌳×3 |
 ```
 
 **Area column:** dominant readiness emoji + **bold** label. For areas with 0 entities, use `🫘` as dominant emoji.
@@ -198,14 +198,32 @@ Substantive line = non-empty after trim, not a frontmatter delimiter (`---`), no
 
 Full-repo discovery that creates `docsmap.yaml`, `history.jsonl`, and `garden.md` from scratch.
 
-### Step 1: Code Directory Discovery
+### Step 1: Full Repository Discovery — Three Buckets
 
-Gary enumerates the full repository file tree using CLI commands, then aggregates to understand structure.
+The garden always has exactly three top-level buckets: **Shed**, **Documentation**, and **Codebase**. Gary discovers each in sequence.
+
+---
+
+**1a — Shed (agentic infrastructure)**
+
+Scan `config.yaml → shed_patterns` + `shed_files` — collect all matching agentic files on disk. This always forms one dedicated Shed area regardless of repo size or granularity choice.
+
+---
+
+**1b — Documentation (knowledge base)**
+
+Scan for all `.md` files in `docs/` and root-level `.md` files (README.md, AGENTS.md, CHANGELOG.md, etc.). This always forms one Documentation area. If both root-level `.md` files and a `docs/` directory are substantial (≥3 files each), Gary may split into "Core Docs" + "docs/" — decided in Step 1.5.
+
+---
+
+**1c — Codebase (source directories)**
+
+Enumerate all non-Shed, non-Documentation files to map code directories.
 
 **File enumeration:**
-- **Primary (git repo)**: `git ls-files` — enumerates all tracked files; automatically respects `.gitignore`, `.gitmodules`, submodule exclusions. No manual exclusion list needed.
-- **Fallback (non-git)**: `find . -type f` — then manually exclude `config.yaml → discovery_exclude` + always-exclude: `node_modules/`, `dist/`, `build/`, `.git/`, `coverage/`, `__pycache__/`, `_gs-gardener/`.
-- `config.yaml → discovery_exclude` supplements `.gitignore` for non-git repos or for paths git tracks but the project wants excluded from the garden. In git repos, `git ls-files` already handles gitignore — `discovery_exclude` is applied only to the fallback path.
+- **Primary (git repo)**: `git ls-files` — automatically respects `.gitignore`, `.gitmodules`, submodules.
+- **Fallback (non-git)**: `find . -type f` — exclude `config.yaml → discovery_exclude` + always-exclude: `node_modules/`, `dist/`, `build/`, `.git/`, `coverage/`, `__pycache__/`, `_gs-gardener/`.
+- `discovery_exclude` supplements `.gitignore` for non-git repos only; in git repos, `git ls-files` already handles all exclusions.
 
 **Directory analysis (run after enumeration):**
 ```bash
@@ -220,51 +238,56 @@ git ls-files | grep -E '^[^/]+/[^/]+/' \
 git ls-files {dir}/ | grep '/' | cut -d'/' -f1 | sort | uniq -c | sort -rn
 ```
 
-**Split-candidate rule**: a directory is worth splitting if it has ≥3 subdirectories each containing ≥5 files. Gary applies this recursively — a monorepo's `frontend/` with 18 subdirs yields 18 candidate areas, not 1.
-
-**Shed discovery**: scan `config.yaml → shed_patterns` + `shed_files` — collect all matching agentic files. These always form one dedicated Shed area regardless of granularity choice.
+**Split-candidate rule**: a directory is worth splitting if it has ≥3 subdirectories each containing ≥5 files. Gary applies this recursively — a `frontend/` with 18 subdirs yields 18 candidate areas, not 1.
 
 **Tech stack signals**: detect from `package.json`, `Makefile`, `pyproject.toml`, `go.mod`, `Cargo.toml` etc.
 
 **Synthesize** (internal reasoning only — not shown to user):
-- Total tracked files, total directories, split candidates
-- Project type: monorepo? single-package? pure docs repo?
-- Which dirs have code files and no docs? (expected to be most)
-- Skip from area candidates: pure tooling dirs (`.github/`, `.husky/`), CI-only dirs, fully generated dirs
+- Shed: N agentic files
+- Documentation: N docs files (root-level + docs/)
+- Codebase: total tracked files, total dirs, split candidates; dirs with code but no docs (expected to be most)
+- Skip from Codebase candidates: pure tooling dirs (`.github/`, `.husky/`), CI-only dirs, fully generated dirs
 
 Gary does NOT present this analysis — it feeds Step 1.5.
 
 ### Step 1.5: Granularity Calibration
 
-Gary presents real repo statistics and asks the user how detailed the garden should be. This replaces abstract size labels with concrete, data-driven choices.
+**Shed and Documentation areas are fixed — always exactly one area each.** This step calibrates the **Codebase bucket only**: how many code directory areas to create.
 
-**Show a compact repo summary** (output to user):
+Gary presents real stats for all three buckets, then focuses the question on Codebase depth.
+
+**Show a compact three-bucket summary** (output to user):
 ```
-📊 Repository — 847 tracked files across 31 directories
+📊 Repository — 3 buckets discovered
 
-Top directories:
+🛖 Shed       — 9 agentic files (CLAUDE.md, .cursor/rules/, .github/agents/, ...)
+📚 Documentation — 12 files (docs/ARCHITECTURE.md, AGENTS.md, README.md, ...)
+💻 Codebase   — 847 code files across 29 directories
+
+How detailed should the Codebase section be?
   frontend/       412 files (18 subdirs: components/, pages/, hooks/, ...)
   backend/        203 files (9 subdirs: api/, db/, services/, ...)
   infrastructure/  89 files (6 subdirs)
   tests/           87 files (4 subdirs)
-  docs/            12 files
-  ... (root-level files + Shed)
+  ...
 ```
 
-**Compute three concrete options** from the data:
-- **Shallow** — one area per top-level directory (no splitting). Area count = number of top-level dirs + Shed + Core Docs.
-- **Standard** *(recommended)* — split dirs that are split candidates (≥3 subdirs × ≥5 files each). Area count computed from the data.
+**Compute three concrete options** for the Codebase section (N computed from real data):
+- **Shallow** — one area per top-level code directory (no splitting).
+- **Standard** *(recommended)* — splits split-candidates (≥3 subdirs × ≥5 files). Area count computed from data.
 - **Deep** — one area per subdirectory with ≥5 files. Maximum visibility.
 
-Present via `AskUserQuestion` with markdown previews. Each preview lists the **actual area names and file counts** derived from the repo data — no invented examples. Always include **Custom** as 4th option.
+Present via `AskUserQuestion` with markdown previews. Each preview lists **actual area names and file counts** from the repo — no invented examples. Always include **Custom** as 4th option.
 
 **Example preview for Standard:**
 ```
-Option B — Standard (12 areas) ← recommended
+Option B — Standard (12 areas total) ← recommended
 
-📁 Core Docs (root *.md — has: README.md, AGENTS.md)
-🛖 Shed (9 agentic files — CLAUDE.md, .cursor/rules/, ...)
-📚 docs/ (12 files — has: ARCHITECTURE.md, ...)
+Fixed:
+🛖 Shed (9 agentic files)
+📚 Documentation (12 docs files)
+
+Codebase (10 areas):
 🌐 frontend/components/ (87 files — no docs yet)
 🌐 frontend/pages/ (63 files — no docs yet)
 🎣 frontend/hooks/ (41 files — no docs yet)
@@ -276,8 +299,8 @@ Option B — Standard (12 areas) ← recommended
 📦 (remaining small dirs merged into nearest parent)
 ```
 
-**After user picks A/B/C**: Gary proceeds directly to Step 2 with the computed area layout.
-**Custom**: Gary asks one clarifying question (which areas to merge/split/rename), then proceeds.
+**After user picks A/B/C**: Gary proceeds directly to Step 2 with the computed layout.
+**Custom**: Gary asks one clarifying question (which Codebase areas to merge/split/rename), then proceeds.
 
 ---
 
@@ -294,11 +317,14 @@ AskUserQuestion: "Plant with these N areas?"
 → Start over (return to Step 1.5)
 ```
 
-**Carry-forward rules** (applied regardless of granularity choice):
-- **Shed** → always one area; uses explicit per-file includes from `config.yaml → shed_files` + `shed_patterns`.
-- Root-level `.md` files → always one "Core Docs" area
-- Dirs with <3 files AND no docs → merged into nearest parent area
-- Generated/artifact dirs (`_bmad-output/`) → secondary area (only if they contain `.md` files)
+**Three-bucket structure (always enforced):**
+- **Shed** → always exactly one area; includes from `config.yaml → shed_files` + `shed_patterns`.
+- **Documentation** → always exactly one area (root `.md` files + `docs/`). If both are substantial (≥3 files each), may be split into "Core Docs" + "docs/" — user decides via Custom option.
+- **Codebase** → one or more areas per granularity choice; all code directories that are not Shed or Documentation.
+
+**Additional carry-forward rules:**
+- Codebase dirs with <3 files AND no docs → merged into nearest parent area
+- Generated/artifact dirs (e.g., `_bmad-output/`) → secondary area only if they contain `.md` files
 
 ### Step 3: Classify Existing Documentation
 
