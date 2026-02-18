@@ -8,6 +8,7 @@ This workflow is **tool-agnostic** — it describes operations, not specific too
 
 | Operation | Claude Code | Cursor | Copilot |
 |-----------|-------------|--------|---------|
+| Enumerate files | `Bash git ls-files` | terminal | terminal |
 | Scan files | `Glob` | file search | workspace search |
 | Count lines | `Bash wc -l` | terminal | terminal |
 | Ask user | `AskUserQuestion` | inline prompt | inline prompt |
@@ -199,68 +200,105 @@ Full-repo discovery that creates `docsmap.yaml`, `history.jsonl`, and `garden.md
 
 ### Step 1: Code Directory Discovery
 
-Gary scans the **repository structure** to understand what code exists — not just where docs are.
+Gary enumerates the full repository file tree using CLI commands, then aggregates to understand structure.
 
-**Scan** (respecting `config.yaml → discovery_exclude` + always-exclude: `node_modules`, `dist`, `build`, `.git`, `coverage`, `__pycache__`, `_gs-gardener/`):
-- Full directory tree, 2–3 levels deep
-- For each directory: count code files (non-`.md`, non-config) and count `.md` files separately
-- **Shed discovery**: scan `config.yaml → shed_patterns` + `shed_files` — collect all matching agentic files (AI instructions, tool configs, skills, agent definitions). These always form one dedicated Shed area.
-- Detect tech stack signals: `package.json`, `Makefile`, `pyproject.toml`, `go.mod`, `Cargo.toml`, etc.
+**File enumeration:**
+- **Primary (git repo)**: `git ls-files` — enumerates all tracked files; automatically respects `.gitignore`, `.gitmodules`, submodule exclusions. No manual exclusion list needed.
+- **Fallback (non-git)**: `find . -type f` — then manually exclude `config.yaml → discovery_exclude` + always-exclude: `node_modules/`, `dist/`, `build/`, `.git/`, `coverage/`, `__pycache__/`, `_gs-gardener/`.
+- `config.yaml → discovery_exclude` supplements `.gitignore` for non-git repos or for paths git tracks but the project wants excluded from the garden. In git repos, `git ls-files` already handles gitignore — `discovery_exclude` is applied only to the fallback path.
+
+**Directory analysis (run after enumeration):**
+```bash
+# Level-1 breakdown: top-level dirs by total file count
+git ls-files | grep '/' | cut -d'/' -f1 | sort | uniq -c | sort -rn
+
+# Level-2 breakdown: detect large dirs with meaningful subdirs
+git ls-files | grep -E '^[^/]+/[^/]+/' \
+  | sed 's|^\([^/]*/[^/]*\)/.*|\1|' | sort | uniq -c | sort -rn | head -40
+
+# Drill into any top-level dir with >50 files (run per-dir as needed)
+git ls-files {dir}/ | grep '/' | cut -d'/' -f1 | sort | uniq -c | sort -rn
+```
+
+**Split-candidate rule**: a directory is worth splitting if it has ≥3 subdirectories each containing ≥5 files. Gary applies this recursively — a monorepo's `frontend/` with 18 subdirs yields 18 candidate areas, not 1.
+
+**Shed discovery**: scan `config.yaml → shed_patterns` + `shed_files` — collect all matching agentic files. These always form one dedicated Shed area regardless of granularity choice.
+
+**Tech stack signals**: detect from `package.json`, `Makefile`, `pyproject.toml`, `go.mod`, `Cargo.toml` etc.
 
 **Synthesize** (internal reasoning only — not shown to user):
-- Project type: monorepo? single-package? pure docs repo? scripts collection?
-- Which directories have code files? (candidates for areas)
-- Which have both code AND docs? Which have code but NO docs? (most will have none — that's expected)
-- Natural groupings: dirs related by parent, naming, or apparent purpose
-- Scale: few dirs (→ compact), moderate (→ standard), many (→ fine-grained)
-- Skip from candidates: pure tooling dirs (`.github/`, `.husky/`), CI configs, fully generated dirs
+- Total tracked files, total directories, split candidates
+- Project type: monorepo? single-package? pure docs repo?
+- Which dirs have code files and no docs? (expected to be most)
+- Skip from area candidates: pure tooling dirs (`.github/`, `.husky/`), CI-only dirs, fully generated dirs
 
-Gary does NOT present this analysis — it powers Step 2.
+Gary does NOT present this analysis — it feeds Step 1.5.
 
-### Step 2: Propose Area Groupings
+### Step 1.5: Granularity Calibration
 
-Gary proposes **2–3 concrete area groupings** using `AskUserQuestion` with markdown previews. Always include **Custom** as the 4th option.
+Gary presents real repo statistics and asks the user how detailed the garden should be. This replaces abstract size labels with concrete, data-driven choices.
 
-**Producing the options:**
-- **Compact** — 3–4 broad areas; good for small or tightly coupled repos
-- **Standard** *(recommended for most repos)* — 5–8 areas; one per logical cluster of related code dirs
-- **Fine-grained** — 8+ areas; one per code directory; good for large monorepos
-
-**Each option preview shows the full area breakdown, emphasising undocumented dirs:**
-
+**Show a compact repo summary** (output to user):
 ```
-Option B — Standard (6 areas) ← recommended
+📊 Repository — 847 tracked files across 31 directories
 
-📁 Core Docs
-   root *.md files
-   Has docs: README.md, AGENTS.md
-
-📁 src/auth/ (12 .ts files)
-   No docs yet
-
-📁 src/payments/ (8 .ts files)
-   No docs yet
-
-📚 docs/ (3 .md files)
-   Has docs: ARCHITECTURE.md, core-beliefs.md, api.md
-
-🛖 Shed (8 agentic files)
-   AGENTS.md, CLAUDE.md, .cursor/rules/agents.mdc, .claude/commands/*.md, .github/agents/gardener.md, ...
-
-🧪 tests/ (5 .ts files)
-   No docs yet
+Top directories:
+  frontend/       412 files (18 subdirs: components/, pages/, hooks/, ...)
+  backend/        203 files (9 subdirs: api/, db/, services/, ...)
+  infrastructure/  89 files (6 subdirs)
+  tests/           87 files (4 subdirs)
+  docs/            12 files
+  ... (root-level files + Shed)
 ```
 
-**Judgment rules for proposals:**
-- **Shed** → always one area; collects all files from `config.yaml → shed_files` + any auto-discovered via `shed_patterns`. Uses explicit per-file includes.
-- Dirs with <3 code files AND no docs → merge into nearest parent area
+**Compute three concrete options** from the data:
+- **Shallow** — one area per top-level directory (no splitting). Area count = number of top-level dirs + Shed + Core Docs.
+- **Standard** *(recommended)* — split dirs that are split candidates (≥3 subdirs × ≥5 files each). Area count computed from the data.
+- **Deep** — one area per subdirectory with ≥5 files. Maximum visibility.
+
+Present via `AskUserQuestion` with markdown previews. Each preview lists the **actual area names and file counts** derived from the repo data — no invented examples. Always include **Custom** as 4th option.
+
+**Example preview for Standard:**
+```
+Option B — Standard (12 areas) ← recommended
+
+📁 Core Docs (root *.md — has: README.md, AGENTS.md)
+🛖 Shed (9 agentic files — CLAUDE.md, .cursor/rules/, ...)
+📚 docs/ (12 files — has: ARCHITECTURE.md, ...)
+🌐 frontend/components/ (87 files — no docs yet)
+🌐 frontend/pages/ (63 files — no docs yet)
+🎣 frontend/hooks/ (41 files — no docs yet)
+⚙️ backend/api/ (74 files — no docs yet)
+🗄️ backend/db/ (58 files — no docs yet)
+🔧 backend/services/ (71 files — no docs yet)
+🏗️ infrastructure/ (89 files — no docs yet)
+🧪 tests/ (87 files — no docs yet)
+📦 (remaining small dirs merged into nearest parent)
+```
+
+**After user picks A/B/C**: Gary proceeds directly to Step 2 with the computed area layout.
+**Custom**: Gary asks one clarifying question (which areas to merge/split/rename), then proceeds.
+
+---
+
+### Step 2: Confirm Area Layout
+
+Gary shows the selected area layout and asks for final confirmation before writing files.
+
+Show the area list (same compact format as the calibration preview). Then:
+
+```
+AskUserQuestion: "Plant with these N areas?"
+→ Plant now
+→ Let me adjust (Gary asks one merge/split/rename question, then re-confirms)
+→ Start over (return to Step 1.5)
+```
+
+**Carry-forward rules** (applied regardless of granularity choice):
+- **Shed** → always one area; uses explicit per-file includes from `config.yaml → shed_files` + `shed_patterns`.
 - Root-level `.md` files → always one "Core Docs" area
-- Generated/artifact dirs (`_bmad-output/`, `dist/`) → secondary area (only if they contain `.md` files)
-- Dirs with only docs and no code (e.g. `docs/`) → their own area as usual
-
-**After user picks:**
-- A/B/C: Gary confirms with one summary line, proceeds to Step 3
-- Custom: Gary asks one clarifying question (which areas to merge/split/rename), then proceeds
+- Dirs with <3 files AND no docs → merged into nearest parent area
+- Generated/artifact dirs (`_bmad-output/`) → secondary area (only if they contain `.md` files)
 
 ### Step 3: Classify Existing Documentation
 
@@ -362,7 +400,7 @@ Evolutionary, non-destructive update that preserves spatial memory — existing 
 
 **Scan B — untracked `.md` files:** Scan `**/*.md` (respecting `config.yaml` → `discovery_exclude`) for docs that don't match any area's `include` globs. Collect for Step 7.
 
-**Scan C — uncovered code directories (required):** Walk the full directory tree (same exclusions as Plant the Garden Step 1: `node_modules`, `dist`, `build`, `.git`, `coverage`, `__pycache__`, `_gs-gardener/`, plus `config.yaml → discovery_exclude`). For each directory: count code files (non-`.md`, non-config). A directory is **uncovered** if it has ≥3 code files AND no existing area's `include` globs would match files inside it. Collect all uncovered dirs — do not skip this scan even if Scan A found no changes.
+**Scan C — uncovered code directories (required):** Use `git ls-files` (or the `find` fallback for non-git repos — same exclusions as Plant the Garden Step 1) to enumerate all tracked files. Aggregate by directory at level-1 and level-2 (same CLI commands as Plant the Garden Step 1). A directory is **uncovered** if it has ≥3 files AND no existing area's `include` globs would match files inside it. Collect all uncovered dirs — do not skip this scan even if Scan A found no changes. `git ls-files` ensures gitignored dirs never appear as candidates.
 
 ### Step 2: Diff
 
