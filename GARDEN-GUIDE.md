@@ -305,11 +305,11 @@ A: The workflows are Claude Code specific currently. However, the patterns could
 
 **Q: Can I customize the workflows?**
 
-A: Yes! If using direct copy installation, edit `_gs-gardener/core/workflows/{name}/workflow.md` in your repo. If using submodule, fork ai-bootstrap first.
+A: Workflows are the core product and should not be edited directly — they get overwritten during updates. All customization happens in `_gs-gardener/core/config.yaml`. If you need workflow changes, consider contributing to the garden system upstream.
 
 **Q: Can I disable Gary's personality?**
 
-A: Edit `_gs-gardener/core/agents/gardener.md` and simplify the `<persona>` section. Remove gardening metaphors from `communication_style`.
+A: The gardener persona is part of the core product. Like workflows, `gardener.md` gets overwritten during updates. Personality customization may be added to config.yaml in future versions.
 
 **Q: How do I change the AGENTS.md line limit?**
 

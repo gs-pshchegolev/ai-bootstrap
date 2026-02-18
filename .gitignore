@@ -25,6 +25,8 @@ Thumbs.db
 dist/
 build/
 coverage/
+test-results/
+playwright-report/
 
 # npm
 .npm/

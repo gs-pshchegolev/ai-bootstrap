@@ -3,7 +3,7 @@
 import { parseArgs } from 'node:util';
 import { cpSync, existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync, statSync, renameSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
-import { checkbox, select } from '@inquirer/prompts';
+import { checkbox, confirm, select } from '@inquirer/prompts';
 
 const PKG_ROOT = resolve(import.meta.dirname, '..');
 const VERSION = readFileSync(join(PKG_ROOT, '_gs-gardener', 'VERSION'), 'utf8').trim();
@@ -254,6 +254,22 @@ async function runUpdate(force, dryRun) {
     process.exit(0);
   }
 
+  // Confirmation before update (skip with --force)
+  if (!force && !dryRun) {
+    console.log(`\n  Updating garden system: ${dim(`v${installedVersion}`)} → ${green(`v${VERSION}`)}`);
+    console.log(`  ${dim('This will overwrite core files. Your config.yaml settings will be preserved.')}\n`);
+
+    const proceed = await confirm({
+      message: 'Continue with update?',
+      default: true,
+    });
+
+    if (!proceed) {
+      console.log(`\n  Update cancelled.\n`);
+      process.exit(0);
+    }
+  }
+
   await runSetup('update', force, dryRun);
 }
 
@@ -291,7 +307,8 @@ async function runSetup(mode, force, dryRun) {
       `  ${green("✓")} Core system → ${dim("_gs-gardener/ (unchanged)")}`,
     );
   } else {
-    const savedConfig = isUpgrade ? safeReadFile(configPath) : null;
+    // Preserve config for any existing installation (upgrades or force reinstalls)
+    const savedConfig = installedVersion ? safeReadFile(configPath) : null;
 
     if (!dryRun) {
       cpSync(coreSrc, coreDest, { recursive: true, force: true });
@@ -309,7 +326,7 @@ async function runSetup(mode, force, dryRun) {
         console.log(`  ${green("✓")} Core system → ${dim("_gs-gardener/")}`);
       }
     } else {
-      const label = isUpgrade ? "(would upgrade, config preserved)" : "";
+      const label = installedVersion ? "(would upgrade, config preserved)" : "";
       console.log(
         `  ${green("✓")} Core system → ${dim(`_gs-gardener/ ${label}`)}`,
       );
@@ -437,9 +454,12 @@ __pycache__/
     }
   }
 
-  // ── 5. Write config.yaml ──────────────────────────────────────────
+  // ── 5. Write or update config.yaml ─────────────────────────────────
   if (!dryRun && freshInstall) {
-    writeFileSync(configPath, defaultConfig(basename(dest)));
+    writeFileSync(configPath, defaultConfig(basename(dest), selectedTools));
+  } else if (!dryRun && !freshInstall) {
+    // Update wrapper_files in existing config to include newly added tools
+    updateConfigWrappers(configPath, selectedTools);
   }
 
   // ── Summary ───────────────────────────────────────────────────────
@@ -631,7 +651,12 @@ function safeReadFile(filePath) {
   }
 }
 
-function defaultConfig(projectName) {
+function defaultConfig(projectName, selectedTools) {
+  const wrapperLines = selectedTools
+    .filter(slug => TOOLS[slug]?.agentFile)
+    .map(slug => `  - "{project-root}/${TOOLS[slug].agentFile.path}"`)
+    .join('\n');
+
   return `# Garden System Configuration
 # Version: ${VERSION}
 
@@ -643,7 +668,7 @@ output_folder: "{project-root}/docs"
 # Coverage tracking
 agents_file: "{project-root}/AGENTS.md"
 wrapper_files:
-  - "{project-root}/CLAUDE.md"
+${wrapperLines}
 
 # Content layers
 docs_directory: "{project-root}/docs"
@@ -655,6 +680,50 @@ agents_max_lines: 150
 # Garden System Version
 version: "${VERSION}"
 `;
+}
+
+function updateConfigWrappers(configPath, selectedTools) {
+  const config = safeReadFile(configPath);
+  if (!config) return;
+
+  const wrapperPaths = selectedTools
+    .filter(slug => TOOLS[slug]?.agentFile)
+    .map(slug => `{project-root}/${TOOLS[slug].agentFile.path}`);
+
+  // Parse existing wrapper_files from config
+  const existingWrappers = [];
+  const lines = config.split('\n');
+  let inWrappers = false;
+  for (const line of lines) {
+    if (/^wrapper_files:/.test(line)) { inWrappers = true; continue; }
+    if (inWrappers) {
+      const match = line.match(/^\s+-\s+"(.+)"/);
+      if (match) { existingWrappers.push(match[1]); continue; }
+      inWrappers = false;
+    }
+  }
+
+  // Merge — add any new wrappers not already present
+  let changed = false;
+  for (const wp of wrapperPaths) {
+    if (!existingWrappers.includes(wp)) {
+      existingWrappers.push(wp);
+      changed = true;
+    }
+  }
+
+  if (!changed) return;
+
+  // Rebuild wrapper_files block
+  const newBlock = 'wrapper_files:\n' +
+    existingWrappers.map(w => `  - "${w}"`).join('\n');
+
+  const updated = config.replace(
+    /wrapper_files:\n(?:\s+-\s+".+"\n?)*/,
+    newBlock + '\n',
+  );
+
+  writeFileSync(configPath, updated);
 }
 
 function installFile(dest, relPath, content, force, dryRun) {

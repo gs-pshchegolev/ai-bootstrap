@@ -66,27 +66,24 @@ git commit -m "feat: add garden system for AI config maintenance"
 
 ### Updating
 
-To update to a newer version:
+To update to a newer version, use the CLI:
 
 ```bash
 cd /path/to/target-repo
 
-# Pull latest ai-bootstrap (if cloned locally)
-cd /path/to/ai-bootstrap && git pull origin main
-cd /path/to/target-repo
+# Update via CLI (interactive confirmation)
+npx @pshch/gary-the-gardener update
 
-# Remove old version
-rm -rf _gs-gardener
-rm .claude/commands/garden-*.md
-
-# Copy new version
-cp -r /path/to/ai-bootstrap/_gs-gardener/ _gs-gardener/
-cp /path/to/ai-bootstrap/.claude/commands/garden-*.md .claude/commands/
-
-# Commit updates
-git add _gs-gardener .claude/commands
-git commit -m "chore: update garden system to latest version"
+# Or force update without confirmation
+npx @pshch/gary-the-gardener update --force
 ```
+
+The update command:
+- Overwrites all core files (`_gs-gardener/core/`)
+- **Preserves your `config.yaml` settings**
+- Updates skill commands for all installed AI tools
+
+> **Note:** Only `config.yaml` is preserved. Any local modifications to workflows or agent files will be lost.
 
 ---
 
@@ -226,6 +223,8 @@ If you see 🪴 Gary The Gardener's menu, installation was successful! 🎉
 ## Configuration
 
 Each installation includes a config file at [_gs-gardener/core/config.yaml](_gs-gardener/core/config.yaml).
+
+> **Important:** `config.yaml` is the only user-customizable file. All other files in `_gs-gardener/` are core product and get overwritten during updates. Do not edit workflows or agent files directly.
 
 ### Default Configuration
 

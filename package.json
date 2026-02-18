@@ -7,6 +7,9 @@
     "gary-the-gardener": "./bin/cli.js",
     "gardener": "./bin/cli.js"
   },
+  "scripts": {
+    "test:e2e": "npx playwright test"
+  },
   "files": [
     "bin/",
     "_gs-gardener/",
@@ -36,5 +39,10 @@
   },
   "dependencies": {
     "@inquirer/prompts": "^7.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
   }
 }
