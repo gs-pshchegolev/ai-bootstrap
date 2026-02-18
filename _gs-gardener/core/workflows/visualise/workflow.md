@@ -54,12 +54,15 @@ Read `garden.md` if it exists. Check for a `hash:` line in its header.
 
 ### Render
 
-Build compact markdown for each area in `docsmap.yaml`. Follow the **Rendering Contract** below.
+Build the garden table for each area in `docsmap.yaml`. Follow the **Rendering Contract** below.
 
-For each area:
-1. Read entity readiness from docsmap
-2. For each row, output label + emoji sequence (no dot padding — only entity emojis)
-3. Continuation rows (overflow >18) indented under the same label
+For each area, compute:
+1. **Dominant state** — the most frequent readiness emoji across all entities in the area (ties favour the more mature)
+2. **Plants cell** — full emoji stream if ≤18 total entities; collapsed counts if >18
+3. **Worms / Dead leaves / Signs** — read `area.code_issues` from docsmap; `—` if field absent or zero
+4. **Total cell** — all non-zero counts in `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂→🪧
+
+Compute the **season mood line** from aggregate totals across all areas (see Rendering Contract).
 
 Write `garden.md`:
 ```markdown
@@ -68,12 +71,14 @@ Write `garden.md`:
 > {X} entities across {N} areas
 **Legend:** 🫘 seed · 🌱 small · 🌿 grown · 🌳 mature
 
-### {area.emoji} {area.label} — {area.description}
-- `{row.label}`: {emoji} {emoji} {emoji}
-- `{row.label}`:
-  - {emoji} {emoji} {emoji} {emoji} {emoji} ...
-  - {emoji} {emoji} {emoji}
+{season-mood-line}
+
+| Area | Plants | Worms | Dead leaves | Signs | Total |
+|------|--------|-------|-------------|-------|-------|
+| {dominant} **{area.label}** | {plants-cell} | {worms-cell} | {dead-leaves-cell} | {signs-cell} | {total-cell} |
 ```
+
+`code_issues` is written by the audit workflow — never by visualise. If absent, treat all quality counts as 0.
 
 ## Phase 4: Display
 
@@ -82,13 +87,9 @@ Output the Gary Block. **Display shows all areas** (both primary and secondary).
 ```
 🪴 **Gary The Gardener** v{version} | 🏞️ Garden Map
 
-Your documentation ecosystem at a glance
+<season-mood-line>
 
----
-
-<garden.md content — all areas>
-
-📊 {X} entities across {N} areas — 🌳 {M} mature, 🌿 {Gr} grown, 🌱 {Sm} small, 🫘 {Se} seeds
+<garden table — all areas>
 
 🌱 *Did you know? <fun gardening fact>*
 ```
@@ -127,23 +128,43 @@ When the user replies with a shortcut or intent, Gary acts:
 
 ## Rendering Contract
 
-### Compact Markdown Format
+### Table Format
 
-No ASCII borders. Each area is a `###` heading, each row is a markdown list item:
+One row per area. Six columns.
 
 ```markdown
-### {area.emoji} {area.label} — {area.description}
-- `{row.label}`: {emoji} {emoji}
-- `{row.label}`:
-  - {emoji} {emoji} {emoji} {emoji} {emoji} {emoji} {emoji} {emoji} {emoji} {emoji} {emoji} {emoji} {emoji} {emoji} {emoji} {emoji} {emoji} {emoji}
-  - {emoji} {emoji} {emoji} {emoji} {emoji} {emoji}
+| Area | Plants | Worms | Dead leaves | Signs | Total |
+|------|--------|-------|-------------|-------|-------|
+| 🌿 **Core Docs** | 🌿 🌿 🌳 🌳 🌿 | 🪱×2 | 🍂×1 | — | 🌳×2 🌿×3 🪱×2 🍂×1 |
+| 🌿 **Knowledge Base** | 🌿 🌱 | — | — | 🪧×4 | 🌿×1 🌱×1 🪧×4 |
+| 🫘 **Wrappers** | 🫘 🫘 🌿 🫘 | — | 🍂×3 | — | 🌿×1 🫘×3 🍂×3 |
+| 🌳 **Artifacts** | 🌳 🌳 🌳 | — | — | — | 🌳×3 |
+| 🌿 **Tests** | 🌿 | — | — | — | 🌿×1 |
 ```
 
-- Short rows (≤6 entities): inline after the label — `` - `label`: {emojis} ``
-- Long rows (>6 entities): label on its own line, emoji sequences indented as `  - {emojis}`
-- Overflow (>18 entities): additional `  - {emojis}` continuation line
-- No dot padding — only show actual entity emojis
-- All areas use universal emojis: 🫘 🌱 🌿 🌳 (+ 🪱 for issues)
+**Area column:** dominant readiness emoji + **bold** area label.
+
+**Plants column:**
+- ≤18 total entities: full emoji stream — all entities concatenated with spaces across all grid rows. Directory grouping not shown here (lives in browse detail).
+- >18 total entities: collapsed counts — `🌳×8 🌿×12 🌱×3 🫘×1 *(browse for detail)*`
+
+**Worms / Dead leaves / Signs columns:** read from `area.code_issues` in docsmap. `🪱×N` / `🍂×N` / `🪧×N` or `—` if zero or absent. Sampled areas show `~` suffix: `🪱~×4`.
+
+**Total column:** all non-zero counts using `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂→🪧.
+
+### Season Mood Line
+
+One line computed from aggregate readiness across all entities in all areas:
+
+| Condition | Mood line |
+|-----------|-----------|
+| mature ≥ 60% | `🍂 Well-tended — mostly mature, a few seeds to nurture` |
+| mature+grown ≥ 60% | `☀️ Growing well — solid coverage, room to fill in` |
+| small+seed > mature+grown | `🌸 Just sprouting — garden is young, lots of potential` |
+| any 🪱 worms or 🍂 dead leaves present | `⚠️ Needs attention — some code quality issues found` |
+| default | `🌱 Taking shape — good progress, keep growing` |
+
+Evaluate in order — first match wins. Place directly below the Gary Block header, before the table.
 
 ### Folder-Level Aggregates
 
@@ -151,7 +172,7 @@ For areas using `granularity: folder`, a single entity represents a directory. T
 
 ## Universal Emoji Vocabulary
 
-All areas share the same 5-state emoji set:
+**Readiness states** (doc entities — line-based):
 
 | Emoji | State | Threshold |
 |-------|-------|-----------|
@@ -159,7 +180,14 @@ All areas share the same 5-state emoji set:
 | 🌿 | grown | 11–99 substantive lines |
 | 🌱 | small | 3–10 substantive lines |
 | 🫘 | seed | ≤2 substantive lines |
-| 🪱 | issue | Audit-flagged (not line-based) |
+
+**Code quality signals** (area-level — written by audit, not line-based):
+
+| Emoji | Signal |
+|-------|--------|
+| 🪱 | Worm — misleading name in code |
+| 🍂 | Dead leaf — expired comment in code |
+| 🪧 | Sign — meaningful JSDoc/commented TS definition |
 
 Substantive line = non-empty after trim, not a frontmatter delimiter (`---`), not a pure markdown heading with no content on same line.
 

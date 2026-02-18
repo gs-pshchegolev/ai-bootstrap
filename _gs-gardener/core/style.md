@@ -93,31 +93,53 @@ Pick a genuinely interesting, surprising fact about plants, soil, composting, pr
 - "A single teaspoon of healthy soil contains more microorganisms than there are people on Earth."
 - "Sunflowers perform heliotropism — young heads track the sun east to west daily, but mature heads face east permanently."
 
-## Garden Visualisation — Universal Emoji Vocabulary
+## Garden Visualisation — Map Format
 
-All areas share the same emoji vocabulary. This keeps the map simple and scannable.
+### Readiness States (doc entities)
 
-### Readiness States
+| Emoji | State | Threshold |
+|-------|-------|-----------|
+| 🌳 | mature | ≥100 substantive lines |
+| 🌿 | grown | 11–99 substantive lines |
+| 🌱 | small | 5–10 substantive lines |
+| 🫘 | seed | ≤5 substantive lines |
 
-| Emoji | State | Threshold | Meaning |
-|-------|-------|-----------|---------|
-| 🌳 | mature | ≥100 substantive lines | Stable, well-developed |
-| 🌿 | grown | 11–99 substantive lines | Usable but incomplete |
-| 🌱 | small | 5–10 substantive lines | Has content, still early |
-| 🫘 | seed | ≤5 substantive lines | Stub / placeholder |
-| 🪱 | issue | Audit-flagged | Needs attention |
+### Code Quality Signals (per area, from audit)
 
-### Folder-Level Aggregates
+Tracked at area level. Not present until an audit code-quality scan has run. `—` when zero.
 
-For areas using `granularity: folder`, a single entity represents a directory. The emoji is followed by a file count: `🌳×12` means a folder with 12 substantial docs inside.
+| Emoji | Signal | What it means |
+|-------|--------|---------------|
+| 🪱 | Worm | A function, variable, or class whose name no longer matches its behavior — a name that lies |
+| 🍂 | Dead leaf | A comment or docstring describing something the code no longer does |
+| 🪧 | Sign | A JSDoc block or commented-out TS definition that captures meaningful semantics (business rules, domain concepts, edge cases). Trivial `@param`/`@returns` type annotations excluded. |
 
-### Legend Format in Garden Map
+All three use `×N` count notation. `~` suffix (e.g. `🪱~×4`) means the area was sampled, not fully scanned.
 
-Inline legend at the top of garden.md, right after the header:
+### Table Layout
+
+6-column markdown table — one row per area. Scales to any project size.
 
 ```
-**Legend:** 🫘 seed · 🌱 small · 🌿 grown · 🌳 mature
+| Area | Plants | Worms | Dead leaves | Signs | Total |
+|------|--------|-------|-------------|-------|-------|
+| {dominant} **{label}** | {emoji stream or collapsed} | 🪱×N or — | 🍂×N or — | 🪧×N or — | {all non-zero ×N} |
 ```
+
+- **Area**: dominant readiness emoji (most frequent state; ties favour more mature) + **bold** label
+- **Plants**: emoji stream for ≤18 entities; `🌳×8 🌿×12 *(browse)*` for larger areas
+- **Worms / Dead leaves / Signs**: counts from `code_issues` in docsmap; `—` if zero or absent
+- **Total**: all non-zero counts, `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂→🪧
+
+### Season Mood Line
+
+One line above the table summarising overall garden health. First match wins:
+
+- `🍂 Well-tended` — mature ≥ 60%
+- `☀️ Growing well` — mature+grown ≥ 60%
+- `🌸 Just sprouting` — small+seed > mature+grown
+- `⚠️ Needs attention` — any 🪱 worms or 🍂 dead leaves flagged
+- `🌱 Taking shape` — default
 
 ### Display Scope
 

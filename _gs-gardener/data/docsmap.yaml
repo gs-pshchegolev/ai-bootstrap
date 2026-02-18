@@ -1,6 +1,6 @@
 version: 2
 generated: "18-02-2026"
-hash: "v2-15-18-02-2026"
+hash: "v2-16-18-02-2026"
 
 areas:
   core-docs:
@@ -127,6 +127,33 @@ areas:
           entities:
             - tests-readme-md
 
+  source:
+    label: Source
+    emoji: "⚙️"
+    description: CLI source code
+    display: secondary
+    granularity: file
+    include:
+      - "bin/**/*.js"
+    readiness_emojis:
+      mature: "\U0001F333"
+      grown: "\U0001F33F"
+      small: "\U0001F331"
+      seed: "\U0001FAD8"
+      issue: "\U0001FAB1"
+    code_issues:
+      worms: 1
+      dead_leaves: 0
+      signs: 0
+      last_scanned: "18-02-2026"
+      sampled: false
+    grid:
+      cols: 18
+      rows:
+        - label: "bin/"
+          entities:
+            - bin-cli-js
+
 entities:
   agents-md:
     path: "AGENTS.md"
@@ -141,7 +168,7 @@ entities:
     path: "README.md"
     type: doc
     area: core-docs
-    readiness: mature
+    readiness: grown
     label: README.md
     placed: "18-02-2026"
     updated: "18-02-2026"
@@ -186,7 +213,7 @@ entities:
     path: "docs/core-beliefs.md"
     type: doc
     area: knowledge-base
-    readiness: grown
+    readiness: small
     label: core-beliefs.md
     placed: "18-02-2026"
     updated: "18-02-2026"
@@ -213,7 +240,7 @@ entities:
     path: ".github/agents/gardener.md"
     type: wrapper
     area: wrappers
-    readiness: small
+    readiness: grown
     label: gardener.md
     placed: "18-02-2026"
     updated: "18-02-2026"
@@ -260,5 +287,14 @@ entities:
     area: tests
     readiness: grown
     label: README.md
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  bin-cli-js:
+    path: "bin/cli.js"
+    type: source
+    area: source
+    readiness: mature
+    label: cli.js
     placed: "18-02-2026"
     updated: "18-02-2026"

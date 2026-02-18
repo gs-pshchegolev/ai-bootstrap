@@ -1,22 +1,15 @@
 # Garden Map
-> Rendered 18-02-2026 | hash: v2-15-18-02-2026
-> 15 entities across 5 areas
+> Rendered 18-02-2026 | hash: v2-16-18-02-2026
+> 16 entities across 6 areas
 **Legend:** 🫘 seed · 🌱 small · 🌿 grown · 🌳 mature
 
-### 📁 Core Docs — Root-level project documentation
-- `root`: 🌿 🌳 🌳 🌳 🌿
+☀️ Growing well — solid coverage, room to fill in
 
-### 📚 Knowledge Base — docs/ directory
-- `docs/`: 🌿 🌿
-
-### 🔌 Wrappers — AI tool sync wrappers
-- `root`: 🫘
-- `.github/`: 🫘 🌱
-- `.junie/`: 🫘
-
-### 📋 Output Artifacts — Generated planning and test artifacts
-- `_bmad-output/`: 🌳 🌳
-- `_bmad-output/implementation-artifacts/`: 🌳
-
-### 🧪 Tests — Test documentation
-- `tests/`: 🌿
+| Area | Plants | Worms | Dead leaves | Signs | Total |
+|------|--------|-------|-------------|-------|-------|
+| 🌿 **Core Docs** | 🌿 🌿 🌳 🌳 🌿 | — | — | — | 🌳×2 🌿×3 |
+| 🌿 **Knowledge Base** | 🌿 🌱 | — | — | — | 🌿×1 🌱×1 |
+| 🫘 **Wrappers** | 🫘 🫘 🌿 🫘 | — | — | — | 🌿×1 🫘×3 |
+| 🌳 **Artifacts** | 🌳 🌳 🌳 | — | — | — | 🌳×3 |
+| 🌿 **Tests** | 🌿 | — | — | — | 🌿×1 |
+| 🌳 **Source** | 🌳 | 🪱×1 | — | — | 🌳×1 🪱×1 |
