@@ -11,7 +11,7 @@ Every Gary response is **one block** with three parts: header, body, footer.
 Identity + version + mode + goal. Always starts with 🪴, includes version from `_gs-gardener/VERSION`, then `|` separator with emoji mode.
 
 ```
-🪴 **Gary The Gardener** v2.1.0 | <emoji> <mode>
+🪴 **Gary The Gardener** v{version} | <emoji> <mode>
 
 <goal — one line describing what's happening>
 ```
@@ -101,35 +101,34 @@ Pick a genuinely interesting, surprising fact about plants, soil, composting, pr
 |-------|-------|-----------|
 | 🌳 | mature | ≥100 substantive lines |
 | 🌿 | grown | 11–99 substantive lines |
-| 🌱 | small | 5–10 substantive lines |
-| 🫘 | seed | ≤5 substantive lines |
+| 🌱 | small | 3–10 substantive lines |
+| 🫘 | seed | ≤2 substantive lines |
 
-### Code Quality Signals (per area, from audit)
+### Documentation Quality Signals (per area, from audit)
 
-Tracked at area level. Not present until an audit code-quality scan has run. `—` when zero.
+Tracked at area level. Not present until an audit has run. `—` when zero.
 
 | Emoji | Signal | What it means |
 |-------|--------|---------------|
-| 🪱 | Worm | A function, variable, or class whose name no longer matches its behavior — a name that lies |
-| 🍂 | Dead leaf | A comment or docstring describing something the code no longer does |
-| 🪧 | Sign | A JSDoc block or commented-out TS definition that captures meaningful semantics (business rules, domain concepts, edge cases). Trivial `@param`/`@returns` type annotations excluded. |
+| 🪱 | Worm | A claim in a `.md` file that contradicts verifiable codebase facts — wrong tech stack, wrong paths, wrong commands |
+| 🍂 | Dead leaf | Documentation describing something that no longer exists — removed files, deleted dependencies, defunct scripts |
 
-All three use `×N` count notation. `~` suffix (e.g. `🪱~×4`) means the area was sampled, not fully scanned.
+Both use `×N` count notation.
 
 ### Table Layout
 
-6-column markdown table — one row per area. Scales to any project size.
+5-column markdown table — one row per area. Scales to any project size.
 
 ```
-| Area | Plants | Worms | Dead leaves | Signs | Total |
-|------|--------|-------|-------------|-------|-------|
-| {dominant} **{label}** | {emoji stream or collapsed} | 🪱×N or — | 🍂×N or — | 🪧×N or — | {all non-zero ×N} |
+| Area | Plants | Worms | Dead leaves | Total |
+|------|--------|-------|-------------|-------|
+| {dominant} **{label}** | {emoji stream or collapsed} | 🪱×N or — | 🍂×N or — | {all non-zero ×N} |
 ```
 
 - **Area**: dominant readiness emoji (most frequent state; ties favour more mature) + **bold** label
 - **Plants**: emoji stream for ≤18 entities; `🌳×8 🌿×12 *(browse)*` for larger areas
-- **Worms / Dead leaves / Signs**: counts from `code_issues` in docsmap; `—` if zero or absent
-- **Total**: all non-zero counts, `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂→🪧
+- **Worms / Dead leaves**: counts from `doc_issues` in docsmap; `—` if zero or absent
+- **Total**: all non-zero counts, `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂
 
 ### Season Mood Line
 

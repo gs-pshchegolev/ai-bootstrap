@@ -1,8 +1,0 @@
-# area: source · scanned: 18-02-2026 · sampled: false
-worms:
-  - f: bin/cli.js
-    l: 178
-    s: runInteractiveMenu
-    n: in non-TTY mode skips menu entirely and runs auto-select; name implies always interactive
-dead_leaves: []
-signs: []

@@ -1,6 +1,6 @@
 version: 2
 generated: "18-02-2026"
-hash: "v2-16-18-02-2026"
+hash: "v2-17-18-02-2026"
 
 areas:
   core-docs:
@@ -16,7 +16,7 @@ areas:
       grown: "\U0001F33F"
       small: "\U0001F331"
       seed: "\U0001FAD8"
-      issue: "\U0001FAB1"
+
     grid:
       cols: 18
       rows:
@@ -41,7 +41,7 @@ areas:
       grown: "\U0001F33F"
       small: "\U0001F331"
       seed: "\U0001FAD8"
-      issue: "\U0001FAB1"
+
     grid:
       cols: 18
       rows:
@@ -61,12 +61,14 @@ areas:
       - ".github/copilot-instructions.md"
       - ".github/agents/gardener.md"
       - ".junie/guidelines.md"
+      - ".cursor/rules/agents.mdc"
+      - ".cursor/rules/garden-agent-gardener.mdc"
     readiness_emojis:
       mature: "\U0001F333"
       grown: "\U0001F33F"
       small: "\U0001F331"
       seed: "\U0001FAD8"
-      issue: "\U0001FAB1"
+
     grid:
       cols: 18
       rows:
@@ -80,6 +82,10 @@ areas:
         - label: ".junie/"
           entities:
             - junie-guidelines-md
+        - label: ".cursor/"
+          entities:
+            - cursor-rules-agents-mdc
+            - cursor-rules-garden-agent-gardener-mdc
 
   output-artifacts:
     label: Output Artifacts
@@ -94,7 +100,7 @@ areas:
       grown: "\U0001F33F"
       small: "\U0001F331"
       seed: "\U0001FAD8"
-      issue: "\U0001FAB1"
+
     grid:
       cols: 18
       rows:
@@ -119,40 +125,13 @@ areas:
       grown: "\U0001F33F"
       small: "\U0001F331"
       seed: "\U0001FAD8"
-      issue: "\U0001FAB1"
+
     grid:
       cols: 18
       rows:
         - label: "tests/"
           entities:
             - tests-readme-md
-
-  source:
-    label: Source
-    emoji: "⚙️"
-    description: CLI source code
-    display: secondary
-    granularity: file
-    include:
-      - "bin/**/*.js"
-    readiness_emojis:
-      mature: "\U0001F333"
-      grown: "\U0001F33F"
-      small: "\U0001F331"
-      seed: "\U0001FAD8"
-      issue: "\U0001FAB1"
-    code_issues:
-      worms: 1
-      dead_leaves: 0
-      signs: 0
-      last_scanned: "18-02-2026"
-      sampled: false
-    grid:
-      cols: 18
-      rows:
-        - label: "bin/"
-          entities:
-            - bin-cli-js
 
 entities:
   agents-md:
@@ -290,11 +269,20 @@ entities:
     placed: "18-02-2026"
     updated: "18-02-2026"
 
-  bin-cli-js:
-    path: "bin/cli.js"
-    type: source
-    area: source
-    readiness: mature
-    label: cli.js
+  cursor-rules-agents-mdc:
+    path: ".cursor/rules/agents.mdc"
+    type: wrapper
+    area: wrappers
+    readiness: small
+    label: agents.mdc
+    placed: "18-02-2026"
+    updated: "18-02-2026"
+
+  cursor-rules-garden-agent-gardener-mdc:
+    path: ".cursor/rules/garden-agent-gardener.mdc"
+    type: wrapper
+    area: wrappers
+    readiness: grown
+    label: garden-agent-gardener.mdc
     placed: "18-02-2026"
     updated: "18-02-2026"

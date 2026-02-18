@@ -33,7 +33,12 @@ This workflow is **tool-agnostic** — it describes operations, not specific too
 
 ## Phase 1: Fast Path
 
-Check if `garden.md` exists. If it does, **read it and jump directly to Phase 4** — no docsmap loading, no hash verification. This is the observe path: the user just wants to see the map.
+Check if `garden.md` exists. If it does:
+1. Read `garden.md` and extract its `hash:` line.
+2. Read `docsmap.yaml` and extract its `hash` field.
+3. **If hashes match**: jump directly to Phase 4 — no re-render needed.
+4. **If hashes differ** (docsmap changed since last render): skip to Phase 3 cache-miss path to re-render.
+5. **If docsmap.yaml is absent**: display `garden.md` as-is with a note that the garden state file is missing.
 
 Only proceed to Phase 2 if `garden.md` is absent.
 
@@ -59,8 +64,8 @@ Build the garden table for each area in `docsmap.yaml`. Follow the **Rendering C
 For each area, compute:
 1. **Dominant state** — the most frequent readiness emoji across all entities in the area (ties favour the more mature)
 2. **Plants cell** — full emoji stream if ≤18 total entities; collapsed counts if >18
-3. **Worms / Dead leaves / Signs** — read `area.code_issues` from docsmap; `—` if field absent or zero
-4. **Total cell** — all non-zero counts in `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂→🪧
+3. **Worms / Dead leaves** — read `area.doc_issues` from docsmap; `—` if field absent or zero
+4. **Total cell** — all non-zero counts in `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂
 
 Compute the **season mood line** from aggregate totals across all areas (see Rendering Contract).
 
@@ -73,12 +78,12 @@ Write `garden.md`:
 
 {season-mood-line}
 
-| Area | Plants | Worms | Dead leaves | Signs | Total |
-|------|--------|-------|-------------|-------|-------|
-| {dominant} **{area.label}** | {plants-cell} | {worms-cell} | {dead-leaves-cell} | {signs-cell} | {total-cell} |
+| Area | Plants | Worms | Dead leaves | Total |
+|------|--------|-------|-------------|-------|
+| {dominant} **{area.label}** | {plants-cell} | {worms-cell} | {dead-leaves-cell} | {total-cell} |
 ```
 
-`code_issues` is written by the audit workflow — never by visualise. If absent, treat all quality counts as 0.
+`doc_issues` is written by the audit workflow — never by visualise. If absent, treat all quality counts as 0.
 
 ## Phase 4: Display
 
@@ -130,32 +135,25 @@ When the user replies with a shortcut or intent, Gary acts:
 
 ### Table Format
 
-One row per area. Six columns.
+One row per area. Five columns.
 
 ```markdown
-| Area | Plants | Worms | Dead leaves | Signs | Total |
-|------|--------|-------|-------------|-------|-------|
-| 🌿 **Core Docs** | 🌿 🌿 🌳 🌳 🌿 | 🪱×2 | 🍂×1 | — | 🌳×2 🌿×3 🪱×2 🍂×1 |
-| 🌿 **Knowledge Base** | 🌿 🌱 | — | — | 🪧×4 | 🌿×1 🌱×1 🪧×4 |
-| 🫘 **Wrappers** | 🫘 🫘 🌿 🫘 | — | 🍂×3 | — | 🌿×1 🫘×3 🍂×3 |
-| 🌳 **Artifacts** | 🌳 🌳 🌳 | — | — | — | 🌳×3 |
-| 🌿 **Tests** | 🌿 | — | — | — | 🌿×1 |
-| ⚙️ **Source** | ⚙️×12 | 🪱×1 | — | — | ⚙️×12 🪱×1 |
+| Area | Plants | Worms | Dead leaves | Total |
+|------|--------|-------|-------------|-------|
+| 🌿 **Core Docs** | 🌿 🌿 🌳 🌳 🌿 | 🪱×2 | 🍂×1 | 🌳×2 🌿×3 🪱×2 🍂×1 |
+| 🌿 **Knowledge Base** | 🌿 🌱 | — | — | 🌿×1 🌱×1 |
+| 🫘 **Wrappers** | 🫘 🫘 🌿 🫘 | — | 🍂×3 | 🌿×1 🫘×3 🍂×3 |
+| 🌳 **Artifacts** | 🌳 🌳 🌳 | — | — | 🌳×3 |
+| 🌿 **Tests** | 🌿 | — | — | 🌿×1 |
 ```
 
-**Area column:**
-- Doc areas: dominant readiness emoji + **bold** label
-- Source areas (`type: source`): always `⚙️` regardless of file readiness
+**Area column:** dominant readiness emoji + **bold** label.
 
-**Plants column:**
-- *Doc areas* — full emoji stream if ≤18 entities; collapsed counts if >18: `🌳×8 🌿×12 🌱×3 🫘×1 *(browse for detail)*`
-- *Source areas* — show file count as `⚙️×{N}` where N = count of files currently matching the area's `include` glob. Do **not** show readiness emojis — code file line counts are not a doc-readiness signal. If area has no `code_issues` yet (never scanned), append `?`: `⚙️×12?`
+**Plants column:** full emoji stream if ≤18 entities; collapsed counts if >18: `🌳×8 🌿×12 🌱×3 🫘×1 *(browse for detail)*`
 
-**Worms / Dead leaves / Signs columns:** read from `area.code_issues` in docsmap. `🪱×N` / `🍂×N` / `🪧×N` or `—` if zero or absent. Sampled areas show `~` suffix: `🪱~×4`.
+**Worms / Dead leaves columns:** read from `area.doc_issues` in docsmap. `🪱×N` / `🍂×N` or `—` if zero or absent.
 
-**Total column:**
-- Doc areas: all non-zero counts using `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂→🪧
-- Source areas: `⚙️×N` file count first, then code quality counts: 🪱→🍂→🪧
+**Total column:** all non-zero counts using `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂
 
 ### Season Mood Line
 
@@ -166,7 +164,7 @@ One line computed from aggregate readiness across all entities in all areas:
 | mature ≥ 60% | `🍂 Well-tended — mostly mature, a few seeds to nurture` |
 | mature+grown ≥ 60% | `☀️ Growing well — solid coverage, room to fill in` |
 | small+seed > mature+grown | `🌸 Just sprouting — garden is young, lots of potential` |
-| any 🪱 worms or 🍂 dead leaves present | `⚠️ Needs attention — some code quality issues found` |
+| any 🪱 worms or 🍂 dead leaves present | `⚠️ Needs attention — some docs contradict or trail the codebase` |
 | default | `🌱 Taking shape — good progress, keep growing` |
 
 Evaluate in order — first match wins. Place directly below the Gary Block header, before the table.
@@ -186,13 +184,12 @@ For areas using `granularity: folder`, a single entity represents a directory. T
 | 🌱 | small | 3–10 substantive lines |
 | 🫘 | seed | ≤2 substantive lines |
 
-**Code quality signals** (area-level — written by audit, not line-based):
+**Documentation quality signals** (area-level — written by audit, not line-based):
 
 | Emoji | Signal |
 |-------|--------|
-| 🪱 | Worm — misleading name in code |
-| 🍂 | Dead leaf — expired comment in code |
-| 🪧 | Sign — meaningful JSDoc/commented TS definition |
+| 🪱 | Worm — a `.md` claim contradicting verifiable codebase facts |
+| 🍂 | Dead leaf — documentation describing something that no longer exists |
 
 Substantive line = non-empty after trim, not a frontmatter delimiter (`---`), not a pure markdown heading with no content on same line.
 
@@ -212,35 +209,39 @@ Classify discovered files into documentation vs non-documentation:
 
 Present filtered summary showing only documentation files, with counts per directory.
 
-### Step 1b: Source Code Discovery
+### Step 1b: Documentation Coverage Gaps
 
-After doc discovery, walk the source tree to find code directories that could become source areas. Repos are often messy (unfinished migrations, dead dirs, generated files mixed with source) — never silently auto-create areas. Walk and show; let the user decide.
+After doc discovery, walk the source tree to find code directories with no documentation. The goal is to surface architectural blind spots — not to create source areas, but to identify where docs should exist but don't.
 
 **Walk:**
 - Scan all directories (excluding `config.yaml` → `discovery_exclude` plus always-exclude: `node_modules`, `dist`, `build`, `.git`, `coverage`, `__pycache__`, `*.generated.*`, `*.min.*`)
-- Collect directories containing code files (non-`.md`, non-config). Count code files per directory at one level of depth — don't enumerate individual files.
+- Collect directories containing code files (non-`.md`, non-config). Count code files per directory at one level of depth.
 
 **Filter obvious noise:**
 - Skip dirs with <3 code files
 - Skip dirs where >80% of files are generated (e.g. all `.d.ts`, all `.min.js`, all `.map`)
 
-**Flag uncertainty explicitly — don't silently choose:**
-- Two dirs with similar content (e.g. `lib/` and `src/` both present) → flag `⚠️ possible unfinished migration — which is active?`
-- Dirs with no recent git activity (>6 months, check via `git log -1 --format="%ar" -- {dir}`) → flag `⚠️ may be stale/dead code`
-- Dirs whose name suggests generated output (`generated/`, `__generated__/`, `out/`) → flag `⚠️ looks generated — skip?`
+**Check documentation coverage:** For each candidate directory, check whether any `.md` file exists in or adjacent to it, or whether any existing doc area's `include` glob would cover a doc in that directory.
 
-**Present a tree-style summary for user confirmation** before adding anything. Let the user correct, merge, rename, or skip:
+**Use LLM judgment to assess architectural importance:**
+- Domain logic, API boundaries, business rules → likely significant
+- Pure utilities, helpers, generated glue → lower priority
+- Dirs with no recent git activity (>6 months, check via `git log -1 --format="%ar" -- {dir}`) → flag as possibly stale
+
+**Present a gap report** (not a confirmation for area creation):
 ```
-Source code directories found — confirm areas:
+📂 Undocumented areas — code exists but no docs found:
 
-· bin/ (1 file) → "Source: CLI"  ✓ proposed
-· src/api/ (24 files) → "Source: API"  ✓ proposed
-· src/utils/ (8 files) → merge into API, or separate?
-· lib/ + src/ both present (12 + 24 files)  ⚠️ migration?
-· dist/ (40 files)  ⚠️ looks generated — skip?
+· src/payments/ (8 .ts files) — ⚠️ looks architecturally significant
+· src/auth/ (12 .ts files) — ⚠️ looks architecturally significant
+· src/utils/ (6 .ts files) — utility code, lower priority
+
+Reply [+] to create doc stubs in these directories, or [S] to skip.
 ```
 
-Gary creates only what the user approves. Approved source areas are staged for Step 5. If no code directories found (pure-doc repo): skip this step silently.
+If user replies `[+]`: create a minimal stub `.md` file (e.g. `README.md`) in each approved directory. The stubs will be picked up as entities in the next Update run. Gary does **not** create source areas in docsmap.
+
+If no code directories with missing docs: skip this step silently.
 
 ### Step 2: Ask User to Define Areas
 
@@ -289,28 +290,7 @@ The grid mirrors the filesystem — adjacent cells are related files.
 
 ### Step 5: Write Files
 
-**Source areas** (approved in Step 1b) are written as area definitions only — no entities and no grid (code quality is tracked at area level via `code_issues`, written later by audit):
-```yaml
-  {area-id}:
-    label: {Label}
-    emoji: "{emoji}"
-    description: {description}
-    display: secondary
-    granularity: file
-    include:
-      - "{glob-pattern}"
-    readiness_emojis:
-      mature: "\U0001F333"
-      grown: "\U0001F33F"
-      small: "\U0001F331"
-      seed: "\U0001FAD8"
-      issue: "\U0001FAB1"
-    grid:
-      cols: 18
-      rows: []
-```
-
-**Doc areas** (defined in Step 2) are written with full entity and grid layout:
+Write areas with full entity and grid layout:
 
 1. Write `docsmap.yaml` with areas, entities, grid layout:
 
@@ -333,7 +313,11 @@ areas:
       grown: "\U0001F33F"
       small: "\U0001F331"
       seed: "\U0001FAD8"
-      issue: "\U0001FAB1"
+    # doc_issues: optional — written by /garden-audit, never by visualise
+    # doc_issues:
+    #   worms: 0          # claims in .md files contradicting the codebase
+    #   dead_leaves: 0    # docs referencing things that no longer exist
+    #   last_checked: "{DD-MM-YYYY}"
     grid:
       cols: 18
       rows:
@@ -343,7 +327,7 @@ areas:
 entities:
   {entity-id}:
     path: "{relative-path}"
-    type: {type}
+    type: {type}             # instructions | doc | wrapper | artifact
     area: {area-id}
     readiness: {mature|grown|small|seed}
     label: {display-name}
