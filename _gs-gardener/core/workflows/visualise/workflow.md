@@ -356,11 +356,13 @@ Evolutionary, non-destructive update that preserves spatial memory — existing 
 
 ### Step 1: Discover
 
-Re-scan each area's `include` globs. Compare discovered files to entities in `docsmap.yaml`.
+**This step has three mandatory scans — run all three every time:**
 
-Also scan `**/*.md` (respecting `config.yaml` → `discovery_exclude`) for **untracked files** — docs that don't match any area's `include` globs. If found, report them after the update summary (Step 7) and offer to add a new area or expand an existing area's globs.
+**Scan A — existing areas:** Re-scan each area's `include` globs. Compare discovered files to entities in `docsmap.yaml`.
 
-Also scan for **uncovered code directories** — directories containing code files (non-`.md`, non-config) that are not covered by any area's `include` globs. Apply the same exclusions as Plant the Garden Step 1 (`node_modules`, `dist`, `.git`, etc.). Skip dirs with <3 code files. If found, surface them in Step 7.
+**Scan B — untracked `.md` files:** Scan `**/*.md` (respecting `config.yaml` → `discovery_exclude`) for docs that don't match any area's `include` globs. Collect for Step 7.
+
+**Scan C — uncovered code directories (required):** Walk the full directory tree (same exclusions as Plant the Garden Step 1: `node_modules`, `dist`, `build`, `.git`, `coverage`, `__pycache__`, `_gs-gardener/`, plus `config.yaml → discovery_exclude`). For each directory: count code files (non-`.md`, non-config). A directory is **uncovered** if it has ≥3 code files AND no existing area's `include` globs would match files inside it. Collect all uncovered dirs — do not skip this scan even if Scan A found no changes.
 
 ### Step 2: Diff
 
@@ -420,16 +422,24 @@ Then ask the user (via `AskUserQuestion`):
 - Expand existing area (add globs to an existing area)
 - Ignore (skip — files remain untracked)
 
-If uncovered code directories were found in Step 1, append (after any untracked docs output):
+If uncovered code directories were found in Scan C, append (after any untracked docs output):
 ```
-📂 Found {N} code directories with no area coverage:
-  - src/new-feature/ (8 .ts files)
-  - src/analytics/ (5 .ts files)
-  - ...
-Reply [R] to re-plant the garden with updated area groupings, or [S] to skip.
+📂 {N} code directories have no garden area yet:
+  · src/new-feature/ (8 .ts files) — no docs yet
+  · src/analytics/ (5 .ts files) — no docs yet
+  · workers/queue/ (4 .ts files) — no docs yet
+Reply [A] to add these as empty areas now, or [S] to skip.
 ```
 
-If the user replies `[R]`: trigger the **Plant the Garden** sub-flow (re-plant), which will run code directory discovery again and propose a revised area grouping that includes the new directories.
+**If user replies `[A]`** — add directly, no re-plant:
+1. For each uncovered dir, propose a label and emoji (use directory name, infer from naming — `src/auth/` → `🔐 Auth`, `workers/queue/` → `⚙️ Queue Worker`, etc.)
+2. Show proposed areas in one compact list — ask user to confirm or rename via a single `AskUserQuestion` ("Confirm these areas?" with options: Add all / Let me rename / Skip)
+3. Append each new area to `docsmap.yaml` with empty `entities: []` and an empty grid row
+4. Bump `hash` and `generated` timestamp
+5. Re-render `garden.md` — the new areas appear with `—` in Plants column immediately
+6. Show updated garden
+
+These are additive changes — no existing areas or entities are modified.
 
 If neither untracked docs nor uncovered dirs: return directly to the Phase 4 footer options.
 
