@@ -147,17 +147,17 @@ One row per area. Five columns.
 | 🌿 **Tests** | 🌿 | — | — | 🌿×1 |
 ```
 
-**Area column:** dominant readiness emoji + **bold** label.
+**Area column:** dominant readiness emoji + **bold** label. For areas with 0 entities, use `🫘` as dominant emoji.
 
-**Plants column:** full emoji stream if ≤18 entities; collapsed counts if >18: `🌳×8 🌿×12 🌱×3 🫘×1 *(browse for detail)*`
+**Plants column:** full emoji stream if ≤18 entities; collapsed counts if >18: `🌳×8 🌿×12 🌱×3 🫘×1 *(browse for detail)*`. For areas with 0 entities, show `—`.
 
 **Worms / Dead leaves columns:** read from `area.doc_issues` in docsmap. `🪱×N` / `🍂×N` or `—` if zero or absent.
 
-**Total column:** all non-zero counts using `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂
+**Total column:** all non-zero counts using `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂. For areas with 0 entities, show `—`.
 
 ### Season Mood Line
 
-One line computed from aggregate readiness across all entities in all areas:
+One line computed from aggregate readiness across entities in areas **that have at least one entity**. Areas with 0 entities are excluded from the percentage calculation (they don't count as "seed" — they're undocumented code directories, which is expected).
 
 | Condition | Mood line |
 |-----------|-----------|
@@ -197,74 +197,78 @@ Substantive line = non-empty after trim, not a frontmatter delimiter (`---`), no
 
 Full-repo discovery that creates `docsmap.yaml`, `history.jsonl`, and `garden.md` from scratch.
 
-### Step 1: Full Discovery + Classification
+### Step 1: Code Directory Discovery
 
-Scan `**/*.md` (excluding directories listed in `config.yaml` → `discovery_exclude`, and always excluding `_gs-gardener/` internals).
+Gary scans the **repository structure** to understand what code exists — not just where docs are.
 
-Classify discovered files into documentation vs non-documentation:
+**Scan** (respecting `config.yaml → discovery_exclude` + always-exclude: `node_modules`, `dist`, `build`, `.git`, `coverage`, `__pycache__`, `_gs-gardener/`):
+- Full directory tree, 2–3 levels deep
+- For each directory: count code files (non-`.md`, non-config) and count `.md` files separately
+- Identify wrapper files from `config.yaml → wrapper_files` — these always form one dedicated area
+- Detect tech stack signals: `package.json`, `Makefile`, `pyproject.toml`, `go.mod`, `Cargo.toml`, etc.
 
-**Documentation** (tracked): files whose primary purpose is to inform humans or AI agents — docs, instructions, guides, specs, planning artifacts.
+**Synthesize** (internal reasoning only — not shown to user):
+- Project type: monorepo? single-package? pure docs repo? scripts collection?
+- Which directories have code files? (candidates for areas)
+- Which have both code AND docs? Which have code but NO docs? (most will have none — that's expected)
+- Natural groupings: dirs related by parent, naming, or apparent purpose
+- Scale: few dirs (→ compact), moderate (→ standard), many (→ fine-grained)
+- Skip from candidates: pure tooling dirs (`.github/`, `.husky/`), CI configs, fully generated dirs
 
-**Non-documentation** (excluded): tool configs, command scripts, agent definitions, workflow internals, generated output. Use `config.yaml` → `wrapper_files` to identify wrapper/redirect files that belong in their own area.
+Gary does NOT present this analysis — it powers Step 2.
 
-Present filtered summary showing only documentation files, with counts per directory.
+### Step 2: Propose Area Groupings
 
-### Step 1b: Documentation Coverage Gaps
+Gary proposes **2–3 concrete area groupings** using `AskUserQuestion` with markdown previews. Always include **Custom** as the 4th option.
 
-After doc discovery, walk the source tree to find code directories with no documentation. The goal is to surface architectural blind spots — not to create source areas, but to identify where docs should exist but don't.
+**Producing the options:**
+- **Compact** — 3–4 broad areas; good for small or tightly coupled repos
+- **Standard** *(recommended for most repos)* — 5–8 areas; one per logical cluster of related code dirs
+- **Fine-grained** — 8+ areas; one per code directory; good for large monorepos
 
-**Walk:**
-- Scan all directories (excluding `config.yaml` → `discovery_exclude` plus always-exclude: `node_modules`, `dist`, `build`, `.git`, `coverage`, `__pycache__`, `*.generated.*`, `*.min.*`)
-- Collect directories containing code files (non-`.md`, non-config). Count code files per directory at one level of depth.
+**Each option preview shows the full area breakdown, emphasising undocumented dirs:**
 
-**Filter obvious noise:**
-- Skip dirs with <3 code files
-- Skip dirs where >80% of files are generated (e.g. all `.d.ts`, all `.min.js`, all `.map`)
-
-**Check documentation coverage:** For each candidate directory, check whether any `.md` file exists in or adjacent to it, or whether any existing doc area's `include` glob would cover a doc in that directory.
-
-**Use LLM judgment to assess architectural importance:**
-- Domain logic, API boundaries, business rules → likely significant
-- Pure utilities, helpers, generated glue → lower priority
-- Dirs with no recent git activity (>6 months, check via `git log -1 --format="%ar" -- {dir}`) → flag as possibly stale
-
-**Present a gap report** (not a confirmation for area creation):
 ```
-📂 Undocumented areas — code exists but no docs found:
+Option B — Standard (6 areas) ← recommended
 
-· src/payments/ (8 .ts files) — ⚠️ looks architecturally significant
-· src/auth/ (12 .ts files) — ⚠️ looks architecturally significant
-· src/utils/ (6 .ts files) — utility code, lower priority
+📁 Core Docs
+   root *.md files
+   Has docs: README.md, AGENTS.md
 
-Reply [+] to create doc stubs in these directories, or [S] to skip.
+📁 src/auth/ (12 .ts files)
+   No docs yet
+
+📁 src/payments/ (8 .ts files)
+   No docs yet
+
+📚 docs/ (3 .md files)
+   Has docs: ARCHITECTURE.md, core-beliefs.md, api.md
+
+🔌 Wrappers (6 explicit files)
+   CLAUDE.md, .cursor/rules/agents.mdc, .github/copilot-instructions.md, ...
+
+🧪 tests/ (5 .ts files)
+   No docs yet
 ```
 
-If user replies `[+]`: create a minimal stub `.md` file (e.g. `README.md`) in each approved directory. The stubs will be picked up as entities in the next Update run. Gary does **not** create source areas in docsmap.
+**Judgment rules for proposals:**
+- Wrapper files → always one area, explicit per-file globs (from `config.yaml → wrapper_files`)
+- Dirs with <3 code files AND no docs → merge into nearest parent area
+- Root-level `.md` files → always one "Core Docs" area
+- Generated/artifact dirs (`_bmad-output/`, `dist/`) → secondary area (only if they contain `.md` files)
+- Dirs with only docs and no code (e.g. `docs/`) → their own area as usual
 
-If no code directories with missing docs: skip this step silently.
+**After user picks:**
+- A/B/C: Gary confirms with one summary line, proceeds to Step 3
+- Custom: Gary asks one clarifying question (which areas to merge/split/rename), then proceeds
 
-### Step 2: Ask User to Define Areas
+### Step 3: Classify Existing Documentation
 
-Ask the user to organize the documentation files into areas. Suggest groupings based on the discovered file structure — look for natural clusters by directory.
+For each area, scan its `include` patterns and find any existing `.md` files:
+- **If found**: count substantive lines → classify readiness per entity
+- **If none**: area has 0 entities — this is valid and expected; most areas in a typical codebase will have no docs
 
-Each area needs:
-- **Label + emoji** — short name and icon
-- **Include globs** — which files belong
-- **Granularity** — `file` (one entity per file) or `folder` (one entity per directory)
-- **Display** — `primary` (shown by default) or `secondary` (shown on request)
-
-**Aim for balanced areas — 4–12 entities each:**
-- Dirs with 1–2 files: merge into a parent or adjacent area rather than creating a solo area
-- Dirs with >15 files: propose splitting by subdirectory or topic into 2–3 smaller areas
-- If splitting would create areas that are still too large, suggest `granularity: folder` (one entity per subdirectory) instead of file-level
-
-This keeps the garden map rows roughly equal in width and prevents one area from dominating the table.
-
-For areas with many files, individual file-level tracking is fine for distinct docs. For areas with hundreds of files, offer **folder-level aggregates**: one entity per subdirectory showing file count.
-
-### Step 3: Classify Readiness
-
-Classify all entities by counting substantive lines. **Areas are independent — scan them in parallel** when the host tool supports it (see Execution Hints). Fall back to sequential if not.
+**Areas are independent — scan them in parallel** when the host tool supports it (see Execution Hints). Fall back to sequential if not.
 
 Per entity, per area's granularity:
 - **File-level**: count substantive lines (≥100 = mature, 11–99 = grown, 3–10 = small, ≤2 = seed)
@@ -292,7 +296,7 @@ The grid mirrors the filesystem — adjacent cells are related files.
 
 Write areas with full entity and grid layout:
 
-1. Write `docsmap.yaml` with areas, entities, grid layout:
+1. Write `docsmap.yaml` with areas, entities, grid layout. **Areas with no documentation have empty entity lists** — their grid rows have empty `entities: []`. This is valid; those areas represent undocumented code directories.
 
 ```yaml
 version: 2

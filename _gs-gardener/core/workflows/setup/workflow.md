@@ -54,6 +54,14 @@ Generate:
 - **.aiignore**: based on actual tech stack
 - **docs/**: ARCHITECTURE.md, core-beliefs.md stub, references/ directory
 
+### Step 4: Plant the Garden
+
+After generating files, run the **Plant the Garden** sub-flow from `_gs-gardener/core/workflows/visualise/workflow.md`.
+
+This produces `docsmap.yaml`, `history.jsonl`, and `garden.md` — the garden is fully planted as part of setup, not as a separate step. Gary will scan the codebase structure, propose 2–3 area groupings, and finalize on user selection.
+
+Skip this step if the user chose "Just AGENTS.md" or "Skip" in Phase 2.
+
 ### Scaffold Path
 
 - Check existing docs/ files — don't overwrite
@@ -77,7 +85,7 @@ Generate the wrapper in correct format. All wrappers reference AGENTS.md as sour
 
 - List each file created with status
 - Recommended next steps: `/garden-audit`, `/garden-extend`, `/garden-references`
-- Suggest commit message: `chore: setup AI agent configuration`
+- Suggest commit message: `chore: setup AI agent configuration and plant garden`
 
 ## Rules
 
