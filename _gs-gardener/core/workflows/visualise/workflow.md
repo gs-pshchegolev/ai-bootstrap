@@ -207,6 +207,36 @@ Classify discovered files into documentation vs non-documentation:
 
 Present filtered summary showing only documentation files, with counts per directory.
 
+### Step 1b: Source Code Discovery
+
+After doc discovery, walk the source tree to find code directories that could become source areas. Repos are often messy (unfinished migrations, dead dirs, generated files mixed with source) — never silently auto-create areas. Walk and show; let the user decide.
+
+**Walk:**
+- Scan all directories (excluding `config.yaml` → `discovery_exclude` plus always-exclude: `node_modules`, `dist`, `build`, `.git`, `coverage`, `__pycache__`, `*.generated.*`, `*.min.*`)
+- Collect directories containing code files (non-`.md`, non-config). Count code files per directory at one level of depth — don't enumerate individual files.
+
+**Filter obvious noise:**
+- Skip dirs with <3 code files
+- Skip dirs where >80% of files are generated (e.g. all `.d.ts`, all `.min.js`, all `.map`)
+
+**Flag uncertainty explicitly — don't silently choose:**
+- Two dirs with similar content (e.g. `lib/` and `src/` both present) → flag `⚠️ possible unfinished migration — which is active?`
+- Dirs with no recent git activity (>6 months, check via `git log -1 --format="%ar" -- {dir}`) → flag `⚠️ may be stale/dead code`
+- Dirs whose name suggests generated output (`generated/`, `__generated__/`, `out/`) → flag `⚠️ looks generated — skip?`
+
+**Present a tree-style summary for user confirmation** before adding anything. Let the user correct, merge, rename, or skip:
+```
+Source code directories found — confirm areas:
+
+· bin/ (1 file) → "Source: CLI"  ✓ proposed
+· src/api/ (24 files) → "Source: API"  ✓ proposed
+· src/utils/ (8 files) → merge into API, or separate?
+· lib/ + src/ both present (12 + 24 files)  ⚠️ migration?
+· dist/ (40 files)  ⚠️ looks generated — skip?
+```
+
+Gary creates only what the user approves. Approved source areas are staged for Step 5. If no code directories found (pure-doc repo): skip this step silently.
+
 ### Step 2: Ask User to Define Areas
 
 Ask the user to organize the documentation files into areas. Suggest groupings based on the discovered file structure — look for natural clusters by directory.
@@ -241,6 +271,29 @@ Per entity, per area's granularity:
 The grid mirrors the filesystem — adjacent cells are related files.
 
 ### Step 5: Write Files
+
+**Source areas** (approved in Step 1b) are written as area definitions only — no entities and no grid (code quality is tracked at area level via `code_issues`, written later by audit):
+```yaml
+  {area-id}:
+    label: {Label}
+    emoji: "{emoji}"
+    description: {description}
+    display: secondary
+    granularity: file
+    include:
+      - "{glob-pattern}"
+    readiness_emojis:
+      mature: "\U0001F333"
+      grown: "\U0001F33F"
+      small: "\U0001F331"
+      seed: "\U0001FAD8"
+      issue: "\U0001FAB1"
+    grid:
+      cols: 18
+      rows: []
+```
+
+**Doc areas** (defined in Step 2) are written with full entity and grid layout:
 
 1. Write `docsmap.yaml` with areas, entities, grid layout:
 

@@ -20,6 +20,14 @@
 - Read each wrapper: CLAUDE.md, .github/copilot-instructions.md, .cursor/rules/agents.mdc
 - Use efficient tools (Glob, Grep, Read) — don't read every file
 
+**Unmapped source check** (run after the above, if any `type: source` areas exist in docsmap):
+1. Collect all `include` patterns from source areas in docsmap.
+2. Walk the tree (exclude `discovery_exclude` from config + always-exclude: `node_modules`, `dist`, `build`, `.git`, `coverage`, `__pycache__`). Find directories with code files.
+3. Identify directories not covered by any source area's `include` pattern.
+4. For each unmatched directory: check recent git activity (`git log -1 --format="%ar" -- {dir}`). Classify as active (<3 months), possibly stale (3–6 months), or likely dead (>6 months).
+5. Include active unmatched directories in the Phase 2 "Coverage gaps" report; list stale as a footnote. Skip dead ones silently.
+6. If no `type: source` areas exist: skip this check entirely (source discovery hasn't been done — surface as a setup gap suggestion instead: "No source areas mapped yet — run `/garden-visualise` → Plant the Garden to discover code areas").
+
 ## Phase 2: Analysis
 
 Check for issues across three categories:
@@ -36,6 +44,14 @@ Check for issues across three categories:
 - **Broken links** — AGENTS.md references missing docs/ files, dead external links
 - **Orphaned files** — files in docs/ not linked from AGENTS.md, undiscoverable by agents
 - **Coverage gaps** — major features with no docs, complex modules undocumented
+- **Unmapped source** — active code directories not covered by any source area (from Phase 1 unmapped source check). Report with file counts and git activity:
+  ```
+  Unmapped source (2 active directories not in any area):
+  · src/payments/ (8 .ts files, active)
+  · services/mailer/ (5 .js files, 2 weeks ago)
+  ⚠️ lib/ (12 files) — last commit 8 months ago, possibly dead
+  Reply [+] to add as source areas.
+  ```
 
 ### Wrappers (sync correctness)
 - Does each wrapper reference AGENTS.md?
