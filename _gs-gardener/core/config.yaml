@@ -1,5 +1,4 @@
 # Garden System Configuration
-# Version: 1.5.2
 
 project_name: ai-bootstrap
 user_name: User
@@ -18,8 +17,25 @@ wrapper_files:
 docs_directory: "{project-root}/docs"
 references_directory: "{project-root}/docs/references"
 
+# Docs ecosystem files (used by health check)
+docs_files:
+  - "{project-root}/docs/ARCHITECTURE.md"
+  - "{project-root}/docs/core-beliefs.md"
+  - "{project-root}/docs/STYLE.md"
+  - "{project-root}/docs/SECURITY.md"
+  - "{project-root}/docs/DOMAIN.md"
+  - "{project-root}/docs/references/"
+
+# Garden memory (persistent state)
+docsmap_file: "{project-root}/_gs-gardener/data/docsmap.yaml"
+history_file: "{project-root}/_gs-gardener/data/history.jsonl"
+snapshot_file: "{project-root}/_gs-gardener/data/garden.md"
+
+# Discovery exclusions (directories skipped during full-repo scan)
+discovery_exclude:
+  - "node_modules/"
+  - ".next/"
+  - ".next-docs/"
+
 # Constraints
 agents_max_lines: 150
-
-# Garden System Version
-version: "1.5.2"
