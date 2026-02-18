@@ -7,13 +7,33 @@ output_folder: "{project-root}/docs"
 
 # Coverage tracking
 agents_file: "{project-root}/AGENTS.md"
-wrapper_files:
+
+# Shed — agentic infrastructure files (AI instructions, tool configs, skills, agent definitions)
+# These always form one dedicated "Shed" area in the garden.
+# shed_files: explicit list for this project (add any tool-specific files here)
+shed_files:
   - "{project-root}/CLAUDE.md"
   - "{project-root}/.github/copilot-instructions.md"
   - "{project-root}/.cursor/rules/agents.mdc"
   - "{project-root}/.junie/guidelines.md"
   - "{project-root}/.cursor/rules/garden-agent-gardener.mdc"
   - "{project-root}/.github/agents/gardener.md"
+
+# shed_patterns: glob patterns used during auto-discovery to find agentic files
+# Gary scans these during Plant the Garden and Update to detect new AI tool configs
+shed_patterns:
+  - "AGENTS.md"
+  - "CLAUDE.md"
+  - "GEMINI.md"
+  - ".claude/commands/**/*.md"
+  - ".claude/hooks/**/*"
+  - ".cursor/rules/**/*.mdc"
+  - ".cursor/rules/**/*.md"
+  - ".github/copilot-instructions.md"
+  - ".github/agents/**/*.md"
+  - ".junie/**/*.md"
+  - ".windsurf/rules/**/*"
+  - ".aider/**/*"
 
 # Content layers
 docs_directory: "{project-root}/docs"

@@ -121,7 +121,7 @@ When the user replies with a shortcut or intent, Gary acts:
 **"Browse area"** flow:
 1. Output a passive area list — no `AskUserQuestion` (avoids the 4-option cap and overlay):
    ```
-   Pick an area: **[1]** Core Docs · **[2]** Knowledge Base · **[3]** Wrappers · ...
+   Pick an area: **[1]** Core Docs · **[2]** Knowledge Base · **[3]** Shed · ...
    ```
    Number each area in order from `docsmap.yaml`. User replies with number or name.
 2. For the selected area, read each entity's file (first 30 lines only) to extract a short "about" phrase (≤10 words describing the document's purpose)
@@ -142,7 +142,7 @@ One row per area. Five columns.
 |------|--------|-------|-------------|-------|
 | 🌿 **Core Docs** | 🌿 🌿 🌳 🌳 🌿 | 🪱×2 | 🍂×1 | 🌳×2 🌿×3 🪱×2 🍂×1 |
 | 🌿 **Knowledge Base** | 🌿 🌱 | — | — | 🌿×1 🌱×1 |
-| 🫘 **Wrappers** | 🫘 🫘 🌿 🫘 | — | 🍂×3 | 🌿×1 🫘×3 🍂×3 |
+| 🫘 **Shed** | 🫘 🫘 🌿 🫘 | — | 🍂×3 | 🌿×1 🫘×3 🍂×3 |
 | 🌳 **Artifacts** | 🌳 🌳 🌳 | — | — | 🌳×3 |
 | 🌿 **Tests** | 🌿 | — | — | 🌿×1 |
 ```
@@ -204,7 +204,7 @@ Gary scans the **repository structure** to understand what code exists — not j
 **Scan** (respecting `config.yaml → discovery_exclude` + always-exclude: `node_modules`, `dist`, `build`, `.git`, `coverage`, `__pycache__`, `_gs-gardener/`):
 - Full directory tree, 2–3 levels deep
 - For each directory: count code files (non-`.md`, non-config) and count `.md` files separately
-- Identify wrapper files from `config.yaml → wrapper_files` — these always form one dedicated area
+- **Shed discovery**: scan `config.yaml → shed_patterns` + `shed_files` — collect all matching agentic files (AI instructions, tool configs, skills, agent definitions). These always form one dedicated Shed area.
 - Detect tech stack signals: `package.json`, `Makefile`, `pyproject.toml`, `go.mod`, `Cargo.toml`, etc.
 
 **Synthesize** (internal reasoning only — not shown to user):
@@ -244,15 +244,15 @@ Option B — Standard (6 areas) ← recommended
 📚 docs/ (3 .md files)
    Has docs: ARCHITECTURE.md, core-beliefs.md, api.md
 
-🔌 Wrappers (6 explicit files)
-   CLAUDE.md, .cursor/rules/agents.mdc, .github/copilot-instructions.md, ...
+🛖 Shed (8 agentic files)
+   AGENTS.md, CLAUDE.md, .cursor/rules/agents.mdc, .claude/commands/*.md, .github/agents/gardener.md, ...
 
 🧪 tests/ (5 .ts files)
    No docs yet
 ```
 
 **Judgment rules for proposals:**
-- Wrapper files → always one area, explicit per-file globs (from `config.yaml → wrapper_files`)
+- **Shed** → always one area; collects all files from `config.yaml → shed_files` + any auto-discovered via `shed_patterns`. Uses explicit per-file includes.
 - Dirs with <3 code files AND no docs → merge into nearest parent area
 - Root-level `.md` files → always one "Core Docs" area
 - Generated/artifact dirs (`_bmad-output/`, `dist/`) → secondary area (only if they contain `.md` files)
@@ -331,7 +331,7 @@ areas:
 entities:
   {entity-id}:
     path: "{relative-path}"
-    type: {type}             # instructions | doc | wrapper | artifact
+    type: {type}             # instructions | doc | shed | artifact
     area: {area-id}
     readiness: {mature|grown|small|seed}
     label: {display-name}
@@ -359,6 +359,8 @@ Evolutionary, non-destructive update that preserves spatial memory — existing 
 Re-scan each area's `include` globs. Compare discovered files to entities in `docsmap.yaml`.
 
 Also scan `**/*.md` (respecting `config.yaml` → `discovery_exclude`) for **untracked files** — docs that don't match any area's `include` globs. If found, report them after the update summary (Step 7) and offer to add a new area or expand an existing area's globs.
+
+Also scan for **uncovered code directories** — directories containing code files (non-`.md`, non-config) that are not covered by any area's `include` globs. Apply the same exclusions as Plant the Garden Step 1 (`node_modules`, `dist`, `.git`, etc.). Skip dirs with <3 code files. If found, surface them in Step 7.
 
 ### Step 2: Diff
 
@@ -406,7 +408,7 @@ Show summary to user:
 🔄 Garden updated — +{N} new, -{N} removed, {N} promoted, {N} demoted
 ```
 
-If untracked files were found in Step 1, append:
+If untracked `.md` files were found in Step 1, append:
 ```
 📂 Found {N} docs outside tracked areas:
   - {path} ({readiness})
@@ -418,7 +420,18 @@ Then ask the user (via `AskUserQuestion`):
 - Expand existing area (add globs to an existing area)
 - Ignore (skip — files remain untracked)
 
-If no untracked files, return directly to the Phase 4 footer options.
+If uncovered code directories were found in Step 1, append (after any untracked docs output):
+```
+📂 Found {N} code directories with no area coverage:
+  - src/new-feature/ (8 .ts files)
+  - src/analytics/ (5 .ts files)
+  - ...
+Reply [R] to re-plant the garden with updated area groupings, or [S] to skip.
+```
+
+If the user replies `[R]`: trigger the **Plant the Garden** sub-flow (re-plant), which will run code directory discovery again and propose a revised area grouping that includes the new directories.
+
+If neither untracked docs nor uncovered dirs: return directly to the Phase 4 footer options.
 
 ## Sub-flow: Summary & Suggestions
 

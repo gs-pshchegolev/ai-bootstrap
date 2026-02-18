@@ -1,6 +1,6 @@
 # Audit
 
-> Deep scan for drift, quality issues, and wrapper sync problems.
+> Deep scan for drift, quality issues, and Shed sync problems.
 
 ## Phases
 
@@ -16,7 +16,7 @@
 - Scan package manager files for actual dependencies
 - Check actual directory structure vs documented
 - Verify documented commands still exist in scripts
-- Read each wrapper: CLAUDE.md, .github/copilot-instructions.md, .cursor/rules/agents.mdc
+- Read Shed files (from `config.yaml → shed_files` + any files matching `shed_patterns`): CLAUDE.md, .github/copilot-instructions.md, .cursor/rules/agents.mdc, .claude/commands/, .github/agents/, etc.
 - Use efficient tools (Glob, Grep, Read) — don't read every file
 
 **Documentation coverage check** (run after the above):
@@ -69,11 +69,12 @@ doc_issues:
   last_checked: "{DD-MM-YYYY}"
 ```
 
-### Wrappers (sync correctness)
-- Does each wrapper reference AGENTS.md?
+### Shed (sync correctness)
+- Do Shed files (CLAUDE.md, copilot-instructions.md, cursor rules, etc.) reference AGENTS.md?
 - Is the reference correct and up to date?
-- Are there conflicting instructions?
-- Any empty or missing wrappers?
+- Are there conflicting instructions across Shed files?
+- Any empty or missing Shed files that should exist?
+- Any agentic files on disk (matching `shed_patterns`) not yet tracked in `shed_files`?
 
 ## Phase 3: Report
 
@@ -82,7 +83,7 @@ Present a combined report grouped by category:
 - **Drift** — critical (architecture), high (tech stack), medium (structure/commands)
 - **Quality** — critical (broken references, worms), medium (staleness, dead leaves, orphans), minor (improvements)
 - **Coverage gaps** — active code directories with no documentation
-- **Wrappers** — healthy vs issues found
+- **Shed** — healthy vs issues found (sync, missing files, untracked agentic files)
 
 Include summary count. Use `AskUserQuestion`: "Fix these issues?" with options: Fix all / Let me choose / Just the report.
 
@@ -113,10 +114,11 @@ Only if approved:
 - Propose removal or update
 - After applying: decrement `area.doc_issues.dead_leaves` in docsmap
 
-**Wrapper fixes:**
+**Shed fixes:**
 - Missing reference: add standard "Follow all instructions in the root AGENTS.md..." text
-- Missing file: generate appropriate wrapper (respect tool-specific format)
+- Missing file: generate appropriate Shed file (respect tool-specific format)
 - Conflicting instructions: ask user which to keep
+- Untracked agentic file found on disk: offer to add it to `config.yaml → shed_files`
 
 **Coverage gap fixes:**
 - Offer to create minimal stub `.md` files in undocumented code directories
@@ -131,7 +133,7 @@ After fixes: verify modified files, show result card with what was fixed and wha
 - If unsure whether something is intentional, ask
 - Keep AGENTS.md under 150 lines — suggest docs/ for overflow
 - Prioritize critical drift over minor issues
-- Never modify AGENTS.md itself during wrapper sync — only fix wrappers
+- Never modify AGENTS.md itself during Shed sync — only fix the Shed files
 - Ask before deleting anything — orphaned files might be intentional
 - For coverage gaps, suggest `/garden-extend` or offer stubs — don't invent full docs
 - Worm/dead leaf detection compares docs against verifiable codebase facts only — never guess

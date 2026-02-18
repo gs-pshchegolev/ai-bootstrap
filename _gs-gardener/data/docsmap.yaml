@@ -50,10 +50,10 @@ areas:
             - docs-architecture-md
             - docs-core-beliefs-md
 
-  wrappers:
-    label: Wrappers
-    emoji: "🔌"
-    description: AI tool sync wrappers
+  shed:
+    label: Shed
+    emoji: "🛖"
+    description: Agentic infrastructure — AI instructions, tool configs, skills, agent definitions
     display: secondary
     granularity: file
     include:
@@ -199,8 +199,8 @@ entities:
 
   claude-md:
     path: "CLAUDE.md"
-    type: wrapper
-    area: wrappers
+    type: shed
+    area: shed
     readiness: seed
     label: CLAUDE.md
     placed: "18-02-2026"
@@ -208,8 +208,8 @@ entities:
 
   github-copilot-instructions-md:
     path: ".github/copilot-instructions.md"
-    type: wrapper
-    area: wrappers
+    type: shed
+    area: shed
     readiness: seed
     label: copilot-instructions.md
     placed: "18-02-2026"
@@ -217,8 +217,8 @@ entities:
 
   github-agents-gardener-md:
     path: ".github/agents/gardener.md"
-    type: wrapper
-    area: wrappers
+    type: shed
+    area: shed
     readiness: grown
     label: gardener.md
     placed: "18-02-2026"
@@ -226,8 +226,8 @@ entities:
 
   junie-guidelines-md:
     path: ".junie/guidelines.md"
-    type: wrapper
-    area: wrappers
+    type: shed
+    area: shed
     readiness: seed
     label: guidelines.md
     placed: "18-02-2026"
@@ -271,8 +271,8 @@ entities:
 
   cursor-rules-agents-mdc:
     path: ".cursor/rules/agents.mdc"
-    type: wrapper
-    area: wrappers
+    type: shed
+    area: shed
     readiness: small
     label: agents.mdc
     placed: "18-02-2026"
@@ -280,8 +280,8 @@ entities:
 
   cursor-rules-garden-agent-gardener-mdc:
     path: ".cursor/rules/garden-agent-gardener.mdc"
-    type: wrapper
-    area: wrappers
+    type: shed
+    area: shed
     readiness: grown
     label: garden-agent-gardener.mdc
     placed: "18-02-2026"
