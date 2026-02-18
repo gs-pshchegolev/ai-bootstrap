@@ -63,13 +63,22 @@ Check for issues across three categories:
 
 Offer this phase via `AskUserQuestion` after Phase 2 analysis: "Also scan code for worms, dead leaves, and signs?" If declined, skip to Phase 4.
 
-**Step 1 — Print live table header immediately (before any scanning begins):**
+**Step 1 — Print scan plan before any scanning begins:**
+
+Count code files for every area up front. Print a scan plan showing what will be scanned, then open the results table:
 ```
-Scanning code quality...
+Scanning code quality · {N} areas · {M} files total
+
+  Source        ·  1 file
+  Core Docs     ·  5 files
+  Knowledge Base·  2 files   (incremental: 1 changed since 15-02-2026)
+  ~ Tests       · ~20/64 files  (sampling — read code_scan_sample_size from config)
 
 | Area | Files | 🪱 Worms | 🍂 Dead leaves | 🪧 Signs |
 |------|-------|----------|----------------|----------|
 ```
+
+Note `~` prefix on sampled areas in the plan. Show incremental note when `last_scanned` is set and only changed files will be scanned. Sample size comes from `config.yaml` → `code_scan_sample_size` (default 20 if not set).
 
 **Step 2 — Per-area scope check (before scanning each area):**
 1. Check `area.code_issues.last_scanned` in docsmap. If set, run `git diff --name-only {last_scanned}` to find changed code files (incremental). If not set, full scan.
@@ -82,9 +91,9 @@ Scanning code quality...
        · `src/api/` ({N} files) → would become **{area-id}-api**
        · `src/utils/` ({N} files) → would become **{area-id}-utils**
        · `src/models/` ({N} files) → would become **{area-id}-models**
-     Scanning with sampling for now. Reply **[SP]** after results to split this area.
+     Scanning ~{code_scan_sample_size} most recently modified for now. Reply **[SP]** after results to split this area.
      ```
-   - Continue scanning immediately — sample the 20 most recently modified (`git log --name-only -n 20`). Mark `sampled: true`.
+   - Continue scanning immediately — sample the `code_scan_sample_size` most recently modified (`git log --name-only -n {code_scan_sample_size}`). Mark `sampled: true`.
 4. If ≤50 files: proceed with full scan.
 
 **Step 3 — Scan with Haiku model, areas in parallel. Per file, identify:**
@@ -94,11 +103,12 @@ Scanning code quality...
 
 **Step 4 — As each area finishes, immediately append its row (don't wait for other areas):**
 ```
-| ✅ Source | 1 | 🪱×1 | — | — |
-| ✅~ Core Docs | ~20/64 | 🪱×2 | 🍂×1 | 🪧×4 |
+| ✅ Source | 1/1 | 🪱×1 | — | — |
+| ✅~ Tests | ~20/64 | 🪱×2 | 🍂×1 | 🪧×4 |
 ```
 - Prefix `✅` when complete
-- Append `~` to area name if sampled; show file count as `~20/64` (scanned/total)
+- Files column: `{scanned}/{total}` — always show both numbers so it's clear what was covered
+- Append `~` to area name if sampled
 - Use `—` for zero counts
 
 **Step 5 — Write findings:**

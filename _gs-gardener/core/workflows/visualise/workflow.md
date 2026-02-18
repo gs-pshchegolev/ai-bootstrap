@@ -140,17 +140,22 @@ One row per area. Six columns.
 | 🫘 **Wrappers** | 🫘 🫘 🌿 🫘 | — | 🍂×3 | — | 🌿×1 🫘×3 🍂×3 |
 | 🌳 **Artifacts** | 🌳 🌳 🌳 | — | — | — | 🌳×3 |
 | 🌿 **Tests** | 🌿 | — | — | — | 🌿×1 |
+| ⚙️ **Source** | ⚙️×12 | 🪱×1 | — | — | ⚙️×12 🪱×1 |
 ```
 
-**Area column:** dominant readiness emoji + **bold** area label.
+**Area column:**
+- Doc areas: dominant readiness emoji + **bold** label
+- Source areas (`type: source`): always `⚙️` regardless of file readiness
 
 **Plants column:**
-- ≤18 total entities: full emoji stream — all entities concatenated with spaces across all grid rows. Directory grouping not shown here (lives in browse detail).
-- >18 total entities: collapsed counts — `🌳×8 🌿×12 🌱×3 🫘×1 *(browse for detail)*`
+- *Doc areas* — full emoji stream if ≤18 entities; collapsed counts if >18: `🌳×8 🌿×12 🌱×3 🫘×1 *(browse for detail)*`
+- *Source areas* — show file count as `⚙️×{N}` where N = count of files currently matching the area's `include` glob. Do **not** show readiness emojis — code file line counts are not a doc-readiness signal. If area has no `code_issues` yet (never scanned), append `?`: `⚙️×12?`
 
 **Worms / Dead leaves / Signs columns:** read from `area.code_issues` in docsmap. `🪱×N` / `🍂×N` / `🪧×N` or `—` if zero or absent. Sampled areas show `~` suffix: `🪱~×4`.
 
-**Total column:** all non-zero counts using `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂→🪧.
+**Total column:**
+- Doc areas: all non-zero counts using `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂→🪧
+- Source areas: `⚙️×N` file count first, then code quality counts: 🪱→🍂→🪧
 
 ### Season Mood Line
 
@@ -247,6 +252,13 @@ Each area needs:
 - **Granularity** — `file` (one entity per file) or `folder` (one entity per directory)
 - **Display** — `primary` (shown by default) or `secondary` (shown on request)
 
+**Aim for balanced areas — 4–12 entities each:**
+- Dirs with 1–2 files: merge into a parent or adjacent area rather than creating a solo area
+- Dirs with >15 files: propose splitting by subdirectory or topic into 2–3 smaller areas
+- If splitting would create areas that are still too large, suggest `granularity: folder` (one entity per subdirectory) instead of file-level
+
+This keeps the garden map rows roughly equal in width and prevents one area from dominating the table.
+
 For areas with many files, individual file-level tracking is fine for distinct docs. For areas with hundreds of files, offer **folder-level aggregates**: one entity per subdirectory showing file count.
 
 ### Step 3: Classify Readiness
@@ -267,6 +279,11 @@ Per entity, per area's granularity:
 **Columns = siblings** within the group:
 - Left-to-right, max 18 per row
 - Overflow wraps to continuation line (indented under same label)
+
+**Balance sparse rows** — avoid rows with only 1–2 entities:
+- If a subdirectory has 1–2 files and its sibling directory also has few files, merge them into a single row with a shared parent label (e.g. `misc/`)
+- If a row would have 1 entity isolated from all others, consider appending it to the nearest logical row
+- Never merge rows from different areas — only within the same area
 
 The grid mirrors the filesystem — adjacent cells are related files.
 

@@ -69,7 +69,7 @@ Supported AI tools: Claude Code, Cursor, GitHub Copilot, JetBrains Junie.
 
 - Published as `@pshch/gary-the-gardener` on npm
 - Single runtime dependency (`@inquirer/prompts`) for interactive CLI UI
-- Garden system version tracked in `_gs-gardener/VERSION` (currently 3.4.0)
+- Garden system version tracked in `_gs-gardener/VERSION` (currently 3.5.0)
 - Commands distributed as `.md` files in tool-specific directories
 - AGENTS.md max line limit: 150 lines (enforced by garden system)
 - `.npmrc` contains auth token reference — never commit actual tokens

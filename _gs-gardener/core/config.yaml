@@ -41,3 +41,7 @@ discovery_exclude:
 
 # Constraints
 agents_max_lines: 150
+
+# Code quality scanning
+code_scan_sample_size: 20      # max files scanned per area when >50 files exist
+code_scan_area_max_lines: 150  # findings file line limit before proposing area split
