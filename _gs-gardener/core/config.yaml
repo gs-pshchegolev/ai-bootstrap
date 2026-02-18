@@ -12,6 +12,8 @@ wrapper_files:
   - "{project-root}/.github/copilot-instructions.md"
   - "{project-root}/.cursor/rules/agents.mdc"
   - "{project-root}/.junie/guidelines.md"
+  - "{project-root}/.cursor/rules/garden-agent-gardener.mdc"
+  - "{project-root}/.github/agents/gardener.md"
 
 # Content layers
 docs_directory: "{project-root}/docs"

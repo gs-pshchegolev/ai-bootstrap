@@ -1,6 +1,6 @@
 {
   "name": "@pshch/gary-the-gardener",
-  "version": "1.5.2",
+  "version": "3.2.0",
   "description": "Gary the Gardener — AI agent that maintains documentation and config for Claude, Copilot, Cursor, Codex, and Junie",
   "type": "module",
   "bin": {
@@ -12,7 +12,9 @@
   },
   "files": [
     "bin/",
-    "_gs-gardener/",
+    "_gs-gardener/VERSION",
+    "_gs-gardener/core/",
+    "_gs-gardener/data/",
     ".claude/commands/garden-*.md",
     "templates/"
   ],

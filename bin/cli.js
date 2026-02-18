@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { parseArgs } from 'node:util';
-import { cpSync, existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync, statSync, renameSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync, statSync, renameSync, rmSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
 import { checkbox, confirm, select } from '@inquirer/prompts';
 
@@ -17,16 +17,13 @@ const dim = (s) => `\x1b[2m${s}\x1b[0m`;
 
 // ── Workflow catalog (shared across all tool generators) ─────────────
 const WORKFLOWS = [
-  { name: 'bootstrap',  icon: '🌱', tag: 'Plant your first seeds' },
-  { name: 'audit',      icon: '🔍', tag: 'Pull the weeds — find stale & missing docs' },
-  { name: 'compact',    icon: '✂️',  tag: 'Prune the overgrowth' },
-  { name: 'sync',       icon: '💧', tag: 'Water the roots — keep wrappers in sync' },
-  { name: 'maintain',   icon: '🌿', tag: 'Walk the rows with shears' },
-  { name: 'extend',     icon: '🌻', tag: 'Grow new beds — add content layers' },
-  { name: 'references', icon: '📚', tag: 'Tend the reference shelf' },
-  { name: 'scaffold',   icon: '🏗️',  tag: 'Lay out the plots — setup docs/ structure' },
-  { name: 'add-tool',   icon: '🔧', tag: 'Plant in new soil — add AI tool support' },
-  { name: 'help',       icon: '❓', tag: 'Ask the gardener' },
+  { name: 'setup',      icon: '🌱', tag: 'Create AGENTS.md, scaffold docs/, add tool wrappers' },
+  { name: 'visualise',  icon: '🗺️',  tag: 'See the garden map — check doc readiness' },
+  { name: 'health',     icon: '🩺', tag: 'Quick scan — 3 improvement suggestions' },
+  { name: 'audit',      icon: '🔍', tag: 'Deep scan for drift, quality & wrapper sync' },
+  { name: 'compact',    icon: '✂️',  tag: 'Compress AGENTS.md under 150 lines' },
+  { name: 'extend',     icon: '🌻', tag: 'Add content layers — guardrails, style, domain' },
+  { name: 'references', icon: '📚', tag: 'Fetch llms.txt for your dependencies' },
 ];
 
 // ── Agent activation block (reused by all tool providers) ────────────
@@ -307,11 +304,26 @@ async function runSetup(mode, force, dryRun) {
       `  ${green("✓")} Core system → ${dim("_gs-gardener/ (unchanged)")}`,
     );
   } else {
-    // Preserve config for any existing installation (upgrades or force reinstalls)
+    // Preserve user data and config for any existing installation (upgrades or force reinstalls)
     const savedConfig = installedVersion ? safeReadFile(configPath) : null;
+    const dataDir = join(coreDest, 'data');
+    const dataExists = installedVersion && existsSync(dataDir);
 
     if (!dryRun) {
+      // Back up data/ before overwriting the entire directory
+      let tmpDataDir;
+      if (dataExists) {
+        tmpDataDir = join(dest, '_gs-gardener-data-backup');
+        cpSync(dataDir, tmpDataDir, { recursive: true });
+      }
+
       cpSync(coreSrc, coreDest, { recursive: true, force: true });
+
+      // Restore data/
+      if (tmpDataDir) {
+        cpSync(tmpDataDir, dataDir, { recursive: true, force: true });
+        rmSync(tmpDataDir, { recursive: true });
+      }
 
       if (savedConfig) {
         const updated = savedConfig
@@ -319,14 +331,14 @@ async function runSetup(mode, force, dryRun) {
           .replace(/^version: .+$/m, `version: "${VERSION}"`);
         writeFileSync(configPath, updated);
         console.log(
-          `  ${green("✓")} Core system → ${dim("_gs-gardener/ (upgraded, config preserved)")}`,
+          `  ${green("✓")} Core system → ${dim("_gs-gardener/ (upgraded, config & data preserved)")}`,
         );
       } else {
         freshInstall = true;
         console.log(`  ${green("✓")} Core system → ${dim("_gs-gardener/")}`);
       }
     } else {
-      const label = installedVersion ? "(would upgrade, config preserved)" : "";
+      const label = installedVersion ? "(would upgrade, config & data preserved)" : "";
       console.log(
         `  ${green("✓")} Core system → ${dim(`_gs-gardener/ ${label}`)}`,
       );
@@ -489,17 +501,10 @@ __pycache__/
 
   // Next steps
   if (!dryRun && mode === 'install') {
-    console.log(`\n${bold("Next steps:")}`);
-    console.log(
-      `  1. Run ${green("/garden-bootstrap")} to set up AI-ready documentation`,
-    );
-    console.log(
-      `     Creates AGENTS.md — the source of truth for all your AI tools`,
-    );
-    console.log(`  2. Run ${green("/garden-audit")} to verify accuracy`);
-    console.log(
-      `  3. Run ${green("/garden-extend")} to add guardrails & principles`,
-    );
+    console.log(`\n${bold("Next steps:")} ${dim("(these are LLM commands — run them inside your AI agent)")}`);
+    console.log(`  1. Run ${green("/garden-setup")}       Create your docs structure`);
+    console.log(`  2. Run ${green("/garden-visualise")}    See the garden map`);
+    console.log(`  3. Run ${green("/garden")}              Open the interactive hub`);
   }
 
   // Garden metaphor
@@ -523,7 +528,7 @@ function runStatus() {
 
   // AGENTS.md
   const agentsExists = existsSync(join(dest, 'AGENTS.md'));
-  console.log(`  ${agentsExists ? green('✓') : '○'} ${'AGENTS.md'.padEnd(18)} ${agentsExists ? green('present') : yellow('not yet created (run /garden-bootstrap)')}`);
+  console.log(`  ${agentsExists ? green('✓') : '○'} ${'AGENTS.md'.padEnd(18)} ${agentsExists ? green('present') : yellow('not yet created (run /garden-setup)')}`);
 
   // .aiignore
   statusLine('.aiignore', existsSync(join(dest, '.aiignore')), 'present');
@@ -588,7 +593,7 @@ function runDoctor() {
 
   // 4. Check AGENTS.md
   if (!existsSync(join(dest, 'AGENTS.md'))) {
-    console.log(`  ${yellow('!')} AGENTS.md not found — run ${green('/garden-bootstrap')} to create it`);
+    console.log(`  ${yellow('!')} AGENTS.md not found — run ${green('/garden-setup')} to create it`);
     issues++;
   } else {
     console.log(`  ${green('✓')} AGENTS.md present`);
@@ -795,7 +800,7 @@ async function promptToolSelection(detected) {
 
 function printGardenWelcome() {
   const cmds = WORKFLOWS.map(w =>
-    `  ${w.icon.padEnd(4)} /garden-${w.name.padEnd(12)} ${w.tag}`
+    `  ${w.icon.padEnd(4)} /garden-${w.name.padEnd(14)} ${w.tag}`
   ).join('\n');
 
   console.log(`
@@ -807,15 +812,25 @@ function printGardenWelcome() {
   the changelog nobody wrote,
   the API docs nobody checked.
 
-${cmds}
+  Your garden is planted. Get started:
 
-  Your garden is planted. Run ${green("/garden-help")} in your AI Agent to begin. 🌻
+  ${bold('1.')} Open your AI coding agent (Claude Code, Cursor, etc.)
+  ${bold('2.')} Run ${green('/garden-setup')} to create your docs structure
+  ${bold('3.')} Run ${green('/garden-visualise')} to see the garden map
+
+  These are ${bold('LLM slash-commands')} — type them inside your AI agent, not in the terminal.
+
+${bold('All commands')}
+${cmds}
+  🪴   /garden              Interactive hub — shows all commands
+
+  Run ${green('/garden')} in your AI agent to begin. 🌻
 `);
 }
 
 function printHelp() {
   const cmds = WORKFLOWS.map(w =>
-    `  ${w.icon.padEnd(4)} /garden-${w.name.padEnd(12)} ${w.tag}`
+    `  ${w.icon.padEnd(4)} /garden-${w.name.padEnd(14)} ${w.tag}`
   ).join('\n');
 
   console.log(`
@@ -830,12 +845,24 @@ function printHelp() {
   the changelog nobody wrote,
   the API docs nobody checked.
 
+${bold('GETTING STARTED')}
+  After install or update, open your AI coding agent and run:
+
+  ${bold('1.')} ${green('/garden-setup')}       Create AGENTS.md, scaffold docs/, add tool wrappers
+  ${bold('2.')} ${green('/garden-visualise')}    See the garden map — check doc readiness
+  ${bold('3.')} ${green('/garden')}              Open the interactive hub
+
+  These are ${bold('LLM slash-commands')} — type them inside your AI agent,
+  not in the terminal.
+
+${bold('ALL LLM COMMANDS')}
 ${cmds}
+  🪴   /garden              Interactive hub — shows all commands
 
 ${bold('USAGE')}
   npx @pshch/gary-the-gardener [command] [options]
 
-${bold('COMMANDS')}
+${bold('CLI COMMANDS')}
   ${green('install')}    Install the garden system ${dim('(first-time setup)')}
   ${green('update')}     Update an existing installation to latest version
   ${green('status')}     Show what's currently installed
