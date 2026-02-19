@@ -18,11 +18,15 @@ This workflow is **tool-agnostic** — it describes operations, not specific too
 
 **Parallelization**: Steps 1 and 3 (discovery + classification) can run areas **in parallel** when the host tool supports concurrent agents (e.g., Claude Code teams, Cursor background agents). Each area's scan is independent — no shared state until the final merge in Step 5.
 
+## READ-ONLY Invariant
+
+**This workflow NEVER modifies `docsmap.yaml` except inside the Update Garden sub-flow (triggered only when the user explicitly types `[U]`).** Phases 1–4 are strictly read-only. `gary_grew` triggers a display block only — no reorganization, no re-plant, no area merging or deletion. The three-bucket structure (Shed · Documentation · Codebase) applies **only** to new gardens via Plant the Garden — existing gardens preserve their area layout exactly as stored in `docsmap.yaml`, regardless of Gary version or any rule in heritage.md.
+
 ## Phases
 
 1. Fast Path — check if `garden.md` exists; if yes, skip to Phase 4 immediately
 2. Load — read or create garden state (only if garden.md missing)
-3. Decide & Render — check hash, re-render if stale
+3. Decide & Render — check hash, re-render if stale (writes garden.md only, never docsmap.yaml)
 4. Display — output Gary Block with garden map and passive shortcut footer
 
 ## File Paths
@@ -49,7 +53,7 @@ Only proceed to Phase 2 if `garden.md` is absent.
 
 Check if `docsmap.yaml` exists. If it does, read and parse it. If not, enter the **Plant the Garden** sub-flow (see below).
 
-After loading, validate `version === 2`. If mismatched, warn and re-plant.
+After loading, validate `version === 2`. If mismatched, **warn only** — do NOT re-plant. Display the garden as-is with a note: "docsmap schema is older — run `/garden-setup` to migrate." Proceed to Phase 3 regardless.
 
 ## Phase 3: Decide & Render
 
@@ -70,6 +74,11 @@ For each area, compute:
 3. **Plants cell** — full emoji stream if ≤18 total entities; collapsed counts if >18; `·` if none
 4. **Issues cell** — combined `area.doc_issues`: `🪱×N 🍂×M` if any; `·` if both zero/absent
 5. **Total cell** — all non-zero counts in `×N` notation, order: 🌳→🌿→🌱→🪱→🍂; `·` if none
+6. **Grouping pass** — after computing all area rows, insert bold sub-header rows between folder groups:
+   - Extract the first path segment of each area's path hint. Areas with `/` = root group.
+   - Root-group areas render first, flat — no sub-header row above them.
+   - If ≥2 distinct non-root groups exist: insert `| **{folder}/** | | | |` before each non-root group.
+   - If any non-root group has >7 areas: split at the next directory level, insert nested sub-headers.
 
 Compute the **season mood line** from aggregate totals across all areas (see Rendering Contract).
 
@@ -132,6 +141,8 @@ A newer Gary mapped this garden. Here's what changed while I was away:
 
 Cap at 5 version entries. If more, show the 3 most recent and append `...and {N} earlier versions`.
 
+**READ-ONLY**: This acknowledgment is display-only. Do NOT modify `docsmap.yaml`, re-plant the garden, or reorganize existing areas. The three-bucket rule exists for new gardens only — never apply it to an existing garden.
+
 ### Shortcut Handling
 
 When the user replies with a shortcut or intent, Gary acts:
@@ -173,6 +184,24 @@ One row per area. Four columns.
 ```
 
 **Area column:** `area.emoji` from docsmap (fixed semantic emoji, not readiness-derived) + **bold** label + `path-hint` code span. Path hint = longest common dir prefix of all `include` patterns; `/` if no common root.
+
+**Grouping sub-headers:** When the table has ≥2 distinct non-root folder groups, insert a sub-header row before each group. Sub-header row: `| **{folder}/** | | | |` — plain bold, no backticks, no emoji, all other cells empty. Root-group areas (`/`) render first with no sub-header. Groups with >7 areas split at the next directory level with nested sub-headers.
+
+```markdown
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
+| 🛖 **Shed** `/` | 🌿 🌿 🌱 | · | 🌿×2 🌱×1 |
+| 📁 **Docs** `/` | 🌳 🌳 🌿 | 🪱×1 | 🌳×2 🌿×1 🪱×1 |
+| **frontend/** | | | |
+| 🎯 **Destination UI** `frontend/destination/` | · | · | · |
+| 🔧 **Control UI** `frontend/control/` | 🌱 | · | 🌱×1 |
+| 🎣 **Hooks** `frontend/hooks/` | 🌿 🌿 | · | 🌿×2 |
+| **src/** | | | |
+| 🌐 **API** `src/api/` | 🌿 🌳 | 🍂×1 | 🌳×1 🌿×1 🍂×1 |
+| 🌳 **Domain** `src/` | 🌿 🌱 | · | 🌿×1 🌱×1 |
+| **tests/** | | | |
+| 🧪 **Tests** `tests/` | 🌳 🌳 | · | 🌳×2 |
+```
 
 **Plants column:** full emoji stream if ≤18 entities; collapsed counts if >18: `🌳×8 🌿×12 🌱×3 *(browse for detail)*`. `·` if no entities.
 
@@ -577,6 +606,10 @@ End with `AskUserQuestion`:
 
 ## Rules
 
+- **NEVER modify `docsmap.yaml` during display (Phases 1–4)**. It is read-only during map rendering. Only the Update Garden sub-flow (user `[U]`) may write to `docsmap.yaml`, and only additively — no area deletion.
+- **NEVER re-plant an existing garden**. If `docsmap.yaml` exists, its area structure is the source of truth. Display it as found. The three-bucket rule (Shed · Documentation · Codebase) applies only when creating a brand-new garden from scratch.
+- **`gary_grew` is display-only**. A version mismatch shows the acknowledgment block — nothing else changes. No reorganization, no re-plant, no area merging.
+- **Schema version mismatch is a warning, not a trigger**. If `version !== 2`, show a migration note and continue — never re-plant.
 - Entity IDs are kebab-case of the relative path (e.g., `AGENTS.md` → `agents-md`, `docs/ARCHITECTURE.md` → `docs-architecture-md`)
 - When re-planting, append a `replant` entry to `history.jsonl` (don't overwrite)
 - Keep the Gary Block compact — the map is the star, minimize surrounding text

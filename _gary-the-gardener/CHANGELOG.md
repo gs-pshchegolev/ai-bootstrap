@@ -5,6 +5,21 @@ All notable changes to the Garden System will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.3] - 2026-02-19
+
+### Added
+- **Folder group sub-headers** — the garden map table now inserts bold sub-header rows (`| **folder/** | | | |`) between non-root folder groups when ≥2 distinct groups exist. Root-group areas (path hint `/`) render first, flat. Groups with >7 areas split at the next directory level with nested sub-headers. Target ~7 areas per group for scannability.
+
+---
+
+## [5.1.2] - 2026-02-19
+
+### Fixed
+- **Critical: garden map no longer destroys existing gardens** — `/garden-map` now has explicit READ-ONLY invariants throughout the workflow. Previously, `gary_grew` (Gary version mismatch) combined with the "three-bucket" rule in heritage.md could cause Gary to re-plant an existing garden, collapsing a 24-area custom layout to 6 areas. Now: `gary_grew` is strictly display-only; Phase 2 schema mismatch warns rather than re-plants; four explicit rules in the Rules section forbid modifying `docsmap.yaml` during display phases.
+- **"Three-bucket" rule scoped to new gardens only** — heritage.md now clarifies that Shed · Documentation · Codebase applies only when planting a brand-new garden. Existing gardens keep their layout exactly as stored in `docsmap.yaml`.
+
+---
+
 ## [5.1.1] - 2026-02-19
 
 ### Changed

@@ -130,6 +130,33 @@ Both use `×N` count notation.
 - **Issues**: combined `🪱×N` worms + `🍂×M` dead leaves from `doc_issues`; `·` if both zero/absent
 - **Total**: all non-zero counts, `×N` notation, order: 🌳→🌿→🌱→🪱→🍂; `·` if no entities
 
+### Grouping
+
+When the table contains areas from ≥2 distinct non-root folder groups, insert **sub-header rows** between those groups.
+
+**Sub-header row format:** `| **{folder}/** | | | |` — plain bold path, no backticks (code spans override bold in most renderers), no emoji, no plants, no totals.
+
+**Algorithm:**
+1. Compute the first path segment of each area's path hint. Areas with path hint `/` = root group.
+2. Root-group areas render first, flat, with no sub-header above them.
+3. If ≥2 distinct non-root groups exist: insert a bold sub-header row before each non-root group.
+4. If any non-root group has >7 areas: split at the next directory level, add nested sub-headers.
+
+```markdown
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
+| 🛖 **Shed** `/` | 🌿 🌱 | · | 🌿×1 🌱×1 |
+| 📁 **Core Docs** `/` | 🌳 🌿 | · | 🌳×1 🌿×1 |
+| **frontend/** | | | |
+| 🎯 **Destination UI** `frontend/destination/` | · | · | · |
+| 🔧 **Control UI** `frontend/control/` | 🌱 | · | 🌱×1 |
+| **src/** | | | |
+| 🌐 **API** `src/api/` | 🌿 🌳 | 🍂×1 | 🌳×1 🌿×1 🍂×1 |
+| 🌳 **Domain** `src/` | 🌿 🌱 | · | 🌿×1 🌱×1 |
+| **tests/** | | | |
+| 🧪 **Tests** `tests/` | 🌳 🌳 | · | 🌳×2 |
+```
+
 ### Season Mood Line
 
 One line above the table summarising overall garden health. First match wins:

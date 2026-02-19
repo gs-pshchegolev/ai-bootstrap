@@ -141,7 +141,9 @@ test.describe('CLI: single-tool install wiring', () => {
     const gardenCmds = readdirSync(cmdDir).filter(
       f => f.startsWith('garden-') && f.endsWith('.md'),
     );
-    expect(gardenCmds.length).toBeGreaterThanOrEqual(10);
+    expect(gardenCmds.length).toBeGreaterThanOrEqual(7);
+    // Hub command must also be present
+    expect(existsSync(join(cmdDir, 'garden.md'))).toBe(true);
 
     // Cursor agent file created
     expect(existsSync(join(tempDir, '.cursor', 'rules', 'garden-agent-gardener.mdc'))).toBe(true);
