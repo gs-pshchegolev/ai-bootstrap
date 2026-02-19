@@ -309,14 +309,28 @@ async function runSetup(mode, force, dryRun) {
     const dataExists = installedVersion && existsSync(dataDir);
 
     if (!dryRun) {
-      // Back up data/ before overwriting the entire directory
+      // Back up data/ and garden/ before overwriting the entire directory
       let tmpDataDir;
       if (dataExists) {
         tmpDataDir = join(dest, '_gary-the-gardener-data-backup');
         cpSync(dataDir, tmpDataDir, { recursive: true });
       }
 
+      const gardenDir = join(coreDest, 'garden');
+      const gardenExists = installedVersion && existsSync(gardenDir);
+      let tmpGardenDir;
+      if (gardenExists) {
+        tmpGardenDir = join(dest, '_gary-the-gardener-garden-backup');
+        cpSync(gardenDir, tmpGardenDir, { recursive: true });
+      }
+
       cpSync(coreSrc, coreDest, { recursive: true, force: true });
+
+      // Restore garden/ (project-specific garden state must never be overwritten by package data)
+      if (tmpGardenDir) {
+        cpSync(tmpGardenDir, gardenDir, { recursive: true, force: true });
+        rmSync(tmpGardenDir, { recursive: true });
+      }
 
       // Restore data/
       if (tmpDataDir) {
@@ -330,14 +344,14 @@ async function runSetup(mode, force, dryRun) {
           .replace(/^version: .+$/m, `version: "${VERSION}"`);
         writeFileSync(configPath, updated);
         console.log(
-          `  ${green("✓")} Core system → ${dim("_gary-the-gardener/ (upgraded, config & data preserved)")}`,
+          `  ${green("✓")} Core system → ${dim("_gary-the-gardener/ (upgraded, config & garden preserved)")}`,
         );
       } else {
         freshInstall = true;
         console.log(`  ${green("✓")} Core system → ${dim("_gary-the-gardener/")}`);
       }
     } else {
-      const label = installedVersion ? "(would upgrade, config & data preserved)" : "";
+      const label = installedVersion ? "(would upgrade, config & garden preserved)" : "";
       console.log(
         `  ${green("✓")} Core system → ${dim(`_gary-the-gardener/ ${label}`)}`,
       );

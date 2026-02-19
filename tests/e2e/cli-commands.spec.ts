@@ -166,11 +166,11 @@ test.describe('CLI: single-tool install wiring', () => {
     expect(existsSync(join(tempDir, '.claude', 'commands'))).toBe(true);
 
     // Copilot agent file created
-    expect(existsSync(join(tempDir, '.github', 'agents', 'gardener.md'))).toBe(true);
+    expect(existsSync(join(tempDir, '.github', 'agents', 'gardener-gary.md'))).toBe(true);
 
     // config.yaml tracks copilot wrapper
     const config = readFileSync(join(tempDir, '_gary-the-gardener', 'core', 'config.yaml'), 'utf8');
-    expect(config).toContain('.github/agents/gardener.md');
+    expect(config).toContain('.github/agents/gardener-gary.md');
   });
 });
 
@@ -182,7 +182,7 @@ test.describe('CLI: adding a second tool', () => {
 
     // Verify cursor is installed, copilot is not
     expect(existsSync(join(tempDir, '.cursor', 'rules', 'garden-agent-gardener.mdc'))).toBe(true);
-    expect(existsSync(join(tempDir, '.github', 'agents', 'gardener.md'))).toBe(false);
+    expect(existsSync(join(tempDir, '.github', 'agents', 'gardener-gary.md'))).toBe(false);
 
     // Second: add copilot via update (--force skips confirmation)
     const update = await cli(['update', '-t', 'copilot', '--force']);
@@ -190,12 +190,12 @@ test.describe('CLI: adding a second tool', () => {
 
     // Both tools now present
     expect(existsSync(join(tempDir, '.cursor', 'rules', 'garden-agent-gardener.mdc'))).toBe(true);
-    expect(existsSync(join(tempDir, '.github', 'agents', 'gardener.md'))).toBe(true);
+    expect(existsSync(join(tempDir, '.github', 'agents', 'gardener-gary.md'))).toBe(true);
 
     // config.yaml updated with both wrappers
     const config = readFileSync(join(tempDir, '_gary-the-gardener', 'core', 'config.yaml'), 'utf8');
     expect(config).toContain('.cursor/rules/garden-agent-gardener.mdc');
-    expect(config).toContain('.github/agents/gardener.md');
+    expect(config).toContain('.github/agents/gardener-gary.md');
   });
 
   test('existing files are preserved when adding a tool', async ({ cli, tempDir }) => {
@@ -205,7 +205,7 @@ test.describe('CLI: adding a second tool', () => {
     // Add copilot — cursor agent file should remain untouched
     const update = await cli(['update', '-t', 'copilot', '--force']);
     expect(update.exitCode).toBe(0);
-    expect(update.stdout).toContain('.github/agents/gardener.md');
+    expect(update.stdout).toContain('.github/agents/gardener-gary.md');
 
     // Original cursor file still present
     expect(existsSync(join(tempDir, '.cursor', 'rules', 'garden-agent-gardener.mdc'))).toBe(true);
@@ -247,12 +247,12 @@ test.describe('CLI: multiple tools flag', () => {
     const result = await cli(['install', '-t', 'cursor,copilot']);
     expect(result.exitCode).toBe(0);
     expect(existsSync(join(tempDir, '.cursor', 'rules', 'garden-agent-gardener.mdc'))).toBe(true);
-    expect(existsSync(join(tempDir, '.github', 'agents', 'gardener.md'))).toBe(true);
+    expect(existsSync(join(tempDir, '.github', 'agents', 'gardener-gary.md'))).toBe(true);
     expect(existsSync(join(tempDir, 'CLAUDE.md'))).toBe(true);
 
     const config = readFileSync(join(tempDir, '_gary-the-gardener', 'core', 'config.yaml'), 'utf8');
     expect(config).toContain('.cursor/rules/garden-agent-gardener.mdc');
-    expect(config).toContain('.github/agents/gardener.md');
+    expect(config).toContain('.github/agents/gardener-gary.md');
   });
 });
 
@@ -336,7 +336,7 @@ test.describe('CLI: config round-trip', () => {
     expect(updated).toContain('user_name: Pavel');
     expect(updated).toContain('communication_language: Czech');
     // New tool wrapper added
-    expect(updated).toContain('.github/agents/gardener.md');
+    expect(updated).toContain('.github/agents/gardener-gary.md');
     // Original wrapper still present
     expect(updated).toContain('.cursor/rules/garden-agent-gardener.mdc');
   });
@@ -354,7 +354,7 @@ test.describe('CLI: config missing wrapper_files', () => {
     // Update should not crash
     const result = await cli(['update', '-t', 'copilot', '--force']);
     expect(result.exitCode).toBe(0);
-    expect(existsSync(join(tempDir, '.github', 'agents', 'gardener.md'))).toBe(true);
+    expect(existsSync(join(tempDir, '.github', 'agents', 'gardener-gary.md'))).toBe(true);
   });
 });
 
@@ -403,10 +403,10 @@ test.describe('CLI: agent file content', () => {
       join(tempDir, '.cursor', 'rules', 'garden-agent-gardener.mdc'), 'utf8',
     );
     expect(cursorAgent).toContain('agent-activation');
-    expect(cursorAgent).toContain('gardener.md');
+    expect(cursorAgent).toContain('gardener.md'); // references core agent file
 
     const copilotAgent = readFileSync(
-      join(tempDir, '.github', 'agents', 'gardener.md'), 'utf8',
+      join(tempDir, '.github', 'agents', 'gardener-gary.md'), 'utf8',
     );
     expect(copilotAgent).toContain('agent-activation');
 
@@ -430,6 +430,75 @@ test.describe('CLI: status command count', () => {
     expect(result.exitCode).toBe(0);
     // Should show "CLAUDE.md + N commands" where N >= 10
     expect(result.stdout).toMatch(/CLAUDE\.md \+ \d+ commands/);
+  });
+});
+
+// ── Garden data preservation during update ──────────────────────────
+test.describe('CLI: garden data preserved on update', () => {
+  test('docsmap.yaml is not overwritten during update', async ({ cli, tempDir }) => {
+    await cli(['install', '-t', 'claude-code']);
+
+    // Simulate garden data created by the LLM agent after planting
+    const gardenDir = join(tempDir, '_gary-the-gardener', 'garden');
+    mkdirSync(gardenDir, { recursive: true });
+    const customDocsmap = [
+      'version: 2',
+      'generated: "01-01-2026"',
+      'hash: "v2-42-01-01-2026"',
+      'areas:',
+      '  custom-area:',
+      '    label: Custom Area',
+    ].join('\n');
+    writeFileSync(join(gardenDir, 'docsmap.yaml'), customDocsmap);
+
+    // Simulate old version to trigger the upgrade code path
+    writeFileSync(join(tempDir, '_gary-the-gardener', 'VERSION'), '1.0.0');
+
+    const result = await cli(['update', '--force']);
+    expect(result.exitCode).toBe(0);
+
+    // docsmap.yaml must be unchanged — the update must never overwrite garden state
+    const preserved = readFileSync(join(gardenDir, 'docsmap.yaml'), 'utf8');
+    expect(preserved).toContain('custom-area');
+    expect(preserved).toContain('v2-42-01-01-2026');
+  });
+
+  test('history.jsonl is not overwritten during update', async ({ cli, tempDir }) => {
+    await cli(['install', '-t', 'claude-code']);
+
+    const gardenDir = join(tempDir, '_gary-the-gardener', 'garden');
+    mkdirSync(gardenDir, { recursive: true });
+    const historyEntry = `{"ts":"01-01-2026","action":"init","summary":"Garden planted with 42 entities"}`;
+    writeFileSync(join(gardenDir, 'history.jsonl'), historyEntry);
+
+    writeFileSync(join(tempDir, '_gary-the-gardener', 'VERSION'), '1.0.0');
+
+    const result = await cli(['update', '--force']);
+    expect(result.exitCode).toBe(0);
+
+    const preserved = readFileSync(join(gardenDir, 'history.jsonl'), 'utf8');
+    expect(preserved).toContain('42 entities');
+  });
+
+  test('garden.md snapshot is not overwritten during update', async ({ cli, tempDir }) => {
+    await cli(['install', '-t', 'claude-code']);
+
+    const gardenDir = join(tempDir, '_gary-the-gardener', 'garden');
+    mkdirSync(gardenDir, { recursive: true });
+    const snapshot = [
+      '# Garden Map',
+      '> Rendered 01-01-2026 | Gary v1.0.0 | hash: v2-42-01-01-2026',
+      '> 42 entities across 8 areas',
+    ].join('\n');
+    writeFileSync(join(gardenDir, 'garden.md'), snapshot);
+
+    writeFileSync(join(tempDir, '_gary-the-gardener', 'VERSION'), '1.0.0');
+
+    const result = await cli(['update', '--force']);
+    expect(result.exitCode).toBe(0);
+
+    const preserved = readFileSync(join(gardenDir, 'garden.md'), 'utf8');
+    expect(preserved).toContain('42 entities across 8 areas');
   });
 });
 

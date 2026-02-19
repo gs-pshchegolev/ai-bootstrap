@@ -5,6 +5,13 @@ All notable changes to the Garden System will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.1] - 2026-02-19
+
+### Fixed
+- **Critical: garden state no longer wiped on CLI update** — `docsmap.yaml`, `history.jsonl`, `garden.md`, and `moments.md` were being overwritten with ai-bootstrap's own garden data whenever a user ran `npx @pshch/gary-the-gardener update`. Two-part fix: (1) `package.json` now ships only `_gary-the-gardener/garden/.gitkeep` instead of the full `garden/` directory, so no project-specific data is bundled in the package; (2) `cli.js` now backs up and restores the `garden/` directory during upgrades, mirroring the existing `data/` preservation logic.
+
+---
+
 ## [5.2.0] - 2026-02-19
 
 ### Changed
