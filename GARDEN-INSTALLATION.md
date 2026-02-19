@@ -40,15 +40,15 @@ Copies the entire garden system into your repository - fully self-contained.
 cd /path/to/target-repo
 
 # Copy garden system source
-mkdir -p _gs-gardener
-cp -r /path/to/ai-bootstrap/_gs-gardener/ _gs-gardener/
+mkdir -p _gary-the-gardener
+cp -r /path/to/ai-bootstrap/_gary-the-gardener/ _gary-the-gardener/
 
 # Copy skill command files
 mkdir -p .claude/commands
 cp /path/to/ai-bootstrap/.claude/commands/garden-*.md .claude/commands/
 
 # Commit to repository
-git add _gs-gardener .claude/commands/garden-*.md
+git add _gary-the-gardener .claude/commands/garden-*.md
 git commit -m "feat: add garden system for AI config maintenance"
 ```
 
@@ -79,7 +79,7 @@ npx @pshch/gary-the-gardener update --force
 ```
 
 The update command:
-- Overwrites all core files (`_gs-gardener/core/`)
+- Overwrites all core files (`_gary-the-gardener/core/`)
 - **Preserves your `config.yaml` settings**
 - Updates skill commands for all installed AI tools
 
@@ -104,14 +104,14 @@ git submodule add https://github.com/your-org/ai-bootstrap.git _ai-bootstrap
 git submodule update --init --recursive
 
 # Create symlink to garden system
-ln -s _ai-bootstrap/_gs-gardener _gs-gardener
+ln -s _ai-bootstrap/_gary-the-gardener _gary-the-gardener
 
 # Copy command files
 mkdir -p .claude/commands
 cp _ai-bootstrap/.claude/commands/garden-*.md .claude/commands/
 
 # Commit
-git add .gitmodules _ai-bootstrap _gs-gardener .claude/commands/garden-*.md
+git add .gitmodules _ai-bootstrap _gary-the-gardener .claude/commands/garden-*.md
 git commit -m "feat: add garden system via submodule"
 ```
 
@@ -162,7 +162,7 @@ Creates symbolic links to the ai-bootstrap repository - changes reflect immediat
 cd /path/to/target-repo
 
 # Create symlinks
-ln -s /path/to/ai-bootstrap/_gs-gardener _gs-gardener
+ln -s /path/to/ai-bootstrap/_gary-the-gardener _gary-the-gardener
 mkdir -p .claude/commands
 ln -s /path/to/ai-bootstrap/.claude/commands/garden-*.md .claude/commands/
 ```
@@ -222,9 +222,9 @@ If you see 🪴 Gary The Gardener's menu, installation was successful! 🎉
 
 ## Configuration
 
-Each installation includes a config file at [_gs-gardener/core/config.yaml](_gs-gardener/core/config.yaml).
+Each installation includes a config file at [_gary-the-gardener/core/config.yaml](_gary-the-gardener/core/config.yaml).
 
-> **Important:** `config.yaml` is the only user-customizable file. All other files in `_gs-gardener/` are core product and get overwritten during updates. Do not edit workflows or agent files directly.
+> **Important:** `config.yaml` is the only user-customizable file. All other files in `_gary-the-gardener/` are core product and get overwritten during updates. Do not edit workflows or agent files directly.
 
 ### Default Configuration
 
@@ -248,7 +248,7 @@ Edit the config file to match your repository structure:
 
 ```bash
 # Edit configuration
-vim _gs-gardener/core/config.yaml
+vim _gary-the-gardener/core/config.yaml
 
 # Restart gardener for changes to take effect
 /garden-agent-gardener
@@ -258,22 +258,22 @@ vim _gs-gardener/core/config.yaml
 
 ### "Cannot find workflow.md"
 
-**Cause:** `_gs-gardener/` directory is missing or incomplete
+**Cause:** `_gary-the-gardener/` directory is missing or incomplete
 
 **Fix:**
-1. Verify `_gs-gardener/` exists: `ls _gs-gardener/core/workflows/`
+1. Verify `_gary-the-gardener/` exists: `ls _gary-the-gardener/core/workflows/`
 2. If using submodule: `git submodule update --init`
 3. If direct copy: Re-copy from ai-bootstrap
-4. Check structure: `_gs-gardener/core/workflows/{workflow-name}/workflow.md` must exist
+4. Check structure: `_gary-the-gardener/core/workflows/{workflow-name}/workflow.md` must exist
 
 ### "Gardener doesn't display menu"
 
 **Cause:** Gardener agent file missing or command has wrong path
 
 **Fix:**
-1. Verify agent exists: `ls _gs-gardener/core/agents/gardener.md`
+1. Verify agent exists: `ls _gary-the-gardener/core/agents/gardener.md`
 2. Check command file: `cat .claude/commands/garden-agent-gardener.md`
-3. Try direct invoke: `claude @_gs-gardener/core/agents/gardener.md`
+3. Try direct invoke: `claude @_gary-the-gardener/core/agents/gardener.md`
 
 ### "Skill not found: garden-sync"
 
@@ -291,19 +291,19 @@ cp /path/to/ai-bootstrap/.claude/commands/garden-*.md .claude/commands/
 
 ### Skills show but workflows fail
 
-**Cause:** `_gs-gardener/` directory path wrong or missing
+**Cause:** `_gary-the-gardener/` directory path wrong or missing
 
 **Fix:**
 ```bash
 # Verify structure
-ls _gs-gardener/core/workflows/
+ls _gary-the-gardener/core/workflows/
 
 # Check permissions
-chmod -R u+r _gs-gardener/
+chmod -R u+r _gary-the-gardener/
 
-# Verify _gs-gardener/ is in project root (same level as .claude/)
+# Verify _gary-the-gardener/ is in project root (same level as .claude/)
 pwd
-ls -la | grep _gs-gardener
+ls -la | grep _gary-the-gardener
 ```
 
 ---

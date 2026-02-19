@@ -5,6 +5,56 @@ All notable changes to the Garden System will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.1] - 2026-02-19
+
+### Changed
+- **4-column garden map** — Worms and Dead leaves columns merged into a single **Issues** column (`🪱×N 🍂×M`). Reduces visual noise, especially in large repos where both columns are usually empty.
+- **Path hints** — Each area row now shows a `path-hint` code span: the longest common directory prefix of all `include` patterns. Helps identify areas when label names alone are ambiguous (e.g. "Control UI" vs "Destination UI").
+- **Fixed area emoji** — Area column now uses `area.emoji` from docsmap (set when the garden is planted) instead of computing a dominant readiness emoji from entities. The readiness signal lives in the Plants and Total columns where it belongs.
+- **Middle-dot for empty cells** — `·` replaces `—` as the empty cell marker throughout the garden map. Less typographic weight.
+- **example-garden.md** — New reference file (`core/agents/example-garden.md`) showing a correct rendered garden for a hypothetical full-stack project.
+
+### Fixed
+- `/garden` command now correctly included in install — `garden.md` was excluded by the `garden-*.md` glob filter in both the CLI copy step and the npm `files` field.
+
+---
+
+## [5.1.0] - 2026-02-19
+
+### Added
+- **Moments loaded on every startup** — `heritage.md`, `moments.md`, and `garden/moments.md` are now loaded in parallel at both hub and workflow invocations. Gary knows how many good moments this garden holds.
+- **Hub footer** — `/garden` shows `🌸 {N} good moments` or `🌱 No moments yet` at the bottom of the command list.
+- **moments-how.md** — How-to-write instructions split into a separate file (`core/agents/moments-how.md`), loaded only when Gary decides to record a moment. Reduces startup token cost.
+
+### Changed
+- **Parallel startup loading** — `heritage.md`, `moments.md`, and `garden/moments.md` load in parallel at every startup (replaces sequential Heritage + Moments loading).
+- **Seed tier removed** — 🫘 seed is no longer a readiness state. Three-tier vocabulary: 🌱 small (≤10 lines) · 🌿 grown (11–99) · 🌳 mature (≥100). Entities previously at seed are reclassified as small. Areas with 0 entities use 🌱 as the dominant emoji.
+
+---
+
+## [5.0.0] - 2026-02-19
+
+### Changed (Breaking)
+- **Command renames** — all user-facing slash commands renamed to garden metaphors. Existing `.claude/commands/garden-*.md` files replaced on update.
+  - `setup` stays (🌱) — tag updated to "Plant your garden — AGENTS.md, docs/, AI tool configs"
+  - `visualise` → `map` (🗺️)
+  - `health` stays (🩺) — tag updated to "Quick check — 3 things that need attention"
+  - `audit` → `inspect` (🔍)
+  - `compact` → `prune` (✂️)
+  - `extend` → `plant` (🌷)
+  - `references` → `research` (📚)
+- **Workflow file titles updated** — `audit/workflow.md` title changed to "Inspect"; `references/workflow.md` title changed to "Research"
+- **Cross-workflow refs** — `/garden-extend` references inside audit workflow updated to `/garden-plant`
+- **Directory renamed** — `_gs-gardener/` → `_gary-the-gardener/`. Anyone with Gary installed must re-install or rename the directory manually.
+- **Data directory renamed** — `_gary-the-gardener/data/` → `_gary-the-gardener/garden/`. Persistent files (`docsmap.yaml`, `history.jsonl`, `garden.md`) move to `garden/`.
+
+### Added
+- **Gary Awareness** — `_gary-the-gardener/core/agents/heritage.md` — Gary's growth journal (version history, current mood, behavioural rules). Loaded at every startup.
+- **Good Moments** — `_gary-the-gardener/core/agents/moments.md` meta-prompt + `_gary-the-gardener/garden/moments.md` per-project memory. Gary writes here when something genuinely feels good.
+- **Version baking in garden.md** — snapshot header now includes `Gary v{VERSION}` alongside the hash. Gary detects version upgrades and shows a "I've grown" acknowledgment block on next map render.
+
+---
+
 ## [4.5.0] - 2026-02-19
 
 ### Changed
@@ -160,10 +210,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Created shared output style guide** (`core/style.md`) - defines compact card format, progress updates, and tone conventions
 
 ### Added
-- `_gs-gardener/core/style.md` - shared output conventions for all workflows
+- `_gary-the-gardener/core/style.md` - shared output conventions for all workflows
 
 ### Removed
-- `_gs-gardener/_config/` directory and coverage status template (inlined into gardener.md)
+- `_gary-the-gardener/_config/` directory and coverage status template (inlined into gardener.md)
 - `.github/agents/gardener.md` (duplicate of core agent file)
 - Redundant `version` field from config.yaml (VERSION file is the source of truth)
 - Example Session sections from all workflows
@@ -211,7 +261,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **`/garden-garden` renamed to `/garden-maintain`** - Clearer command name (no longer self-referential)
-- **Workflow directory renamed** - `_gs-gardener/core/workflows/garden/` -> `_gs-gardener/core/workflows/maintain/`
+- **Workflow directory renamed** - `_gary-the-gardener/core/workflows/garden/` -> `_gary-the-gardener/core/workflows/maintain/`
 - **Help workflow structure** - Now defers heavy I/O checks to contextual analysis (Phase 4)
 - **Gary The Gardener menu** - Shows 9 options when AGENTS.md missing, 8 when it exists
 - **Bootstrap integration** - ai-bootstrapper.md converted to standard garden workflow
@@ -243,10 +293,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `/garden-maintain` - Find and fix documentation issues
   - `/garden-compact` - Compress AGENTS.md while preserving facts
   - `/garden-help` - Get help understanding when to use each skill
-- Configuration system (`_gs-gardener/core/config.yaml`)
+- Configuration system (`_gary-the-gardener/core/config.yaml`)
 - Workflow-based architecture (8 workflows)
 - Coverage status tracking
-- Version tracking (`_gs-gardener/VERSION`)
+- Version tracking (`_gary-the-gardener/VERSION`)
 
 ### Philosophy
 - Progressive disclosure - Start simple, reveal complexity as needed

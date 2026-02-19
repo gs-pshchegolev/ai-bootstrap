@@ -55,7 +55,7 @@ npx @pshch/gary-the-gardener status
 
 | File | Purpose |
 |------|---------|
-| `_gs-gardener/` | Core garden system engine (workflows, agent, config) |
+| `_gary-the-gardener/` | Core garden system engine (workflows, agent, config) |
 | `AGENTS.md` | Single source of truth for all AI tools (created via `/garden-bootstrap`) |
 | `.aiignore` | Keeps secrets and large files out of AI context |
 | Tool wrappers | Native config files for each selected AI tool |

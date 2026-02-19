@@ -8,7 +8,7 @@ Every Gary response is **one block** with three parts: header, body, footer.
 
 ### Block Header
 
-Identity + version + mode + goal. Always starts with 🪴, includes version from `_gs-gardener/VERSION`, then `|` separator with emoji mode.
+Identity + version + mode + goal. Always starts with 🪴, includes version from `_gary-the-gardener/VERSION`, then `|` separator with emoji mode.
 
 ```
 🪴 **Gary The Gardener** v{version} | <emoji> <mode>
@@ -101,12 +101,11 @@ Pick a genuinely interesting, surprising fact about plants, soil, composting, pr
 |-------|-------|-----------|
 | 🌳 | mature | ≥100 substantive lines |
 | 🌿 | grown | 11–99 substantive lines |
-| 🌱 | small | 3–10 substantive lines |
-| 🫘 | seed | ≤2 substantive lines |
+| 🌱 | small | ≤10 substantive lines |
 
 ### Documentation Quality Signals (per area, from audit)
 
-Tracked at area level. Not present until an audit has run. `—` when zero.
+Tracked at area level. Not present until an audit has run. `·` when zero.
 
 | Emoji | Signal | What it means |
 |-------|--------|---------------|
@@ -117,18 +116,19 @@ Both use `×N` count notation.
 
 ### Table Layout
 
-5-column markdown table — one row per area. Scales to any project size.
+4-column markdown table — one row per area. Scales to any project size.
 
 ```
-| Area | Plants | Worms | Dead leaves | Total |
-|------|--------|-------|-------------|-------|
-| {dominant} **{label}** | {emoji stream or collapsed} | 🪱×N or — | 🍂×N or — | {all non-zero ×N} |
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
+| {area.emoji} **{label}** `{path-hint}` | {emoji stream or ·} | {🪱×N 🍂×M or ·} | {all non-zero ×N or ·} |
 ```
 
-- **Area**: dominant readiness emoji (most frequent state; ties favour more mature) + **bold** label
-- **Plants**: emoji stream for ≤18 entities; `🌳×8 🌿×12 *(browse)*` for larger areas
-- **Worms / Dead leaves**: counts from `doc_issues` in docsmap; `—` if zero or absent
-- **Total**: all non-zero counts, `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂
+- **Area**: `area.emoji` from docsmap (fixed per area, not computed from readiness) + **bold** label + `path-hint` code span
+- **path-hint**: longest common directory prefix across all `include` patterns. Per pattern: strip everything from the first `*`, then take the dirname. Find the shared prefix. Use `/` if empty or patterns span multiple roots.
+- **Plants**: emoji stream for ≤18 entities; `🌳×8 🌿×12 *(browse)*` for larger areas; `·` if no entities
+- **Issues**: combined `🪱×N` worms + `🍂×M` dead leaves from `doc_issues`; `·` if both zero/absent
+- **Total**: all non-zero counts, `×N` notation, order: 🌳→🌿→🌱→🪱→🍂; `·` if no entities
 
 ### Season Mood Line
 
@@ -136,7 +136,7 @@ One line above the table summarising overall garden health. First match wins:
 
 - `🍂 Well-tended` — mature ≥ 60%
 - `☀️ Growing well` — mature+grown ≥ 60%
-- `🌸 Just sprouting` — small+seed > mature+grown
+- `🌸 Just sprouting` — small > mature+grown
 - `⚠️ Needs attention` — any 🪱 worms or 🍂 dead leaves flagged
 - `🌱 Taking shape` — default
 

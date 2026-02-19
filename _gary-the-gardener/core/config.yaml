@@ -46,9 +46,9 @@ docs_files:
   - "{project-root}/docs/references/"
 
 # Garden memory (persistent state)
-docsmap_file: "{project-root}/_gs-gardener/data/docsmap.yaml"
-history_file: "{project-root}/_gs-gardener/data/history.jsonl"
-snapshot_file: "{project-root}/_gs-gardener/data/garden.md"
+docsmap_file: "{project-root}/_gary-the-gardener/garden/docsmap.yaml"
+history_file: "{project-root}/_gary-the-gardener/garden/history.jsonl"
+snapshot_file: "{project-root}/_gary-the-gardener/garden/garden.md"
 
 # Discovery exclusions (directories skipped during full-repo scan)
 discovery_exclude:

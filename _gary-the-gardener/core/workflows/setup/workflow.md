@@ -56,7 +56,7 @@ Generate:
 
 ### Step 4: Plant the Garden
 
-After generating files, run the **Plant the Garden** sub-flow from `_gs-gardener/core/workflows/visualise/workflow.md`.
+After generating files, run the **Plant the Garden** sub-flow from `_gary-the-gardener/core/workflows/visualise/workflow.md`.
 
 This produces `docsmap.yaml`, `history.jsonl`, and `garden.md` — the garden is fully planted as part of setup, not as a separate step. Gary will scan the codebase structure, propose 2–3 area groupings, and finalize on user selection.
 

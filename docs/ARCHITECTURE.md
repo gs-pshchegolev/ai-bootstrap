@@ -37,14 +37,14 @@ This creates a tight feedback loop: if a workflow produces bad output, the devel
 
 1. Guard: `install` rejects if already installed (suggests `update`); `update` rejects if not installed (suggests `install`)
 2. Detect existing installation and version
-3. Copy `_gs-gardener/` to target (preserving config on upgrade)
+3. Copy `_gary-the-gardener/` to target (preserving config on upgrade)
 4. Create `.aiignore` if missing
 5. Detect or prompt for AI tool selection (inquirer checkbox)
 6. Install tool-specific agent files
 7. For Claude Code: also copy skill command files (`.claude/commands/garden-*.md`)
 8. Write `config.yaml` for fresh installs
 
-## Garden System (`_gs-gardener/`)
+## Garden System (`_gary-the-gardener/`)
 
 The core product. A collection of markdown files that define:
 
@@ -84,5 +84,5 @@ The CLI generates tool-specific files that reference the garden system:
 ## Distribution
 
 - Published to npm as `@pshch/gary-the-gardener`
-- The `files` field in package.json ships: `bin/`, `_gs-gardener/`, `.claude/commands/garden-*.md`, `templates/`
+- The `files` field in package.json ships: `bin/`, `_gary-the-gardener/`, `.claude/commands/garden-*.md`, `templates/`
 - No build step — source JavaScript is distributed directly

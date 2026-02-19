@@ -6,7 +6,7 @@ import { join, resolve, basename } from 'node:path';
 import { checkbox, confirm, select } from '@inquirer/prompts';
 
 const PKG_ROOT = resolve(import.meta.dirname, '..');
-const VERSION = readFileSync(join(PKG_ROOT, '_gs-gardener', 'VERSION'), 'utf8').trim();
+const VERSION = readFileSync(join(PKG_ROOT, '_gary-the-gardener', 'VERSION'), 'utf8').trim();
 
 // ── Colors ───────────────────────────────────────────────────────────
 const bold = (s) => `\x1b[1m${s}\x1b[0m`;
@@ -17,20 +17,20 @@ const dim = (s) => `\x1b[2m${s}\x1b[0m`;
 
 // ── Workflow catalog (shared across all tool generators) ─────────────
 const WORKFLOWS = [
-  { name: 'setup',      icon: '🌱', tag: 'Create AGENTS.md, scaffold docs/, add tool wrappers' },
-  { name: 'visualise',  icon: '🗺️',  tag: 'See the garden map — check doc readiness' },
-  { name: 'health',     icon: '🩺', tag: 'Quick scan — 3 improvement suggestions' },
-  { name: 'audit',      icon: '🔍', tag: 'Deep scan for drift, quality & wrapper sync' },
-  { name: 'compact',    icon: '✂️',  tag: 'Compress AGENTS.md under 150 lines' },
-  { name: 'extend',     icon: '🌻', tag: 'Add content layers — guardrails, style, domain' },
-  { name: 'references', icon: '📚', tag: 'Fetch llms.txt for your dependencies' },
+  { name: 'setup',    icon: '🌱', tag: 'Plant your garden — AGENTS.md, docs/, AI tool configs' },
+  { name: 'map',      icon: '🗺️',  tag: 'See your garden map' },
+  { name: 'health',   icon: '🩺', tag: 'Quick check — 3 things that need attention' },
+  { name: 'inspect',  icon: '🔍', tag: 'Inspect for drift, quality issues & Shed sync' },
+  { name: 'prune',    icon: '✂️',  tag: 'Trim AGENTS.md to under 150 lines' },
+  { name: 'plant',    icon: '🌷', tag: 'Add a content layer — guardrails, style, domain' },
+  { name: 'research', icon: '📚', tag: 'Research dependencies — fetch llms.txt files' },
 ];
 
 // ── Agent activation block (reused by all tool providers) ────────────
 const AGENT_ACTIVATION = `You must fully embody this agent's persona and follow all activation instructions exactly as specified. NEVER break character until given an exit command.
 
 <agent-activation CRITICAL="TRUE">
-1. LOAD the FULL agent file from {project-root}/_gs-gardener/core/agents/gardener.md
+1. LOAD the FULL agent file from {project-root}/_gary-the-gardener/core/agents/gardener.md
 2. READ its entire contents - this contains the complete agent persona, menu, and instructions
 3. FOLLOW every step in the <activation> section precisely
 4. DISPLAY the welcome greeting and coverage status
@@ -177,7 +177,7 @@ if (command && COMMANDS[command]) {
 
 async function runInteractiveMenu() {
   const dest = process.cwd();
-  const installedVersion = readInstalledVersion(join(dest, '_gs-gardener'));
+  const installedVersion = readInstalledVersion(join(dest, '_gary-the-gardener'));
   const isInstalled = !!installedVersion;
 
   // Non-TTY fallback: auto-detect action
@@ -230,7 +230,7 @@ async function runInteractiveMenu() {
 
 async function runInstall(force, dryRun) {
   const dest = process.cwd();
-  const installedVersion = readInstalledVersion(join(dest, '_gs-gardener'));
+  const installedVersion = readInstalledVersion(join(dest, '_gary-the-gardener'));
 
   if (installedVersion && !force) {
     console.log(`\n  Garden system already installed ${dim(`(v${installedVersion})`)}.`);
@@ -243,7 +243,7 @@ async function runInstall(force, dryRun) {
 
 async function runUpdate(force, dryRun) {
   const dest = process.cwd();
-  const installedVersion = readInstalledVersion(join(dest, '_gs-gardener'));
+  const installedVersion = readInstalledVersion(join(dest, '_gary-the-gardener'));
 
   if (!installedVersion) {
     console.log(`\n  Garden system not found in this directory.`);
@@ -281,8 +281,8 @@ async function runSetup(mode, force, dryRun) {
   const requestedTools = parseToolsFlag(values.tools);
 
   // ── Detect existing installation ──────────────────────────────────
-  const coreSrc = join(PKG_ROOT, "_gs-gardener");
-  const coreDest = join(dest, "_gs-gardener");
+  const coreSrc = join(PKG_ROOT, "_gary-the-gardener");
+  const coreDest = join(dest, "_gary-the-gardener");
   const configPath = join(coreDest, "core", "config.yaml");
 
   const installedVersion = readInstalledVersion(coreDest);
@@ -301,7 +301,7 @@ async function runSetup(mode, force, dryRun) {
   // ── 1. Core Garden System ─────────────────────────────────────────
   if (isCurrent && !force) {
     console.log(
-      `  ${green("✓")} Core system → ${dim("_gs-gardener/ (unchanged)")}`,
+      `  ${green("✓")} Core system → ${dim("_gary-the-gardener/ (unchanged)")}`,
     );
   } else {
     // Preserve user data and config for any existing installation (upgrades or force reinstalls)
@@ -313,7 +313,7 @@ async function runSetup(mode, force, dryRun) {
       // Back up data/ before overwriting the entire directory
       let tmpDataDir;
       if (dataExists) {
-        tmpDataDir = join(dest, '_gs-gardener-data-backup');
+        tmpDataDir = join(dest, '_gary-the-gardener-data-backup');
         cpSync(dataDir, tmpDataDir, { recursive: true });
       }
 
@@ -331,16 +331,16 @@ async function runSetup(mode, force, dryRun) {
           .replace(/^version: .+$/m, `version: "${VERSION}"`);
         writeFileSync(configPath, updated);
         console.log(
-          `  ${green("✓")} Core system → ${dim("_gs-gardener/ (upgraded, config & data preserved)")}`,
+          `  ${green("✓")} Core system → ${dim("_gary-the-gardener/ (upgraded, config & data preserved)")}`,
         );
       } else {
         freshInstall = true;
-        console.log(`  ${green("✓")} Core system → ${dim("_gs-gardener/")}`);
+        console.log(`  ${green("✓")} Core system → ${dim("_gary-the-gardener/")}`);
       }
     } else {
       const label = installedVersion ? "(would upgrade, config & data preserved)" : "";
       console.log(
-        `  ${green("✓")} Core system → ${dim(`_gs-gardener/ ${label}`)}`,
+        `  ${green("✓")} Core system → ${dim(`_gary-the-gardener/ ${label}`)}`,
       );
     }
   }
@@ -448,7 +448,7 @@ __pycache__/
       const cmdSrc = join(PKG_ROOT, ".claude", "commands");
       const cmdDest = join(dest, ".claude", "commands");
       const gardenCmds = readdirSync(cmdSrc).filter(
-        (f) => f.startsWith("garden-") && f.endsWith(".md"),
+        (f) => (f === "garden.md" || f.startsWith("garden-")) && f.endsWith(".md"),
       );
       const shouldUpdateCmds = isUpgrade || force || !installedVersion;
       let copied = 0;
@@ -502,8 +502,8 @@ __pycache__/
   // Next steps
   if (!dryRun && mode === 'install') {
     console.log(`\n${bold("Next steps:")} ${dim("(these are LLM commands — run them inside your AI agent)")}`);
-    console.log(`  1. Run ${green("/garden-setup")}       Create your docs structure`);
-    console.log(`  2. Run ${green("/garden-visualise")}    See the garden map`);
+    console.log(`  1. Run ${green("/garden-setup")}         Create your docs structure`);
+    console.log(`  2. Run ${green("/garden-map")}         See the garden map`);
     console.log(`  3. Run ${green("/garden")}              Open the interactive hub`);
   }
 
@@ -517,11 +517,11 @@ function runStatus() {
   console.log(`\n🪴 ${bold('Gary The Gardener — Status')}\n`);
 
   // Core system
-  const coreInstalled = existsSync(join(dest, '_gs-gardener', 'core'));
+  const coreInstalled = existsSync(join(dest, '_gary-the-gardener', 'core'));
   let coreVersion = '';
   if (coreInstalled) {
     try {
-      coreVersion = readFileSync(join(dest, '_gs-gardener', 'VERSION'), 'utf8').trim();
+      coreVersion = readFileSync(join(dest, '_gary-the-gardener', 'VERSION'), 'utf8').trim();
     } catch { /* ignore */ }
   }
   statusLine('Core system', coreInstalled, coreInstalled ? `v${coreVersion}` : null);
@@ -564,7 +564,7 @@ function runDoctor() {
   console.log(`\n🪴 ${bold('Gary The Gardener — Doctor')}\n`);
 
   // 1. Check core system exists
-  const coreDest = join(dest, '_gs-gardener');
+  const coreDest = join(dest, '_gary-the-gardener');
   const coreExists = existsSync(join(coreDest, 'core'));
   if (!coreExists) {
     console.log(`  ${red('✗')} Core system not found`);
@@ -775,7 +775,7 @@ function detectTools(dest) {
 }
 
 async function promptToolSelection(detected) {
-  console.log(dim('\n  Each tool gets a gardener agent that loads from _gs-gardener/.\n'));
+  console.log(dim('\n  Each tool gets a gardener agent that loads from _gary-the-gardener/.\n'));
 
   const choices = TOOL_SLUGS.map((slug) => {
     const tool = TOOLS[slug];
@@ -800,7 +800,7 @@ async function promptToolSelection(detected) {
 
 function printGardenWelcome() {
   const cmds = WORKFLOWS.map(w =>
-    `  ${w.icon.padEnd(4)} /garden-${w.name.padEnd(14)} ${w.tag}`
+    `  /garden-${w.name.padEnd(14)} ${w.tag}`
   ).join('\n');
 
   console.log(`
@@ -816,7 +816,7 @@ function printGardenWelcome() {
 
   ${bold('1.')} Open your AI coding agent (Claude Code, Cursor, etc.)
   ${bold('2.')} Run ${green('/garden-setup')} to create your docs structure
-  ${bold('3.')} Run ${green('/garden-visualise')} to see the garden map
+  ${bold('3.')} Run ${green('/garden-map')} to see the garden map
 
   These are ${bold('LLM slash-commands')} — type them inside your AI agent, not in the terminal.
 
@@ -830,7 +830,7 @@ ${cmds}
 
 function printHelp() {
   const cmds = WORKFLOWS.map(w =>
-    `  ${w.icon.padEnd(4)} /garden-${w.name.padEnd(14)} ${w.tag}`
+    `  /garden-${w.name.padEnd(14)} ${w.tag}`
   ).join('\n');
 
   console.log(`
@@ -848,8 +848,8 @@ function printHelp() {
 ${bold('GETTING STARTED')}
   After install or update, open your AI coding agent and run:
 
-  ${bold('1.')} ${green('/garden-setup')}       Create AGENTS.md, scaffold docs/, add tool wrappers
-  ${bold('2.')} ${green('/garden-visualise')}    See the garden map — check doc readiness
+  ${bold('1.')} ${green('/garden-setup')}         Plant your garden — AGENTS.md, docs/, AI tool configs
+  ${bold('2.')} ${green('/garden-map')}         See the garden map
   ${bold('3.')} ${green('/garden')}              Open the interactive hub
 
   These are ${bold('LLM slash-commands')} — type them inside your AI agent,
@@ -872,7 +872,7 @@ ${bold('CLI COMMANDS')}
 
 ${bold('WHAT GETS INSTALLED')}
   ${dim('Always (Claude Code — the agent host):')}
-    • Core system        ${dim('(_gs-gardener/)')}
+    • Core system        ${dim('(_gary-the-gardener/)')}
     • Skill commands     ${dim('(.claude/commands/garden-*.md)')}
     • CLAUDE.md          ${dim('(points Claude to AGENTS.md)')}
     • .aiignore          ${dim('(keeps secrets out of AI context)')}

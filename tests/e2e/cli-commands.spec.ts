@@ -38,7 +38,7 @@ test.describe('CLI: install --dry-run', () => {
     expect(result.exitCode).toBe(0);
 
     // Verify no files were written
-    expect(existsSync(join(tempDir, '_gs-gardener'))).toBe(false);
+    expect(existsSync(join(tempDir, '_gary-the-gardener'))).toBe(false);
     expect(existsSync(join(tempDir, 'CLAUDE.md'))).toBe(false);
   });
 });
@@ -115,8 +115,8 @@ test.describe('CLI: install creates expected files', () => {
   test('creates core files in target directory', async ({ cli, tempDir }) => {
     await cli(['install', '-t', 'claude-code']);
 
-    expect(existsSync(join(tempDir, '_gs-gardener', 'VERSION'))).toBe(true);
-    expect(existsSync(join(tempDir, '_gs-gardener', 'core', 'config.yaml'))).toBe(true);
+    expect(existsSync(join(tempDir, '_gary-the-gardener', 'VERSION'))).toBe(true);
+    expect(existsSync(join(tempDir, '_gary-the-gardener', 'core', 'config.yaml'))).toBe(true);
     expect(existsSync(join(tempDir, 'CLAUDE.md'))).toBe(true);
     expect(existsSync(join(tempDir, '.aiignore'))).toBe(true);
     expect(existsSync(join(tempDir, '.claude', 'commands'))).toBe(true);
@@ -129,8 +129,8 @@ test.describe('CLI: single-tool install wiring', () => {
     expect(result.exitCode).toBe(0);
 
     // Core system always installed
-    expect(existsSync(join(tempDir, '_gs-gardener', 'VERSION'))).toBe(true);
-    expect(existsSync(join(tempDir, '_gs-gardener', 'core', 'config.yaml'))).toBe(true);
+    expect(existsSync(join(tempDir, '_gary-the-gardener', 'VERSION'))).toBe(true);
+    expect(existsSync(join(tempDir, '_gary-the-gardener', 'core', 'config.yaml'))).toBe(true);
 
     // Claude Code is required — always wired even when only cursor selected
     expect(existsSync(join(tempDir, 'CLAUDE.md'))).toBe(true);
@@ -150,7 +150,7 @@ test.describe('CLI: single-tool install wiring', () => {
     expect(existsSync(join(tempDir, '.aiignore'))).toBe(true);
 
     // config.yaml tracks both claude and cursor wrappers
-    const config = readFileSync(join(tempDir, '_gs-gardener', 'core', 'config.yaml'), 'utf8');
+    const config = readFileSync(join(tempDir, '_gary-the-gardener', 'core', 'config.yaml'), 'utf8');
     expect(config).toContain('CLAUDE.md');
     expect(config).toContain('.cursor/rules/garden-agent-gardener.mdc');
   });
@@ -167,7 +167,7 @@ test.describe('CLI: single-tool install wiring', () => {
     expect(existsSync(join(tempDir, '.github', 'agents', 'gardener.md'))).toBe(true);
 
     // config.yaml tracks copilot wrapper
-    const config = readFileSync(join(tempDir, '_gs-gardener', 'core', 'config.yaml'), 'utf8');
+    const config = readFileSync(join(tempDir, '_gary-the-gardener', 'core', 'config.yaml'), 'utf8');
     expect(config).toContain('.github/agents/gardener.md');
   });
 });
@@ -191,7 +191,7 @@ test.describe('CLI: adding a second tool', () => {
     expect(existsSync(join(tempDir, '.github', 'agents', 'gardener.md'))).toBe(true);
 
     // config.yaml updated with both wrappers
-    const config = readFileSync(join(tempDir, '_gs-gardener', 'core', 'config.yaml'), 'utf8');
+    const config = readFileSync(join(tempDir, '_gary-the-gardener', 'core', 'config.yaml'), 'utf8');
     expect(config).toContain('.cursor/rules/garden-agent-gardener.mdc');
     expect(config).toContain('.github/agents/gardener.md');
   });
@@ -220,7 +220,7 @@ test.describe('CLI: non-TTY auto-install', () => {
     const result = await cli([]);
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('Installation complete');
-    expect(existsSync(join(tempDir, '_gs-gardener', 'VERSION'))).toBe(true);
+    expect(existsSync(join(tempDir, '_gary-the-gardener', 'VERSION'))).toBe(true);
     expect(existsSync(join(tempDir, 'CLAUDE.md'))).toBe(true);
   });
 });
@@ -248,7 +248,7 @@ test.describe('CLI: multiple tools flag', () => {
     expect(existsSync(join(tempDir, '.github', 'agents', 'gardener.md'))).toBe(true);
     expect(existsSync(join(tempDir, 'CLAUDE.md'))).toBe(true);
 
-    const config = readFileSync(join(tempDir, '_gs-gardener', 'core', 'config.yaml'), 'utf8');
+    const config = readFileSync(join(tempDir, '_gary-the-gardener', 'core', 'config.yaml'), 'utf8');
     expect(config).toContain('.cursor/rules/garden-agent-gardener.mdc');
     expect(config).toContain('.github/agents/gardener.md');
   });
@@ -281,7 +281,7 @@ test.describe('CLI: version upgrade', () => {
     await cli(['install', '-t', 'cursor']);
 
     // Simulate old version
-    const versionPath = join(tempDir, '_gs-gardener', 'VERSION');
+    const versionPath = join(tempDir, '_gary-the-gardener', 'VERSION');
     writeFileSync(versionPath, '1.4.0');
 
     const result = await cli(['update', '-t', 'cursor', '--force']);
@@ -289,7 +289,7 @@ test.describe('CLI: version upgrade', () => {
     expect(result.stdout).toContain('Upgrading');
 
     // Config preserved with correct wrapper
-    const config = readFileSync(join(tempDir, '_gs-gardener', 'core', 'config.yaml'), 'utf8');
+    const config = readFileSync(join(tempDir, '_gary-the-gardener', 'core', 'config.yaml'), 'utf8');
     expect(config).toContain('.cursor/rules/garden-agent-gardener.mdc');
   });
 });
@@ -300,7 +300,7 @@ test.describe('CLI: update --dry-run', () => {
     await cli(['install', '-t', 'cursor']);
 
     // Simulate old version so there's something to upgrade
-    const versionPath = join(tempDir, '_gs-gardener', 'VERSION');
+    const versionPath = join(tempDir, '_gary-the-gardener', 'VERSION');
     writeFileSync(versionPath, '1.4.0');
 
     const result = await cli(['update', '--dry-run', '-t', 'cursor']);
@@ -320,7 +320,7 @@ test.describe('CLI: config round-trip', () => {
     await cli(['install', '-t', 'cursor']);
 
     // Add custom values to config
-    const configPath = join(tempDir, '_gs-gardener', 'core', 'config.yaml');
+    const configPath = join(tempDir, '_gary-the-gardener', 'core', 'config.yaml');
     let config = readFileSync(configPath, 'utf8');
     config = config.replace('user_name: User', 'user_name: Pavel');
     config = config.replace('communication_language: English', 'communication_language: Czech');
@@ -346,7 +346,7 @@ test.describe('CLI: config missing wrapper_files', () => {
     await cli(['install', '-t', 'cursor']);
 
     // Rewrite config without wrapper_files section
-    const configPath = join(tempDir, '_gs-gardener', 'core', 'config.yaml');
+    const configPath = join(tempDir, '_gary-the-gardener', 'core', 'config.yaml');
     writeFileSync(configPath, `# Minimal config\nproject_name: test\nversion: "1.0.0"\n`);
 
     // Update should not crash
@@ -362,7 +362,7 @@ test.describe('CLI: doctor version mismatch', () => {
     await cli(['install', '-t', 'cursor']);
 
     // Fake old version
-    writeFileSync(join(tempDir, '_gs-gardener', 'VERSION'), '0.0.1');
+    writeFileSync(join(tempDir, '_gary-the-gardener', 'VERSION'), '0.0.1');
 
     const result = await cli(['doctor']);
     expect(result.exitCode).toBe(0);

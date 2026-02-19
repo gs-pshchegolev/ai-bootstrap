@@ -1,6 +1,6 @@
 version: 2
-generated: "18-02-2026"
-hash: "v2-17-18-02-2026"
+generated: "19-02-2026"
+hash: "v2-20-19-02-2026"
 
 areas:
   core-docs:
@@ -15,7 +15,6 @@ areas:
       mature: "\U0001F333"
       grown: "\U0001F33F"
       small: "\U0001F331"
-      seed: "\U0001FAD8"
 
     grid:
       cols: 18
@@ -40,7 +39,6 @@ areas:
       mature: "\U0001F333"
       grown: "\U0001F33F"
       small: "\U0001F331"
-      seed: "\U0001FAD8"
 
     grid:
       cols: 18
@@ -63,11 +61,13 @@ areas:
       - ".junie/guidelines.md"
       - ".cursor/rules/agents.mdc"
       - ".cursor/rules/garden-agent-gardener.mdc"
+      - ".claude/commands/**/*.md"
+      - "_bmad/**/*.md"
+      - ".codex/**/*"
     readiness_emojis:
       mature: "\U0001F333"
       grown: "\U0001F33F"
       small: "\U0001F331"
-      seed: "\U0001FAD8"
 
     grid:
       cols: 18
@@ -86,6 +86,11 @@ areas:
           entities:
             - cursor-rules-agents-mdc
             - cursor-rules-garden-agent-gardener-mdc
+        - label: "bulk (folder)"
+          entities:
+            - claude-commands-shed
+            - bmad-shed
+            - codex-shed
 
   output-artifacts:
     label: Output Artifacts
@@ -99,7 +104,6 @@ areas:
       mature: "\U0001F333"
       grown: "\U0001F33F"
       small: "\U0001F331"
-      seed: "\U0001FAD8"
 
     grid:
       cols: 18
@@ -124,7 +128,6 @@ areas:
       mature: "\U0001F333"
       grown: "\U0001F33F"
       small: "\U0001F331"
-      seed: "\U0001FAD8"
 
     grid:
       cols: 18
@@ -201,7 +204,7 @@ entities:
     path: "CLAUDE.md"
     type: shed
     area: shed
-    readiness: seed
+    readiness: small
     label: CLAUDE.md
     placed: "18-02-2026"
     updated: "18-02-2026"
@@ -210,7 +213,7 @@ entities:
     path: ".github/copilot-instructions.md"
     type: shed
     area: shed
-    readiness: seed
+    readiness: small
     label: copilot-instructions.md
     placed: "18-02-2026"
     updated: "18-02-2026"
@@ -228,7 +231,7 @@ entities:
     path: ".junie/guidelines.md"
     type: shed
     area: shed
-    readiness: seed
+    readiness: small
     label: guidelines.md
     placed: "18-02-2026"
     updated: "18-02-2026"
@@ -286,3 +289,30 @@ entities:
     label: garden-agent-gardener.mdc
     placed: "18-02-2026"
     updated: "18-02-2026"
+
+  claude-commands-shed:
+    path: ".claude/commands/"
+    type: shed
+    area: shed
+    readiness: grown
+    label: .claude/commands/ (80 files)
+    placed: "19-02-2026"
+    updated: "19-02-2026"
+
+  bmad-shed:
+    path: "_bmad/"
+    type: shed
+    area: shed
+    readiness: mature
+    label: _bmad/ (543 files)
+    placed: "19-02-2026"
+    updated: "19-02-2026"
+
+  codex-shed:
+    path: ".codex/"
+    type: shed
+    area: shed
+    readiness: grown
+    label: .codex/ (76 files)
+    placed: "19-02-2026"
+    updated: "19-02-2026"

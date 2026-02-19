@@ -30,7 +30,7 @@ Check all ecosystem files using Glob and Read. Track status for each:
 - Completeness vs actual dependencies — check whichever manifest exists: package.json, requirements.txt / pyproject.toml, Cargo.toml, go.mod, pom.xml, Gemfile, etc.
 
 **Garden state** (optional):
-- `{project-root}/_gs-gardener/data/docsmap.yaml` — exists? If yes, read entity count and count seeds vs plants across all areas
+- `{project-root}/_gary-the-gardener/garden/docsmap.yaml` — exists? If yes, read entity count and count seeds vs plants across all areas
 
 **Cross-references**:
 - Does AGENTS.md "Further Reading" section link to files that actually exist?

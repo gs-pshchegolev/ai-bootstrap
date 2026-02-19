@@ -189,7 +189,7 @@ test('upgrade preserves config during version change', async ({ cli, tempDir }) 
   await cli(['install', '-t', 'cursor']);
 
   // Simulate old version by rewriting VERSION file
-  const versionPath = join(tempDir, '_gs-gardener', 'VERSION');
+  const versionPath = join(tempDir, '_gary-the-gardener', 'VERSION');
   writeFileSync(versionPath, '1.4.0');
 
   // Run update
@@ -199,7 +199,7 @@ test('upgrade preserves config during version change', async ({ cli, tempDir }) 
 
   // Config preserved
   const config = readFileSync(
-    join(tempDir, '_gs-gardener', 'core', 'config.yaml'), 'utf8'
+    join(tempDir, '_gary-the-gardener', 'core', 'config.yaml'), 'utf8'
   );
   expect(config).toContain('.cursor/rules/garden-agent-gardener.mdc');
 });
@@ -209,7 +209,7 @@ test('custom config keys survive tool addition', async ({ cli, tempDir }) => {
   await cli(['install', '-t', 'cursor']);
 
   // Add custom keys to config
-  const configPath = join(tempDir, '_gs-gardener', 'core', 'config.yaml');
+  const configPath = join(tempDir, '_gary-the-gardener', 'core', 'config.yaml');
   let config = readFileSync(configPath, 'utf8');
   config = config.replace('user_name: User', 'user_name: Pavel');
   config = config.replace(

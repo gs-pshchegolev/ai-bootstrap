@@ -1,6 +1,6 @@
-# References
+# Research
 
-> Fetch and manage dependency reference documentation (llms.txt files).
+> Research and fetch dependency reference documentation (llms.txt files).
 
 ## Phases
 

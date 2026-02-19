@@ -72,9 +72,9 @@ Your friendly Repository Garden Keeper with a menu-driven interface for all main
 
 **Current:** 1.1.0
 
-Check version: `cat _gs-gardener/VERSION`
+Check version: `cat _gary-the-gardener/VERSION`
 
-See [CHANGELOG](_gs-gardener/CHANGELOG.md) for version history.
+See [CHANGELOG](_gary-the-gardener/CHANGELOG.md) for version history.
 
 ---
 

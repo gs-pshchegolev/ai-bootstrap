@@ -13,7 +13,7 @@ Node.js >= 20.11.0
 
 ```
 bin/cli.js                    # CLI entry point (install, update, status, doctor)
-_gs-gardener/                 # Garden system (core product)
+_gary-the-gardener/                 # Garden system (core product)
   core/
     agents/gardener.md        # Gardener agent persona
     config.yaml               # Default configuration
@@ -51,15 +51,15 @@ Publish requires `NPM_TOKEN` environment variable.
 
 The CLI (`bin/cli.js`) is the sole entry point with four commands:
 
-- **install**: First-time setup — copies `_gs-gardener/` into target repo, creates `.aiignore`, installs tool-specific agent files, and writes garden skill commands
+- **install**: First-time setup — copies `_gary-the-gardener/` into target repo, creates `.aiignore`, installs tool-specific agent files, and writes garden skill commands
 - **update**: Upgrades an existing installation to the latest version
 - **status**: Reports which garden components are installed in the current directory
 - **doctor**: Validates installation health (version consistency, required files)
 
 When no command is given, an interactive menu is shown (using `@inquirer/prompts`).
 
-The **Garden System** (`_gs-gardener/core/`) is the core product:
-- **Workflows** (7): audit, compact, extend, health, references, setup, visualise
+The **Garden System** (`_gary-the-gardener/core/`) is the core product:
+- **Workflows** (7): health, inspect, map, plant, prune, research, setup
 - **Agent**: `gardener.md` — the interactive gardener persona
 - **Config**: `config.yaml` — project settings, coverage tracking, constraints
 
@@ -69,7 +69,7 @@ Supported AI tools: Claude Code, Cursor, GitHub Copilot, JetBrains Junie.
 
 - Published as `@pshch/gary-the-gardener` on npm
 - Single runtime dependency (`@inquirer/prompts`) for interactive CLI UI
-- Garden system version tracked in `_gs-gardener/VERSION` (currently 4.5.0)
+- Garden system version tracked in `_gary-the-gardener/VERSION` (currently 4.5.0)
 - Commands distributed as `.md` files in tool-specific directories
 - AGENTS.md max line limit: 150 lines (enforced by garden system)
 - `.npmrc` contains auth token reference — never commit actual tokens

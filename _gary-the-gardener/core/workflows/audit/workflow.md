@@ -1,6 +1,6 @@
-# Audit
+# Inspect
 
-> Deep scan for drift, quality issues, and Shed sync problems.
+> Deep inspection for drift, quality issues, and Shed sync problems.
 
 ## Phases
 
@@ -100,7 +100,7 @@ Only if approved:
 - Staleness: update docs to match reality
 - Broken links: fix paths, or ask whether to create missing target or remove reference
 - Orphaned files: ask whether to link from AGENTS.md, keep unlisted, or delete
-- Coverage gaps: suggest `/garden-extend` for new content, or offer to create stubs
+- Coverage gaps: suggest `/garden-plant` for new content, or offer to create stubs
 
 **Worm fixes:**
 - Open the referenced `.md` file at the location of the incorrect claim
@@ -135,5 +135,5 @@ After fixes: verify modified files, show result card with what was fixed and wha
 - Prioritize critical drift over minor issues
 - Never modify AGENTS.md itself during Shed sync — only fix the Shed files
 - Ask before deleting anything — orphaned files might be intentional
-- For coverage gaps, suggest `/garden-extend` or offer stubs — don't invent full docs
+- For coverage gaps, suggest `/garden-plant` or offer stubs — don't invent full docs
 - Worm/dead leaf detection compares docs against verifiable codebase facts only — never guess

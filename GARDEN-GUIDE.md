@@ -220,7 +220,7 @@ Generates wrapper file that properly references AGENTS.md.
 
 ```
 your-repo/
-├── _gs-gardener/                                   # Garden system source
+├── _gary-the-gardener/                                   # Garden system source
 │   ├── VERSION                            # Version file (1.2.0)
 │   ├── core/
 │   │   ├── config.yaml                    # Configuration
@@ -260,8 +260,8 @@ your-repo/
 1. **User invokes skill:** `/garden-agent-gardener` or `/garden-sync`
 2. **Command file loads:** `.claude/commands/garden-agent-gardener.md`
 3. **For gardener:** Loads agent definition, displays menu, waits for input
-4. **For skill:** Loads workflow from `_gs-gardener/core/workflows/{name}/workflow.md`
-5. **Workflow reads config:** Gets settings from `_gs-gardener/core/config.yaml`
+4. **For skill:** Loads workflow from `_gary-the-gardener/core/workflows/{name}/workflow.md`
+5. **Workflow reads config:** Gets settings from `_gary-the-gardener/core/config.yaml`
 6. **Workflow executes:** Follows phases (Discovery → Analysis → Report → Execution → Verification)
 7. **Results displayed:** User sees findings, approves changes, sees completion summary
 
@@ -305,7 +305,7 @@ A: The workflows are Claude Code specific currently. However, the patterns could
 
 **Q: Can I customize the workflows?**
 
-A: Workflows are the core product and should not be edited directly — they get overwritten during updates. All customization happens in `_gs-gardener/core/config.yaml`. If you need workflow changes, consider contributing to the garden system upstream.
+A: Workflows are the core product and should not be edited directly — they get overwritten during updates. All customization happens in `_gary-the-gardener/core/config.yaml`. If you need workflow changes, consider contributing to the garden system upstream.
 
 **Q: Can I disable Gary's personality?**
 
@@ -313,7 +313,7 @@ A: The gardener persona is part of the core product. Like workflows, `gardener.m
 
 **Q: How do I change the AGENTS.md line limit?**
 
-A: Edit `_gs-gardener/core/config.yaml` and change `agents_max_lines` value (default: 150).
+A: Edit `_gary-the-gardener/core/config.yaml` and change `agents_max_lines` value (default: 150).
 
 ### Technical Questions
 
@@ -323,7 +323,7 @@ A: Run `/garden-compact` to compress it, or move detailed content to docs/ using
 
 **Q: Does this work with monorepos?**
 
-A: Yes! Install in the root or per-package. Adjust `_gs-gardener/core/config.yaml` paths accordingly.
+A: Yes! Install in the root or per-package. Adjust `_gary-the-gardener/core/config.yaml` paths accordingly.
 
 **Q: Can I run garden skills in CI/CD?**
 
@@ -351,9 +351,9 @@ A: Check these common causes:
 
 A: Yes! All changes are git-tracked. Use `git diff` to review and `git checkout` to revert if needed.
 
-**Q: What if I accidentally deleted _gs-gardener/?**
+**Q: What if I accidentally deleted _gary-the-gardener/?**
 
-A: Re-run installation from [GARDEN-INSTALLATION.md](GARDEN-INSTALLATION.md). Your config was in `_gs-gardener/core/config.yaml`, so you may need to reconfigure.
+A: Re-run installation from [GARDEN-INSTALLATION.md](GARDEN-INSTALLATION.md). Your config was in `_gary-the-gardener/core/config.yaml`, so you may need to reconfigure.
 
 ---
 
@@ -367,7 +367,7 @@ The Garden System follows semantic versioning:
 
 **Check version:**
 ```bash
-cat _gs-gardener/VERSION
+cat _gary-the-gardener/VERSION
 ```
 
 **Current version:** 1.2.0

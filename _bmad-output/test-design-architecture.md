@@ -73,7 +73,7 @@ No architectural blockers exist. The CLI is fully testable today via process spa
 |---------|----------|-------------|------|--------|-------|------------|-------|
 | R-001 | TECH | Interactive prompts (`select`, `checkbox`, `confirm`) untestable via E2E — regressions in prompt flows go undetected | 2 | 2 | 4 | Add `GARY_NON_INTERACTIVE=1` env var or `--non-interactive` flag | Dev |
 | R-003 | TECH | Version upgrade path untested — config preservation or upgrade messaging may break silently | 2 | 2 | 4 | Add test with fake old VERSION file, run update, verify output and config | QA |
-| R-005 | OPS | npm publish could ship wrong files — `_gs-gardener/` or commands missing from package | 1 | 3 | 3 | Add pre-publish validation (check `files` field contents match expectations) | Dev |
+| R-005 | OPS | npm publish could ship wrong files — `_gary-the-gardener/` or commands missing from package | 1 | 3 | 3 | Add pre-publish validation (check `files` field contents match expectations) | Dev |
 
 #### Low-Priority Risks (Score 1-2)
 

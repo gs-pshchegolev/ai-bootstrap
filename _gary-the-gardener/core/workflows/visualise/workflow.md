@@ -27,19 +27,21 @@ This workflow is **tool-agnostic** — it describes operations, not specific too
 
 ## File Paths
 
-- **Sitemap**: `{project-root}/_gs-gardener/data/docsmap.yaml`
-- **History**: `{project-root}/_gs-gardener/data/history.jsonl`
-- **Snapshot**: `{project-root}/_gs-gardener/data/garden.md`
-- **Config**: `{project-root}/_gs-gardener/core/config.yaml`
+- **Sitemap**: `{project-root}/_gary-the-gardener/garden/docsmap.yaml`
+- **History**: `{project-root}/_gary-the-gardener/garden/history.jsonl`
+- **Snapshot**: `{project-root}/_gary-the-gardener/garden/garden.md`
+- **Config**: `{project-root}/_gary-the-gardener/core/config.yaml`
 
 ## Phase 1: Fast Path
 
 Check if `garden.md` exists. If it does:
-1. Read `garden.md` and extract its `hash:` line.
-2. Read `docsmap.yaml` and extract its `hash` field.
-3. **If hashes match**: jump directly to Phase 4 — no re-render needed.
-4. **If hashes differ** (docsmap changed since last render): skip to Phase 3 cache-miss path to re-render.
-5. **If docsmap.yaml is absent**: display `garden.md` as-is with a note that the garden state file is missing.
+1. Read `garden.md` and extract its `hash:` line and `Gary v{X.Y.Z}` from the header.
+2. Read current Gary version from `{project-root}/_gary-the-gardener/VERSION`.
+3. **If Gary versions differ**: set `gary_grew = true`. Proceed regardless — the garden still renders.
+4. Read `docsmap.yaml` and extract its `hash` field.
+5. **If hashes match**: jump directly to Phase 4 — no re-render needed.
+6. **If hashes differ** (docsmap changed since last render): skip to Phase 3 cache-miss path to re-render.
+7. **If docsmap.yaml is absent**: display `garden.md` as-is with a note that the garden state file is missing.
 
 Only proceed to Phase 2 if `garden.md` is absent.
 
@@ -63,25 +65,26 @@ Read `garden.md` if it exists. Check for a `hash:` line in its header.
 Build the garden table for each area in `docsmap.yaml`. Follow the **Rendering Contract** below.
 
 For each area, compute:
-1. **Dominant state** — the most frequent readiness emoji across all entities in the area (ties favour the more mature)
-2. **Plants cell** — full emoji stream if ≤18 total entities; collapsed counts if >18
-3. **Worms / Dead leaves** — read `area.doc_issues` from docsmap; `—` if field absent or zero
-4. **Total cell** — all non-zero counts in `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂
+1. **Area emoji** — use `area.emoji` from docsmap (fixed per area, not computed from readiness)
+2. **Path hint** — derive from all `include` patterns: for each pattern, strip from the first `*` and take the dirname; find the longest common directory prefix across all results. Use `/` if empty or patterns span multiple roots.
+3. **Plants cell** — full emoji stream if ≤18 total entities; collapsed counts if >18; `·` if none
+4. **Issues cell** — combined `area.doc_issues`: `🪱×N 🍂×M` if any; `·` if both zero/absent
+5. **Total cell** — all non-zero counts in `×N` notation, order: 🌳→🌿→🌱→🪱→🍂; `·` if none
 
 Compute the **season mood line** from aggregate totals across all areas (see Rendering Contract).
 
 Write `garden.md`:
 ```markdown
 # Garden Map
-> Rendered {DD-MM-YYYY} | hash: {hash}
+> Rendered {DD-MM-YYYY} | Gary v{VERSION} | hash: {hash}
 > {X} entities across {N} areas
-**Legend:** 🫘 seed · 🌱 small · 🌿 grown · 🌳 mature
+**Legend:** 🌱 small · 🌿 grown · 🌳 mature
 
 {season-mood-line}
 
-| Area | Plants | Worms | Dead leaves | Total |
-|------|--------|-------|-------------|-------|
-| {dominant} **{area.label}** | {plants-cell} | {worms-cell} | {dead-leaves-cell} | {total-cell} |
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
+| {area.emoji} **{area.label}** `{path-hint}` | {plants-cell} | {issues-cell} | {total-cell} |
 ```
 
 `doc_issues` is written by the audit workflow — never by visualise. If absent, treat all quality counts as 0.
@@ -107,6 +110,27 @@ Output the Gary Block. **Display shows all areas** (both primary and secondary).
 ```
 
 Turn ends. Gary waits for the user to follow up.
+
+## Gary Grew Acknowledgment
+
+If `gary_grew = true` was set in Phase 1, output this block **after** the garden display (same turn):
+
+1. Load `{project-root}/_gary-the-gardener/core/agents/heritage.md`.
+2. Find all version entries newer than the version extracted from the old `garden.md` (compare semver).
+3. Output a second Gary Block:
+
+```
+🪴 **Gary The Gardener** v{VERSION} | 🌱 I've grown
+
+A newer Gary mapped this garden. Here's what changed while I was away:
+
+- **v{X.Y.Z}** — {first sentence from that version's entry in heritage.md}
+- ...
+
+↘️ **[k]** Got it
+```
+
+Cap at 5 version entries. If more, show the 3 most recent and append `...and {N} earlier versions`.
 
 ### Shortcut Handling
 
@@ -136,25 +160,25 @@ When the user replies with a shortcut or intent, Gary acts:
 
 ### Table Format
 
-One row per area. Five columns.
+One row per area. Four columns.
 
 ```markdown
-| Area | Plants | Worms | Dead leaves | Total |
-|------|--------|-------|-------------|-------|
-| 🛖 **Shed** | 🌿 🌿 🫘 🌿 🫘 | — | 🍂×1 | 🌿×3 🫘×2 🍂×1 |
-| 🌿 **Documentation** | 🌿 🌿 🌳 🌳 🌿 | 🪱×2 | 🍂×1 | 🌳×2 🌿×3 🪱×2 🍂×1 |
-| 🫘 **src/auth/** | — | — | — | — |
-| 🌿 **src/api/** | 🌿 | — | — | 🌿×1 |
-| 🌳 **tests/** | 🌳 🌳 🌳 | — | — | 🌳×3 |
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
+| 🛖 **Shed** `/` | 🌿 🌿 🌱 🌿 🌱 | 🍂×1 | 🌿×3 🌱×2 🍂×1 |
+| 📁 **Docs** `docs/` | 🌿 🌿 🌳 🌳 🌿 | 🪱×2 🍂×1 | 🌳×2 🌿×3 🪱×2 🍂×1 |
+| 🎯 **Destination UI** `src/destination/` | · | · | · |
+| 🌐 **API** `src/api/` | 🌿 | · | 🌿×1 |
+| 🧪 **Tests** `tests/` | 🌳 🌳 🌳 | · | 🌳×3 |
 ```
 
-**Area column:** dominant readiness emoji + **bold** label. For areas with 0 entities, use `🫘` as dominant emoji.
+**Area column:** `area.emoji` from docsmap (fixed semantic emoji, not readiness-derived) + **bold** label + `path-hint` code span. Path hint = longest common dir prefix of all `include` patterns; `/` if no common root.
 
-**Plants column:** full emoji stream if ≤18 entities; collapsed counts if >18: `🌳×8 🌿×12 🌱×3 🫘×1 *(browse for detail)*`. For areas with 0 entities, show `—`.
+**Plants column:** full emoji stream if ≤18 entities; collapsed counts if >18: `🌳×8 🌿×12 🌱×3 *(browse for detail)*`. `·` if no entities.
 
-**Worms / Dead leaves columns:** read from `area.doc_issues` in docsmap. `🪱×N` / `🍂×N` or `—` if zero or absent.
+**Issues column:** combined worms + dead leaves from `area.doc_issues`: `🪱×N 🍂×M` (show only non-zero counts). `·` if both zero or absent.
 
-**Total column:** all non-zero counts using `×N` notation, order: 🌳→🌿→🌱→🫘→🪱→🍂. For areas with 0 entities, show `—`.
+**Total column:** all non-zero counts using `×N` notation, order: 🌳→🌿→🌱→🪱→🍂. `·` if no entities.
 
 ### Season Mood Line
 
@@ -164,7 +188,7 @@ One line computed from aggregate readiness across entities in areas **that have 
 |-----------|-----------|
 | mature ≥ 60% | `🍂 Well-tended — mostly mature, a few seeds to nurture` |
 | mature+grown ≥ 60% | `☀️ Growing well — solid coverage, room to fill in` |
-| small+seed > mature+grown | `🌸 Just sprouting — garden is young, lots of potential` |
+| small > mature+grown | `🌸 Just sprouting — garden is young, lots of potential` |
 | any 🪱 worms or 🍂 dead leaves present | `⚠️ Needs attention — some docs contradict or trail the codebase` |
 | default | `🌱 Taking shape — good progress, keep growing` |
 
@@ -182,8 +206,7 @@ For areas using `granularity: folder`, a single entity represents a directory. T
 |-------|-------|-----------|
 | 🌳 | mature | ≥100 substantive lines |
 | 🌿 | grown | 11–99 substantive lines |
-| 🌱 | small | 3–10 substantive lines |
-| 🫘 | seed | ≤2 substantive lines |
+| 🌱 | small | ≤10 substantive lines |
 
 **Documentation quality signals** (area-level — written by audit, not line-based):
 
@@ -222,7 +245,7 @@ Enumerate all non-Shed, non-Documentation files to map code directories.
 
 **File enumeration:**
 - **Primary (git repo)**: `git ls-files` — automatically respects `.gitignore`, `.gitmodules`, submodules.
-- **Fallback (non-git)**: `find . -type f` — exclude `config.yaml → discovery_exclude` + always-exclude: `node_modules/`, `dist/`, `build/`, `.git/`, `coverage/`, `__pycache__/`, `_gs-gardener/`.
+- **Fallback (non-git)**: `find . -type f` — exclude `config.yaml → discovery_exclude` + always-exclude: `node_modules/`, `dist/`, `build/`, `.git/`, `coverage/`, `__pycache__/`, `_gary-the-gardener/`.
 - `discovery_exclude` supplements `.gitignore` for non-git repos only; in git repos, `git ls-files` already handles all exclusions.
 
 **Directory analysis (run after enumeration):**
@@ -335,7 +358,7 @@ For each area, scan its `include` patterns and find any existing `.md` files:
 **Areas are independent — scan them in parallel** when the host tool supports it (see Execution Hints). Fall back to sequential if not.
 
 Per entity, per area's granularity:
-- **File-level**: count substantive lines (≥100 = mature, 11–99 = grown, 3–10 = small, ≤2 = seed)
+- **File-level**: count substantive lines (≥100 = mature, 11–99 = grown, ≤10 = small)
 - **Folder-level**: count files in dir (>10 files with content = mature, 2–10 = grown, 1 = small, 0 = seed)
 
 ### Step 4: Assign Grid Coordinates (Spatial Mapping)
@@ -380,7 +403,6 @@ areas:
       mature: "\U0001F333"
       grown: "\U0001F33F"
       small: "\U0001F331"
-      seed: "\U0001FAD8"
     # doc_issues: optional — written by /garden-audit, never by visualise
     # doc_issues:
     #   worms: 0          # claims in .md files contradicting the codebase
@@ -397,7 +419,7 @@ entities:
     path: "{relative-path}"
     type: {type}             # instructions | doc | shed | artifact
     area: {area-id}
-    readiness: {mature|grown|small|seed}
+    readiness: {mature|grown|small}
     label: {display-name}
     placed: "{DD-MM-YYYY}"
     updated: "{DD-MM-YYYY}"
@@ -405,7 +427,7 @@ entities:
 
 2. Write first entry to `history.jsonl`:
 ```jsonl
-{"ts":"{DD-MM-YYYY}","action":"init","summary":"Garden planted with {N} entities ({M} mature, {G} grown, {Sm} small, {Se} seeds)","areas":["{area-ids}"],"counts":{"mature":{M},"grown":{G},"small":{Sm},"seed":{Se}}}
+{"ts":"{DD-MM-YYYY}","action":"init","summary":"Garden planted with {N} entities ({M} mature, {G} grown, {Sm} small)","areas":["{area-ids}"],"counts":{"mature":{M},"grown":{G},"small":{Sm}}}
 ```
 
 3. Render and write `garden.md` (see Phase 3).
@@ -559,6 +581,6 @@ End with `AskUserQuestion`:
 - When re-planting, append a `replant` entry to `history.jsonl` (don't overwrite)
 - Keep the Gary Block compact — the map is the star, minimize surrounding text
 - The snapshot cache (`garden.md` hash) avoids re-rendering when nothing changed — respect it
-- All areas use the universal emoji vocabulary: 🫘 seed, 🌱 small, 🌿 grown, 🌳 mature, 🪱 issue
+- All areas use the universal emoji vocabulary: 🌱 small, 🌿 grown, 🌳 mature, 🪱 issue
 - Grid coordinates reflect filesystem groupings (not flat packing)
 - Garden map always shows all areas; `display` field is metadata for other workflows
