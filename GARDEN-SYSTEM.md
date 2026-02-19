@@ -1,81 +1,41 @@
 # Garden System
 
-> Maintain AI agent configurations across repositories with 🪴 Gary The Gardener 🪴
+> 🪴 Gary The Gardener — maps your codebase, maintains AI configurations, and keeps docs honest.
 
 ## What is it?
 
-The Garden System provides AI agent maintenance for repositories using AGENTS.md configuration. This repository is itself maintained by the garden system it ships — a self-hosting arrangement that serves as both dogfooding and a living integration test.
+Gary The Gardener is a CLI tool and AI agent that installs into any repo. Once installed, it gives every supported AI tool (Claude Code, Copilot, Cursor, Codex, Junie, Windsurf) a shared gardener agent and 7 maintenance commands.
 
-- **🪴 Gary The Gardener** 🪴 - Interactive Repository Garden Keeper subagent (v1.1.0)
-- **10 maintenance skills** - Individual operations for keeping AI configs healthy
+The garden is a persistent map of your codebase — three fixed buckets (Shed · Documentation · Codebase), rendered as a compact table that updates as your repo grows.
 
-The system follows a "gardening" philosophy: documentation needs regular care, pruning, and attention to stay healthy.
+## 7 Commands
 
-## Components
+| Command | What it does |
+|---------|-------------|
+| `/garden-setup` 🌱 | First-time setup — AGENTS.md, docs/, AI tool configs |
+| `/garden-map` 🗺️ | See the garden map — all areas and readiness |
+| `/garden-health` 🩺 | Quick scan, 3 improvement suggestions |
+| `/garden-inspect` 🔍 | Deep scan — drift, quality issues, Shed sync |
+| `/garden-prune` ✂️ | Trim AGENTS.md to under 150 lines |
+| `/garden-plant` 🌷 | Add a content layer — guardrails, style, domain |
+| `/garden-research` 📚 | Fetch llms.txt for dependencies |
 
-### 🪴 Gary The Gardener (Interactive Subagent)
+## Hub
 
-Your friendly Repository Garden Keeper with a menu-driven interface for all maintenance tasks.
+**Claude Code:** `/garden` — opens the interactive hub, lists all 7 commands.
 
-**Invoke:** `/gardener`
+**GitHub Copilot:** `@gardener-gary` in VS Code Copilot Chat — activates Gary directly.
 
-### Individual Skills
-
-| Skill | Description |
-|-------|-------------|
-| `/garden-bootstrap` 🌱 | First-time AI-readiness setup (one-time) |
-| `/garden-sync` 🔄 | Sync wrappers with AGENTS.md |
-| `/garden-audit` 🔍 | Audit for drift between docs and code |
-| `/garden-extend` 🌱 | Add content layers (guardrails, principles, style) |
-| `/garden-references` 📚 | Fetch and manage dependency docs (llms.txt) |
-| `/garden-add-tool` 🛠️ | Add support for new AI tools |
-| `/garden-scaffold` 🏗️ | Set up docs/ knowledge base structure |
-| `/garden-maintain` 🪴 | Find and fix documentation issues |
-| `/garden-compact` ✂️ | Compress AGENTS.md while preserving facts |
-| `/garden-help` 💡 | Get help understanding when to use each skill |
-
-## Quick Start
-
-1. **Install the system** in your repository (see [Installation Guide](GARDEN-INSTALLATION.md))
-2. **Test it works:** `/garden-agent-gardener`
-3. **Use the gardener** for interactive maintenance or invoke skills directly
-
-### Example Session
-
-```bash
-# Interactive (recommended for exploration)
-/garden-agent-gardener
-
-# Direct skill invocation (quick tasks)
-/garden-audit
-/garden-sync
-```
-
-## When to Use Garden Maintenance
-
-| Scenario | Recommended Skill |
-|----------|-------------------|
-| First-time setup (no AGENTS.md) | `/garden-bootstrap` |
-| After major code changes | `/garden-audit` |
-| Monthly health check | `/garden-maintain` |
-| Adding new features | `/garden-extend` |
-| Dependencies changed | `/garden-references` |
-| AGENTS.md too long (>150 lines) | `/garden-compact` |
-| Supporting new AI tool | `/garden-add-tool` |
+**Cursor / Windsurf / Junie:** Agent is always loaded via the tool's config files.
 
 ## Documentation
 
-- **[Installation Guide](GARDEN-INSTALLATION.md)** - Setup in target repositories
-- **[Usage Guide](GARDEN-GUIDE.md)** - Usage patterns, maintenance, troubleshooting, FAQ
+- **[Installation Guide](GARDEN-INSTALLATION.md)** — first-time setup
+- **[Usage Guide](GARDEN-GUIDE.md)** — commands, garden map, maintenance patterns
+- **[CHANGELOG](_gary-the-gardener/CHANGELOG.md)** — version history
 
 ## Version
 
-**Current:** 1.1.0
-
-Check version: `cat _gary-the-gardener/VERSION`
-
-See [CHANGELOG](_gary-the-gardener/CHANGELOG.md) for version history.
-
----
+Check: `cat _gary-the-gardener/VERSION`
 
 🪴 Happy gardening!

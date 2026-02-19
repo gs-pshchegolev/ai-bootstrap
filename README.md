@@ -1,8 +1,8 @@
 # 🪴 Gary The Gardener
 
-**Your AI documentation stays fresh, synced, and healthy — automatically.**
+**Maps your codebase, keeps AI docs honest, and stays in sync across every AI tool.**
 
-One CLI command. One source of truth. Every AI tool in sync.
+One CLI command. One garden map. Every AI tool knows your repo.
 
 ```bash
 npx @pshch/gary-the-gardener
@@ -18,19 +18,31 @@ npx @pshch/gary-the-gardener
 
 ## How It Works
 
-Gary maintains **AGENTS.md** as a single source of truth and syncs it to every AI tool's native config format:
+Gary discovers your repo structure and organises it into three fixed buckets:
 
 ```
-                    AGENTS.md
-                   (source of truth)
-                        │
-        ┌───────┬───────┼───────┬───────┐
-        ▼       ▼       ▼       ▼       ▼
-   CLAUDE.md  .cursor/  .github/  .windsurf/  .junie/
-              rules/    agents/   rules/      guidelines.md
+📁 Your Repo → git ls-files (respects .gitignore)
+  ↓
+  🛖 Shed        — AI tool configs & agent files
+  📚 Documentation  — docs/, root .md files
+  💻 Codebase    — source directories (most have no docs yet — expected)
+  ↓
+  🗺️ Garden Map (docsmap.yaml + garden.md — persists across sessions)
 ```
 
-When code changes, Gary detects drift, fixes stale references, and keeps every wrapper file accurate — so your AI tools never hallucinate about your codebase.
+The garden map shows readiness at a glance and groups areas by folder:
+
+```
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
+| 🛖 Shed /          | 🌳 🌿 🌿 🌱 | · | 🌳×1 🌿×2 🌱×1 |
+| 📚 Docs /          | 🌳 🌿 🌿    | · | 🌳×1 🌿×2      |
+| **src/**           |             |   |                 |
+| 🌐 API  src/api/   | 🌿 🌳       | · | 🌳×1 🌿×1      |
+| 🌳 Domain  src/    | 🌿 🌱 🌱    | · | 🌿×1 🌱×2      |
+| **tests/**         |             |   |                 |
+| 🧪 Tests  tests/   | 🌿 🌿       | · | 🌿×2            |
+```
 
 ## Install
 
@@ -55,37 +67,34 @@ npx @pshch/gary-the-gardener status
 
 | File | Purpose |
 |------|---------|
-| `_gary-the-gardener/` | Core garden system engine (workflows, agent, config) |
-| `AGENTS.md` | Single source of truth for all AI tools (created via `/garden-bootstrap`) |
+| `_gary-the-gardener/` | Core garden system (workflows, agent, config, garden state) |
+| `AGENTS.md` | Single source of truth for all AI tools (created via `/garden-setup`) |
 | `.aiignore` | Keeps secrets and large files out of AI context |
-| Tool wrappers | Native config files for each selected AI tool |
+| Shed files | Native config files for each selected AI tool |
 
 ## Supported Tools
 
-| Tool | Config path | Detection |
-|------|------------|-----------|
-| Claude Code | `CLAUDE.md` + `.claude/commands/` | `.claude/` |
-| Cursor | `.cursor/rules/agents.mdc` | `.cursor/`, `.cursorrules` |
-| GitHub Copilot | `.github/agents/gardener.md` | `.github/` |
-| Windsurf | `.windsurf/rules/garden-agent-gardener.md` | `.windsurfrules`, `.windsurf/` |
-| JetBrains Junie | `.junie/guidelines.md` | `.junie/` |
+| Tool | Config path | Invoke Gary |
+|------|------------|-------------|
+| Claude Code | `CLAUDE.md` + `.claude/commands/` | `/garden` |
+| Cursor | `.cursor/rules/garden-agent-gardener.mdc` | Always active |
+| GitHub Copilot | `.github/agents/gardener-gary.md` | `@gardener-gary` |
+| Windsurf | `.windsurf/rules/garden-agent-gardener.md` | Always active |
+| JetBrains Junie | `.junie/guidelines.md` | Always active |
 
-## 10 Maintenance Skills
+## 7 Maintenance Commands
 
 Run these as slash commands inside your AI tool:
 
 | Command | What it does |
 |---------|-------------|
-| `/garden-bootstrap` | 🌱 First-time setup — generates AGENTS.md from your codebase |
-| `/garden-audit` | 🔍 Detects drift between docs and actual code |
-| `/garden-sync` | 💧 Syncs all wrapper files with AGENTS.md |
-| `/garden-compact` | ✂️ Compresses AGENTS.md under 150 lines without losing facts |
-| `/garden-maintain` | 🌿 Fixes staleness, broken links, orphaned files |
-| `/garden-extend` | 🌻 Adds guardrails, golden principles, style guides |
-| `/garden-references` | 📚 Fetches and stores llms.txt for key dependencies |
-| `/garden-scaffold` | 🏗️ Sets up `docs/` knowledge base structure |
-| `/garden-add-tool` | 🔧 Generates config for a new AI tool |
-| `/garden-help` | ❓ Shows what to do next |
+| `/garden-setup` 🌱 | First-time setup — garden map, AGENTS.md, docs/, Shed files |
+| `/garden-map` 🗺️ | See the full garden map — areas, readiness, folder groups |
+| `/garden-health` 🩺 | Quick scan — 3 prioritised improvement suggestions |
+| `/garden-inspect` 🔍 | Deep scan — finds drift, dead docs, and Shed gaps |
+| `/garden-prune` ✂️ | Compress AGENTS.md under 150 lines without losing facts |
+| `/garden-plant` 🌷 | Add a content layer — guardrails, style, domain knowledge |
+| `/garden-research` 📚 | Fetch and store llms.txt for key dependencies |
 
 ## Quick Start
 
@@ -94,24 +103,24 @@ Run these as slash commands inside your AI tool:
 npx @pshch/gary-the-gardener
 
 # 2. Open your AI tool and run:
-/garden-bootstrap    # Creates AGENTS.md from your codebase
-/garden-audit        # Verifies accuracy
-/garden-extend       # Adds guardrails & principles
+/garden-setup    # Maps your codebase, creates AGENTS.md
+/garden-map      # See your garden — coverage at a glance
+/garden-inspect  # Find drift and stale docs
 ```
 
 ## Use Cases
 
-**New project** — One command generates AGENTS.md from your codebase and creates wrapper files for every AI tool your team uses.
+**New project** — `/garden-setup` maps your entire codebase into Shed, Documentation, and Codebase buckets with real file counts. Pick your coverage depth. AGENTS.md gets created.
 
-**Post-refactor** — `/garden-audit` finds every stale reference so your AI tools don't hallucinate about files that no longer exist.
+**Post-refactor** — `/garden-inspect` finds every worm (doc contradicts code) and dead leaf (doc describes something gone) so AI tools never hallucinate about your codebase.
 
-**Multi-tool team** — One AGENTS.md, synced to each tool's native format. No more config drift between editors.
+**Multi-tool team** — One AGENTS.md, Shed files in sync for every tool. Claude Code, Copilot, Cursor — all see the same garden.
 
-**Context bloat** — `/garden-compact` compresses AGENTS.md under 150 lines, removing verbosity while preserving every fact.
+**Context bloat** — `/garden-prune` compresses AGENTS.md under 150 lines, removing verbosity while preserving every fact.
 
 ## Technical Details
 
-- **Zero dependencies** — pure Node.js built-ins only
+- **Zero runtime dependencies** — pure Node.js built-ins only
 - **Node.js ≥ 20.11.0**
 - **ESM** — ships as source, no build step
 - **MIT License**

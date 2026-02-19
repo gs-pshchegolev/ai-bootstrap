@@ -1,389 +1,141 @@
 # Garden System Usage Guide
 
-Complete guide for using the Garden System to maintain AI agent configurations.
+## Starting Gary
 
-## Table of Contents
+**Claude Code:** Run `/garden` — shows the hub with all 7 commands.
 
-- [Using the Gardener (Interactive)](#using-the-gardener-interactive)
-- [Using Individual Skills](#using-individual-skills)
-- [Maintenance Schedule](#maintenance-schedule)
-- [Architecture](#architecture)
-- [FAQ](#faq)
-- [Support](#support)
+**GitHub Copilot:** Type `@gardener-gary` in VS Code Copilot Chat — activates Gary.
+
+**Cursor / Windsurf / Junie:** The agent is always loaded via the tool's config files.
 
 ---
 
-## Using the Gardener (Interactive)
+## The 7 Commands
 
-The gardener provides a friendly, menu-driven interface for all maintenance tasks.
+### `/garden-setup` — Plant your garden
 
-### Starting the Gardener
+First-time setup. Gary scans your repo, discovers three buckets (Shed · Documentation · Codebase), shows real file counts, and asks how granular you want the Codebase section (Shallow / Standard / Deep). Creates `docsmap.yaml`, `garden.md`, `history.jsonl`, and `AGENTS.md` if missing.
 
-```bash
-/garden-agent-gardener
-```
+Run when: setting up a new repo, or after major project restructuring.
 
-### Interactive Flow
+### `/garden-map` — See your garden map
 
-Gary will:
-1. Display garden health status
-2. Show maintenance menu
-3. Wait for your selection
-4. Execute the selected task
-5. Ask if you want to return to menu
+Reads `docsmap.yaml` and renders the garden table. Strictly read-only — never modifies your area structure.
 
-### Example Session
+The table groups Codebase areas by folder with bold sub-header rows:
 
 ```
-User: /garden-agent-gardener
-
-Gary: 🪴 Hello! I'm 🪴 Gary The Gardener (v1.2.0)...
-      [Shows health status]
-      [Shows maintenance menu]
-
-User: AU
-
-Gary: 🔍 Let me inspect your garden for drift...
-      [Runs audit]
-      [Shows findings]
-
-      Would you like me to fix these issues?
-
-User: Yes
-
-Gary: [Fixes issues]
-      ✨ Audit Complete! Your garden is healthier...
-
-      Would you like to return to the menu?
-
-User: No
-
-Gary: 🪴 Happy gardening! Call me anytime with /garden-agent-gardener
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
+| 🛖 Shed /          | 🌳 🌿 🌱 | ·    | 🌳×1 🌿×1 🌱×1 |
+| **src/**           |           |      |                 |
+| 🌐 API  src/api/   | 🌿 🌳    | ·    | 🌳×1 🌿×1       |
+| 🌳 Domain  src/    | 🌿 🌱    | ·    | 🌿×1 🌱×1       |
+| **tests/**         |           |      |                 |
+| 🧪 Tests  tests/   | 🌳 🌳    | ·    | 🌳×2            |
 ```
 
-### Menu Options
+Run when: you want to see current doc coverage and readiness.
 
-| Code | Skill | When to Use |
-|------|-------|-------------|
-| `BS` | Bootstrap | First-time setup (only if AGENTS.md missing) |
-| `SY` | Sync | Verify wrappers reference AGENTS.md correctly |
-| `AU` | Audit | Check for drift after code changes |
-| `EX` | Extend | Add new content layers (guardrails, principles) |
-| `RE` | References | Update dependency documentation |
-| `AT` | Add Tool | Generate wrapper for new AI tool |
-| `SC` | Scaffold | Set up docs/ directory structure |
-| `GD` | Maintain | Find staleness, broken links, orphans |
-| `CO` | Compact | Compress AGENTS.md when too long |
-| `MH` | Menu | Redisplay the menu |
-| `DA` | Dismiss | Exit and return to normal Claude |
+### `/garden-health` — Quick health check
+
+Scans all entities, produces 3 prioritised improvement suggestions. Fast — no deep reads.
+
+Run when: weekly, or before a sprint.
+
+### `/garden-inspect` — Deep inspection
+
+Reads every tracked entity (up to 60 lines each). Finds worms (🪱 doc contradicts code) and dead leaves (🍂 doc describes something gone). Also audits Shed for sync gaps.
+
+Run when: after major code changes, before a release.
+
+### `/garden-prune` — Trim AGENTS.md
+
+Compresses AGENTS.md under 150 lines, preserving all facts. No information loss.
+
+Run when: AGENTS.md exceeds 150 lines.
+
+### `/garden-plant` — Add a content layer
+
+Adds guardrails, golden principles, style guides, or domain knowledge to AGENTS.md.
+
+Run when: after establishing a new team convention or pattern.
+
+### `/garden-research` — Fetch dependency docs
+
+Downloads and stores `llms.txt` files for key libraries. Keeps Gary up to date on your stack.
+
+Run when: after upgrading or adding a major dependency.
 
 ---
 
-## Using Individual Skills
+## The Garden Map
 
-Invoke skills directly without the interactive menu - useful for quick tasks and automation.
+Three fixed buckets — always present, always in this order:
 
-### Skill Commands
+| Bucket | What it covers |
+|--------|----------------|
+| 🛖 Shed | Agentic infrastructure: CLAUDE.md, .github/agents/, .cursor/rules/, .codex/, etc. |
+| 📚 Documentation | Root .md files and docs/ directory |
+| 💻 Codebase | All code directories — most will have no docs yet (expected) |
 
-```bash
-# First-time AI-readiness setup (create AGENTS.md)
-/garden-bootstrap
+**Readiness:** 🌳 mature (≥100 substantive lines) · 🌿 grown (11–99) · 🌱 small (≤10)
 
-# Sync wrappers with AGENTS.md
-/garden-sync
+**Quality signals** (from `/garden-inspect`): 🪱 worm (doc contradicts code) · 🍂 dead leaf (doc describes something gone)
 
-# Audit for drift between docs and code
-/garden-audit
-
-# Add content layer (guardrails, principles, style, domain)
-/garden-extend
-
-# Fetch and manage dependency docs (llms.txt)
-/garden-references
-
-# Add new AI tool wrapper
-/garden-add-tool
-
-# Setup docs/ directory structure
-/garden-scaffold
-
-# Garden documentation (staleness, links, orphans)
-/garden-maintain
-
-# Compress AGENTS.md
-/garden-compact
-
-# Get help understanding skills
-/garden-help
-```
-
-### When to Use Direct Skills
-
-**Good for:**
-- Quick one-off maintenance tasks
-- Scripting and automation
-- CI/CD integration
-- When you know exactly what you need
-
-**Use the gardener instead when:**
-- Exploring what maintenance is needed
-- Unsure which task to run
-- Want guided workflow
-- Prefer interactive experience
+**Folder groups:** Codebase areas with the same top-level path (e.g. all `src/*` areas) are grouped under a bold sub-header row. Groups with >7 areas split at the next directory level.
 
 ---
 
 ## Maintenance Schedule
 
-### After Major Code Changes
-
-**Run:** `/garden-audit`
-
-Catches drift between documentation and actual code. Verifies that AGENTS.md still reflects reality.
-
-```bash
-# After refactoring, adding features, or moving files
-/garden-audit
-```
-
-### Monthly Health Check
-
-**Run:** `/garden-maintain`
-
-Identifies staleness, broken links, orphaned files, and coverage gaps.
-
-```bash
-# First of the month routine maintenance
-/garden-maintain
-```
-
-### When Adding Features
-
-**Run:** `/garden-extend`
-
-Documents new patterns, guardrails, golden principles, or domain knowledge.
-
-```bash
-# After implementing significant new functionality
-/garden-extend
-```
-
-### When Dependencies Change
-
-**Run:** `/garden-references`
-
-Updates llms.txt files for frameworks and libraries.
-
-```bash
-# After upgrading frameworks or adding new dependencies
-/garden-references
-```
-
-### When AGENTS.md Gets Too Long
-
-**Run:** `/garden-compact`
-
-Compresses AGENTS.md to target 150 lines while preserving all facts.
-
-```bash
-# When AGENTS.md exceeds 150 lines
-/garden-compact
-```
-
-### When Adding New AI Tool
-
-**Run:** `/garden-add-tool`
-
-Generates wrapper file that properly references AGENTS.md.
-
-```bash
-# When integrating Cursor, Aider, or other AI tools
-/garden-add-tool
-```
-
-### Recommended Cadence
-
-| Frequency | Task | Command |
-|-----------|------|---------|
-| After changes | Audit | `/garden-audit` |
-| Weekly | Sync | `/garden-sync` |
-| Monthly | Maintain | `/garden-maintain` |
-| As needed | Extend | `/garden-extend` |
-| As needed | References | `/garden-references` |
-| As needed | Compact | `/garden-compact` |
+| Frequency | Command | Why |
+|-----------|---------|-----|
+| After code changes | `/garden-inspect` | Catch drift before AI tools hallucinate |
+| Weekly | `/garden-map` | Spot coverage gaps |
+| Monthly | `/garden-health` | Get 3 improvement suggestions |
+| As needed | `/garden-prune` | Keep AGENTS.md lean |
+| New feature | `/garden-plant` | Document the pattern |
+| Dep update | `/garden-research` | Refresh llms.txt |
 
 ---
 
 ## Architecture
 
-### Directory Structure
-
 ```
-your-repo/
-├── _gary-the-gardener/                                   # Garden system source
-│   ├── VERSION                            # Version file (1.2.0)
-│   ├── core/
-│   │   ├── config.yaml                    # Configuration
-│   │   ├── agents/
-│   │   │   └── gardener.md                # 🪴 Gary The Gardener definition
-│   │   └── workflows/
-│   │       ├── add-tool/workflow.md
-│   │       ├── audit/workflow.md
-│   │       ├── bootstrap/workflow.md
-│   │       ├── compact/workflow.md
-│   │       ├── extend/workflow.md
-│   │       ├── help/workflow.md
-│   │       ├── maintain/workflow.md
-│   │       ├── references/workflow.md
-│   │       ├── scaffold/workflow.md
-│   │       └── sync/workflow.md
-│   └── _config/
-│       └── templates/
-│           └── coverage-status-template.md
-└── .claude/
-    └── commands/
-        ├── garden-agent-gardener.md       # Gardener command
-        ├── garden-add-tool.md             # Skill commands
-        ├── garden-audit.md
-        ├── garden-bootstrap.md
-        ├── garden-compact.md
-        ├── garden-extend.md
-        ├── garden-help.md
-        ├── garden-maintain.md
-        ├── garden-references.md
-        ├── garden-scaffold.md
-        └── garden-sync.md
+_gary-the-gardener/
+  VERSION                       # Current version (e.g. 5.2.0)
+  core/
+    agents/gardener.md          # Gary persona + hub + workflow activation
+    config.yaml                 # Shed patterns, discovery exclusions
+    style.md                    # Output format (Gary Block, table layout)
+    workflows/ (7 dirs)         # One workflow.md per command
+  garden/
+    docsmap.yaml                # Garden state (areas, entities, grid)
+    garden.md                   # Rendered snapshot (read-only cache)
+    history.jsonl               # Append-only log (max 50 entries)
+    moments.md                  # Good moments log
 ```
-
-### How It Works
-
-1. **User invokes skill:** `/garden-agent-gardener` or `/garden-sync`
-2. **Command file loads:** `.claude/commands/garden-agent-gardener.md`
-3. **For gardener:** Loads agent definition, displays menu, waits for input
-4. **For skill:** Loads workflow from `_gary-the-gardener/core/workflows/{name}/workflow.md`
-5. **Workflow reads config:** Gets settings from `_gary-the-gardener/core/config.yaml`
-6. **Workflow executes:** Follows phases (Discovery → Analysis → Report → Execution → Verification)
-7. **Results displayed:** User sees findings, approves changes, sees completion summary
-
-### Workflow Phases
-
-Each skill follows a structured workflow:
-
-1. **Discovery** - Find relevant files and gather context
-2. **Analysis** - Examine content and identify issues
-3. **Report** - Show findings to user before acting
-4. **Execution** - Make approved changes
-5. **Verification** - Confirm changes were successful
-
-### Design Philosophy
-
-- **Progressive disclosure** - Start simple (menu), reveal complexity as needed
-- **Report before acting** - Always show findings before making changes
-- **Preserve facts** - Compress verbosity, never lose information
-- **Gardening metaphor** - Documentation needs care, pruning, and nurturing
-- **Friendly but professional** - Gary is helpful but stays focused
 
 ---
 
 ## FAQ
 
-### General Questions
+**Can I modify the workflows?**
+No — they're overwritten on `gary-the-gardener update`. Customise via `_gary-the-gardener/core/config.yaml`.
 
-**Q: Do I need to use the gardener, or can I use skills directly?**
+**Does `/garden-map` modify my garden?**
+Never. It's strictly read-only with respect to `docsmap.yaml`. The `[U]` Update shortcut inside the map view is the only way to write to `docsmap.yaml`, and even then it only adds — never deletes areas.
 
-A: Both work! Gardener is best for exploration and discovery. Skills are best for quick tasks or automation.
+**What if Gary replants my garden accidentally?**
+It won't — an explicit READ-ONLY invariant is enforced at every phase of the map workflow. If your garden has a `docsmap.yaml`, Gary displays it as-is and never reorganises it.
 
-**Q: How often should I run garden maintenance?**
+**Monorepo support?**
+Install per-package or at the root. Adjust `config.yaml` discovery paths accordingly.
 
-A: Run `/garden-audit` after major changes, `/garden-maintain` monthly, and `/garden-extend` when adding significant features.
-
-**Q: Can I use this with tools other than Claude Code?**
-
-A: The workflows are Claude Code specific currently. However, the patterns could be adapted to other AI tools.
-
-### Customization
-
-**Q: Can I customize the workflows?**
-
-A: Workflows are the core product and should not be edited directly — they get overwritten during updates. All customization happens in `_gary-the-gardener/core/config.yaml`. If you need workflow changes, consider contributing to the garden system upstream.
-
-**Q: Can I disable Gary's personality?**
-
-A: The gardener persona is part of the core product. Like workflows, `gardener.md` gets overwritten during updates. Personality customization may be added to config.yaml in future versions.
-
-**Q: How do I change the AGENTS.md line limit?**
-
-A: Edit `_gary-the-gardener/core/config.yaml` and change `agents_max_lines` value (default: 150).
-
-### Technical Questions
-
-**Q: What if my AGENTS.md is already over 150 lines?**
-
-A: Run `/garden-compact` to compress it, or move detailed content to docs/ using `/garden-extend`.
-
-**Q: Does this work with monorepos?**
-
-A: Yes! Install in the root or per-package. Adjust `_gary-the-gardener/core/config.yaml` paths accordingly.
-
-**Q: Can I run garden skills in CI/CD?**
-
-A: Yes! Skills can be invoked directly. Example:
-```bash
-# In GitHub Actions
-- name: Audit AI config
-  run: /garden-audit --non-interactive
-```
-
-**Q: What happens if workflows conflict with each other?**
-
-A: Workflows are designed to be independent and can run in sequence. Gary ensures only one operation runs at a time.
-
-### Troubleshooting
-
-**Q: Garden system worked before, but now fails - what happened?**
-
-A: Check these common causes:
-1. Did you move ai-bootstrap? (Symlink issue)
-2. Did you update and forget to re-copy commands? (Submodule issue)
-3. Did config.yaml get modified accidentally?
-
-**Q: Can I revert changes made by garden skills?**
-
-A: Yes! All changes are git-tracked. Use `git diff` to review and `git checkout` to revert if needed.
-
-**Q: What if I accidentally deleted _gary-the-gardener/?**
-
-A: Re-run installation from [GARDEN-INSTALLATION.md](GARDEN-INSTALLATION.md). Your config was in `_gary-the-gardener/core/config.yaml`, so you may need to reconfigure.
+**How do I check the installed version?**
+`cat _gary-the-gardener/VERSION` or `gary-the-gardener status`.
 
 ---
-
-## Versioning
-
-The Garden System follows semantic versioning:
-
-- **Major version (X.0.0)** - Breaking changes to workflow interfaces or agent structure
-- **Minor version (0.X.0)** - New skills, features, or workflow enhancements
-- **Patch version (0.0.X)** - Bug fixes and improvements
-
-**Check version:**
-```bash
-cat _gary-the-gardener/VERSION
-```
-
-**Current version:** 1.2.0
-
----
-
-## Support
-
-- **Issues:** Report at [ai-bootstrap repository](https://github.com/your-org/ai-bootstrap/issues)
-- **Questions:** Ask 🪴 Gary The Gardener! `/garden-agent-gardener`
-- **Updates:** Watch ai-bootstrap repository for new releases
-
----
-
-**Version:** 1.2.0
-**Last Updated:** 2026-02-15
-**Maintained by:** ai-bootstrap project
 
 🪴 Happy gardening!

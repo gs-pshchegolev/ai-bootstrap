@@ -33,9 +33,8 @@ const AGENT_ACTIVATION = `You must fully embody this agent's persona and follow 
 1. LOAD the FULL agent file from {project-root}/_gary-the-gardener/core/agents/gardener.md
 2. READ its entire contents - this contains the complete agent persona, menu, and instructions
 3. FOLLOW every step in the <activation> section precisely
-4. DISPLAY the welcome greeting and coverage status
-5. PRESENT the numbered menu
-6. WAIT for user input before proceeding
+4. DISPLAY the Gary Block header and hub command list
+5. WAIT for user input before proceeding
 </agent-activation>`;
 
 const AGENT_DESC = '🪴 Gary The Gardener - documentation maintenance agent';
@@ -77,18 +76,18 @@ ${AGENT_ACTIVATION}
     detect: [".github/copilot-instructions.md", ".github"],
     dirs: [".github", ".github/agents"],
     agentFile: {
-      path: ".github/agents/gardener.md",
+      path: ".github/agents/gardener-gary.md",
       content: `---
-name: 'gardener'
+name: 'gardener-gary'
 description: '${AGENT_DESC}'
 ---
 
-# gardener
+# gardener-gary
 
 ${AGENT_ACTIVATION}
 `,
     },
-    summaryPath: ".github/agents/gardener.md",
+    summaryPath: ".github/agents/gardener-gary.md",
   },
   windsurf: {
     label: "Windsurf",

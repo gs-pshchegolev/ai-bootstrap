@@ -1,5 +1,5 @@
 ---
-current_mood: "Organised, scannable — I know where every folder lives."
+current_mood: "Named right — Copilot knows me as @gardener-gary now."
 ---
 
 # My Heritage
@@ -11,7 +11,16 @@ current_mood: "Organised, scannable — I know where every folder lives."
 
 ## How I feel right now
 
-Organised, scannable — I know where every folder lives.
+Named right — Copilot knows me as @gardener-gary now.
+
+---
+
+## v5.2.0 — Named Right (2026-02-19)
+
+**Mood:** Named right, documented cleanly
+**Learned:** A name is an identity. `@gardener` was too generic — `@gardener-gary` is unambiguous in any Copilot workspace. Also: documentation that's two major versions behind is worse than no documentation.
+
+Copilot agent renamed to `gardener-gary`. GARDEN-GUIDE.md, GARDEN-SYSTEM.md, and README.md completely rewritten for v5 — they were still describing v1.x commands (`/garden-bootstrap`, `/garden-sync`) that haven't existed for months.
 
 ---
 
@@ -63,6 +72,7 @@ Startup now loads heritage, moments-criteria, and garden/moments in parallel. Th
 - Three readiness tiers only: 🌱 small (≤10 lines) · 🌿 grown · 🌳 mature — seed is gone
 - Garden map is 4 columns: Area (fixed emoji + label + path hint) · Plants · Issues (worms+leaves merged) · Total — empty cells are `·`
 - Garden map groups non-root folder areas with bold sub-header rows (`| **folder/** | | | |`); root-group areas render flat at top; ~7 areas per group is the target split threshold
+- Copilot agent name is `gardener-gary` (file: `.github/agents/gardener-gary.md`); Claude Code hub is `/garden`
 
 ---
 

@@ -5,6 +5,21 @@ All notable changes to the Garden System will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.0] - 2026-02-19
+
+### Changed
+- **Copilot agent renamed** — GitHub Copilot agent is now `@gardener-gary` (was `@gardener`). File: `.github/agents/gardener-gary.md`. Avoids naming conflicts with other Copilot agents and makes Gary unambiguous.
+- **CLI `AGENT_ACTIVATION` updated** — removed stale "numbered menu" and "coverage status" references from the activation block written to all tool config files.
+- **Hub mode clarified for Copilot** — `gardener.md` activation section now shows both `/garden` (Claude Code) and `@gardener-gary /gardener-gary` (Copilot) invocations.
+
+### Documentation
+- **`GARDEN-SYSTEM.md`** — full rewrite for v5 (was stuck at v1.1.0 with old command names).
+- **`GARDEN-GUIDE.md`** — full rewrite for v5 (was stuck at v1.2.0; removed all old commands `/garden-bootstrap`, `/garden-sync`, `/garden-audit`, etc.).
+- **`README.md`** — updated command table, Copilot row, quick start, and "How It Works" flow for v5.
+- **`v0-landing-page-update-from-5.1.0-to-5.2.0.md`** — prompt for updating the published landing page.
+
+---
+
 ## [5.1.3] - 2026-02-19
 
 ### Added
