@@ -833,11 +833,11 @@ function printGardenWelcome() {
 
   These are ${bold('LLM slash-commands')} — type them inside your AI agent, not in the terminal.
 
-${bold('All commands')}
+${bold('All commands')} ${dim('(Claude Code · Cursor · Windsurf · Junie)')}
 ${cmds}
   🪴   /garden              Interactive hub — shows all commands
 
-  Run ${green('/garden')} in your AI agent to begin. 🌻
+  Run ${green('/garden')} to begin. GitHub Copilot users: ${green('@gardener-gary')} 🌻
 `);
 }
 
@@ -867,8 +867,9 @@ ${bold('GETTING STARTED')}
 
   These are ${bold('LLM slash-commands')} — type them inside your AI agent,
   not in the terminal.
+  ${dim('GitHub Copilot users: @gardener-gary (agent mention — replaces all /garden-* commands)')}
 
-${bold('ALL LLM COMMANDS')}
+${bold('ALL LLM COMMANDS')} ${dim('(Claude Code · Cursor · Windsurf · Junie)')}
 ${cmds}
   🪴   /garden              Interactive hub — shows all commands
 
@@ -892,7 +893,7 @@ ${bold('WHAT GETS INSTALLED')}
 
   ${dim('Optional (gardener agent for other tools):')}
     • Cursor             ${dim('(.cursor/rules/garden-agent-gardener.mdc)')}
-    • GitHub Copilot     ${dim('(.github/agents/gardener.md)')}
+    • GitHub Copilot     ${dim('(.github/agents/gardener-gary.md · @gardener-gary)')}
     • Windsurf           ${dim('(.windsurf/rules/garden-agent-gardener.md)')}
     • JetBrains Junie    ${dim('(.junie/guidelines.md)')}
 

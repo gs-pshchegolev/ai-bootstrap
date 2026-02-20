@@ -5,6 +5,20 @@ All notable changes to the Garden System will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.3] - 2026-02-20
+
+### Changed
+- **`heritage.md` hard limit** — file trimmed from 172 lines to under 100. Hard limit (100 lines) baked into the intro rule block. v5.1.x and older entries compressed into one-liners in the "Fading memories" section. "What I know now" section preserved in full as the permanent lessons anchor.
+
+---
+
+## [5.2.2] - 2026-02-20
+
+### Changed
+- **CLI post-install output** — slash commands (`/garden`, `/garden-*`) are now clearly scoped to Claude Code · Cursor · Windsurf · Junie. GitHub Copilot users see `@gardener-gary` called out separately as the agent mention that replaces all slash commands. The "WHAT GETS INSTALLED" section in `--help` now shows `.github/agents/gardener-gary.md · @gardener-gary` for the Copilot entry.
+
+---
+
 ## [5.2.1] - 2026-02-19
 
 ### Fixed
