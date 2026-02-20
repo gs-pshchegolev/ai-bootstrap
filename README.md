@@ -1,88 +1,102 @@
 # 🪴 Gary The Gardener
 
-**Maps your codebase, keeps AI docs honest, and stays in sync across every AI tool.**
+**AI documentation agent that maps your codebase, catches drift, and keeps every AI tool in sync.**
 
-One CLI command. One garden map. Every AI tool knows your repo.
+[![npm](https://img.shields.io/npm/v/@pshch/gary-the-gardener)](https://www.npmjs.com/package/@pshch/gary-the-gardener)
+[![license](https://img.shields.io/npm/l/@pshch/gary-the-gardener)](LICENSE)
+[![node](https://img.shields.io/node/v/@pshch/gary-the-gardener)](package.json)
 
 ```bash
 npx @pshch/gary-the-gardener
 ```
 
-## The Problem
+---
+
+## What you get
+
+Run `/garden-map` in your AI tool to see your repo's documentation coverage at a glance:
+
+```
+🪴 Gary The Gardener v5.2.4 | 🗺️ Garden Map
+══════════════════════════════════════════
+```
+
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
+| 🛖 Shed &nbsp;&nbsp;`/` | 🌳 🌿 🌿 🌱 | · | 🌳×1 🌿×2 🌱×1 |
+| 📚 Docs &nbsp;&nbsp;`/` | 🌳 🌿 🌿 | · | 🌳×1 🌿×2 |
+| **src/** | | | |
+| 🌐 API &nbsp;&nbsp;`src/api/` | 🌿 🌳 🌿 | · | 🌳×1 🌿×2 |
+| 🏗️ Core &nbsp;&nbsp;`src/core/` | 🌿 🌱 🌱 | 🪱×1 | 🌿×1 🌱×2 |
+| 🎛️ Config &nbsp;&nbsp;`src/config/` | 🌱 | · | 🌱×1 |
+| 🔧 Utils &nbsp;&nbsp;`src/utils/` | · | · | · |
+| **tests/** | | | |
+| 🧪 Tests &nbsp;&nbsp;`tests/` | 🌿 🌿 | · | 🌿×2 |
+
+```
+Season: mostly 🌿 grown  ·  1 🪱 worm  ·  1 uncovered area
+🌸 3 good moments in this garden
+```
+
+> **Readiness:** 🌱 small (≤10 lines) · 🌿 grown · 🌳 mature
+> **Issues:** 🪱 doc contradicts code · 🍂 doc describes something gone
+> **Empty area** (`·`) = honest coverage gap — not an error
+
+---
+
+## The problem
 
 | | What happens | Result |
 |---|---|---|
-| **Drift** | Code changes but AI docs don't | Agents hallucinate about files that no longer exist |
-| **Fragmentation** | Each tool has its own config file | They fall out of sync — "works in my editor" surprises |
-| **Neglect** | Nobody remembers to update docs | They rot silently until AI output degrades |
+| **Drift** | Code changes, AI docs don't | Agents hallucinate about files that no longer exist |
+| **Fragmentation** | Each tool has its own config | They fall out of sync — "works in my editor" surprises |
+| **Neglect** | Nobody updates the docs | They rot silently until AI output degrades |
 
-## How It Works
+Gary maintains a single **garden map** (`docsmap.yaml` + `garden.md`) that persists across sessions. Every AI tool reads from the same source of truth.
 
-Gary discovers your repo structure and organises it into three fixed buckets:
+---
 
-```
-📁 Your Repo → git ls-files (respects .gitignore)
-  ↓
-  🛖 Shed        — AI tool configs & agent files
-  📚 Documentation  — docs/, root .md files
-  💻 Codebase    — source directories (most have no docs yet — expected)
-  ↓
-  🗺️ Garden Map (docsmap.yaml + garden.md — persists across sessions)
-```
-
-The garden map shows readiness at a glance and groups areas by folder:
-
-```
-| Area | Plants | Issues | Total |
-|------|--------|--------|-------|
-| 🛖 Shed /          | 🌳 🌿 🌿 🌱 | · | 🌳×1 🌿×2 🌱×1 |
-| 📚 Docs /          | 🌳 🌿 🌿    | · | 🌳×1 🌿×2      |
-| **src/**           |             |   |                 |
-| 🌐 API  src/api/   | 🌿 🌳       | · | 🌳×1 🌿×1      |
-| 🌳 Domain  src/    | 🌿 🌱 🌱    | · | 🌿×1 🌱×2      |
-| **tests/**         |             |   |                 |
-| 🧪 Tests  tests/   | 🌿 🌿       | · | 🌿×2            |
-```
-
-## Install
+## Quick start
 
 ```bash
-# Interactive — auto-detects your AI tools, lets you pick
+# 1. Install Gary into your repo
 npx @pshch/gary-the-gardener
 
-# Specific tools only
-npx @pshch/gary-the-gardener --tools cursor,copilot
-
-# Preview without writing
-npx @pshch/gary-the-gardener --dry-run
-
-# Force reinstall
-npx @pshch/gary-the-gardener -f
-
-# Check what's installed
-npx @pshch/gary-the-gardener status
+# 2. Open your AI tool and run:
+/garden-setup    # Map your codebase, create AGENTS.md
+/garden-map      # See coverage at a glance
+/garden-inspect  # Find drift and stale docs
 ```
 
-**What gets installed:**
+For Claude Code and GitHub Copilot, the hub shows all commands:
 
-| File | Purpose |
-|------|---------|
-| `_gary-the-gardener/` | Core garden system (workflows, agent, config, garden state) |
-| `AGENTS.md` | Single source of truth for all AI tools (created via `/garden-setup`) |
-| `.aiignore` | Keeps secrets and large files out of AI context |
-| Shed files | Native config files for each selected AI tool |
+| Tool | How to open Gary |
+|------|-----------------|
+| Claude Code | `/gardener-gary` |
+| GitHub Copilot | `@gardener-gary` |
+| Cursor / Windsurf / Junie | Always active — no invocation needed |
 
-## Supported Tools
+---
 
-| Tool | Config path | Invoke Gary |
-|------|------------|-------------|
-| Claude Code | `CLAUDE.md` + `.claude/commands/` | `/gardener-gary` |
-| Cursor | `.cursor/rules/garden-agent-gardener.mdc` | Always active |
-| GitHub Copilot | `.github/agents/gardener-gary.md` | `@gardener-gary` |
-| Windsurf | `.windsurf/rules/garden-agent-gardener.md` | Always active |
-| JetBrains Junie | `.junie/guidelines.md` | Always active |
+## How it works
 
-## 7 Maintenance Commands
+Gary discovers your repo using `git ls-files` (respects `.gitignore`) and organises everything into three fixed buckets:
+
+```
+📁 Your Repo
+  ↓  git ls-files
+  🛖 Shed          — AI tool configs, agent files, instruction files
+  📚 Documentation  — docs/ directory and root .md files
+  💻 Codebase       — source directories (empty areas are expected and honest)
+  ↓
+  🗺️ Garden Map     — docsmap.yaml + garden.md, persists across sessions
+```
+
+The map is **read-only by default** — `/garden-map` never modifies your garden layout. Only explicit update commands write back, and only additively.
+
+---
+
+## 7 maintenance commands
 
 Run these as slash commands inside your AI tool:
 
@@ -92,25 +106,27 @@ Run these as slash commands inside your AI tool:
 | `/garden-map` 🗺️ | See the full garden map — areas, readiness, folder groups |
 | `/garden-health` 🩺 | Quick scan — 3 prioritised improvement suggestions |
 | `/garden-inspect` 🔍 | Deep scan — finds drift, dead docs, and Shed gaps |
-| `/garden-prune` ✂️ | Compress AGENTS.md under 150 lines without losing facts |
+| `/garden-prune` ✂️ | Compress AGENTS.md to under 150 lines without losing facts |
 | `/garden-plant` 🌷 | Add a content layer — guardrails, style, domain knowledge |
 | `/garden-research` 📚 | Fetch and store llms.txt for key dependencies |
 
-## Quick Start
+---
 
-```bash
-# 1. Install Gary into your repo
-npx @pshch/gary-the-gardener
+## Supported tools
 
-# 2. Open your AI tool and run:
-/garden-setup    # Maps your codebase, creates AGENTS.md
-/garden-map      # See your garden — coverage at a glance
-/garden-inspect  # Find drift and stale docs
-```
+| Tool | Config installed | Invoke Gary |
+|------|-----------------|-------------|
+| Claude Code | `CLAUDE.md` + `.claude/commands/` | `/gardener-gary` |
+| GitHub Copilot | `.github/agents/gardener-gary.md` | `@gardener-gary` |
+| Cursor | `.cursor/rules/garden-agent-gardener.mdc` | Always active |
+| Windsurf | `.windsurf/rules/garden-agent-gardener.md` | Always active |
+| JetBrains Junie | `.junie/guidelines.md` | Always active |
 
-## Use Cases
+---
 
-**New project** — `/garden-setup` maps your entire codebase into Shed, Documentation, and Codebase buckets with real file counts. Pick your coverage depth. AGENTS.md gets created.
+## Use cases
+
+**New project** — `/garden-setup` maps your entire codebase with real file counts. Pick your coverage depth. AGENTS.md gets created and committed.
 
 **Post-refactor** — `/garden-inspect` finds every worm (doc contradicts code) and dead leaf (doc describes something gone) so AI tools never hallucinate about your codebase.
 
@@ -118,18 +134,19 @@ npx @pshch/gary-the-gardener
 
 **Context bloat** — `/garden-prune` compresses AGENTS.md under 150 lines, removing verbosity while preserving every fact.
 
-## Technical Details
+---
 
-- **Zero runtime dependencies** — pure Node.js built-ins only
-- **Node.js ≥ 20.11.0**
-- **ESM** — ships as source, no build step
-- **MIT License**
+## Install options
 
-## Links
+```bash
+npx @pshch/gary-the-gardener                      # interactive — auto-detects tools
+npx @pshch/gary-the-gardener install -t copilot   # specific tool only
+npx @pshch/gary-the-gardener update               # upgrade existing installation
+npx @pshch/gary-the-gardener --dry-run            # preview without writing files
+npx @pshch/gary-the-gardener status               # check what's installed
+```
 
-- [Landing page](https://v0-gary-the-gardener.vercel.app/)
-- [GitHub](https://github.com/pshch/ai-bootstrap)
-- [npm](https://www.npmjs.com/package/@pshch/gary-the-gardener)
+**Zero runtime dependencies** · Node.js ≥ 20.11.0 · ESM · MIT
 
 ---
 
