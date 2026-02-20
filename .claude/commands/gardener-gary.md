@@ -1,5 +1,5 @@
 ---
-name: 'garden'
+name: 'gardener-gary'
 description: 'Interactive garden maintenance hub'
 ---
 

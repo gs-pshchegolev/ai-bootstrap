@@ -2,7 +2,7 @@
 
 ## Starting Gary
 
-**Claude Code:** Run `/garden` — shows the hub with all 7 commands.
+**Claude Code:** Run `/gardener-gary` — shows the hub with all 7 commands.
 
 **GitHub Copilot:** Type `@gardener-gary` in VS Code Copilot Chat — activates Gary.
 

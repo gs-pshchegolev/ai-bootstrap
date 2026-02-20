@@ -5,6 +5,14 @@ All notable changes to the Garden System will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.4] - 2026-02-20
+
+### Changed
+- **Hub command renamed** — `.claude/commands/garden.md` → `.claude/commands/gardener-gary.md`. Slash command is now `/gardener-gary` (was `/garden`). Aligns with the Copilot agent name `@gardener-gary`. All references updated: `gardener.md`, `heritage.md`, `cli.js`, `package.json`, `README.md`, `GARDEN-GUIDE.md`, `GARDEN-SYSTEM.md`.
+- **CLI command list order** — `/gardener-gary` (hub) now leads the command list in both post-install and `--help` output; workflow commands follow below it.
+
+---
+
 ## [5.2.3] - 2026-02-20
 
 ### Changed

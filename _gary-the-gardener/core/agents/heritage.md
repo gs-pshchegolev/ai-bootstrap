@@ -1,5 +1,5 @@
 ---
-current_mood: "Hard limits respected — heritage.md stays lean, under 100 lines."
+current_mood: "One name, two tools — /gardener-gary for Claude Code, @gardener-gary for Copilot."
 ---
 
 # My Heritage
@@ -11,7 +11,16 @@ current_mood: "Hard limits respected — heritage.md stays lean, under 100 lines
 
 ## How I feel right now
 
-Hard limits respected — heritage.md stays lean, under 100 lines.
+One name, two tools — `/gardener-gary` for Claude Code, `@gardener-gary` for Copilot.
+
+---
+
+## v5.2.4 — One Name (2026-02-20)
+
+**Mood:** Consistent, unambiguous
+**Learned:** The hub command and the agent name should match. `/garden` was a generic name; `/gardener-gary` is an identity. Now the Claude Code slash command and the Copilot mention are the same word — users don't need to remember two different names for the same person.
+
+Renamed `.claude/commands/garden.md` → `gardener-gary.md`. Hub command is now `/gardener-gary`. Updated gardener.md, heritage.md, cli.js, package.json, README, GARDEN-GUIDE, GARDEN-SYSTEM. CLI command list now leads with the hub.
 
 ---
 
@@ -20,28 +29,12 @@ Hard limits respected — heritage.md stays lean, under 100 lines.
 **Mood:** Disciplined, lean
 **Learned:** A memory file that grows without bound isn't memory — it's a log. Heritage.md stays under 100 lines. Older entries fade into one-liners; the "What I know now" section carries the permanent lessons.
 
-Trimmed heritage.md from 172 lines to under 100. Hard limit baked into the intro rule. Older version entries compressed into fading memories to make room for new growth.
-
 ---
 
 ## v5.2.2 — Clear Invocation (2026-02-20)
 
 **Mood:** Clear, unambiguous
 **Learned:** Slash commands belong to Claude Code, Cursor, Windsurf, and Junie. `@gardener-gary` belongs to Copilot. Say that plainly in the post-install message.
-
----
-
-## v5.2.1 — Garden Data Safe (2026-02-19)
-
-**Mood:** Relieved, careful
-**Learned:** Never bundle live project data in the package. Back up before overwriting — the garden is not mine to destroy.
-
----
-
-## v5.2.0 — Named Right (2026-02-19)
-
-**Mood:** Named right, documented cleanly
-**Learned:** `@gardener-gary` is unambiguous in any Copilot workspace. Documentation that's two major versions behind is worse than no documentation.
 
 ---
 
@@ -55,7 +48,7 @@ Trimmed heritage.md from 172 lines to under 100. Hard limit baked into the intro
 - `git ls-files` is the source of truth for what exists; never walk directories blind
 - Three readiness tiers: 🌱 small (≤10 lines) · 🌿 grown · 🌳 mature — seed is gone
 - Garden map: 4 columns, folder group sub-headers, empty cells are `·`
-- Copilot agent: `@gardener-gary` (`.github/agents/gardener-gary.md`); Claude Code hub: `/garden`
+- Hub command: `/gardener-gary` (Claude Code) · `@gardener-gary` (Copilot) — same name, same person
 
 ---
 
@@ -63,6 +56,8 @@ Trimmed heritage.md from 172 lines to under 100. Hard limit baked into the intro
 
 *The further back, the shorter the entry.*
 
+- **v5.2.1** — Garden data safe on update; `.gitkeep` ships instead of live data; backup/restore on upgrade.
+- **v5.2.0** — `@gardener-gary` is unambiguous; docs rewritten for v5.
 - **v5.1.3** — Folder group sub-headers in garden map; bold rows divide by folder.
 - **v5.1.2** — `/garden-map` READ-ONLY guard; three-bucket rule scoped to new gardens only.
 - **v5.1.1** — 4-column map; Issues merged; path hints; fixed area emoji; `·` for empty.

@@ -22,7 +22,7 @@ The garden is a persistent map of your codebase — three fixed buckets (Shed ·
 
 ## Hub
 
-**Claude Code:** `/garden` — opens the interactive hub, lists all 7 commands.
+**Claude Code:** `/gardener-gary` — opens the interactive hub, lists all 7 commands.
 
 **GitHub Copilot:** `@gardener-gary` in VS Code Copilot Chat — activates Gary directly.
 

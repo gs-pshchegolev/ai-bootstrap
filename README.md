@@ -76,7 +76,7 @@ npx @pshch/gary-the-gardener status
 
 | Tool | Config path | Invoke Gary |
 |------|------------|-------------|
-| Claude Code | `CLAUDE.md` + `.claude/commands/` | `/garden` |
+| Claude Code | `CLAUDE.md` + `.claude/commands/` | `/gardener-gary` |
 | Cursor | `.cursor/rules/garden-agent-gardener.mdc` | Always active |
 | GitHub Copilot | `.github/agents/gardener-gary.md` | `@gardener-gary` |
 | Windsurf | `.windsurf/rules/garden-agent-gardener.md` | Always active |

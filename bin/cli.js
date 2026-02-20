@@ -461,7 +461,7 @@ __pycache__/
       const cmdSrc = join(PKG_ROOT, ".claude", "commands");
       const cmdDest = join(dest, ".claude", "commands");
       const gardenCmds = readdirSync(cmdSrc).filter(
-        (f) => (f === "garden.md" || f.startsWith("garden-")) && f.endsWith(".md"),
+        (f) => (f === "gardener-gary.md" || f.startsWith("garden-")) && f.endsWith(".md"),
       );
       const shouldUpdateCmds = isUpgrade || force || !installedVersion;
       let copied = 0;
@@ -517,7 +517,7 @@ __pycache__/
     console.log(`\n${bold("Next steps:")} ${dim("(these are LLM commands — run them inside your AI agent)")}`);
     console.log(`  1. Run ${green("/garden-setup")}         Create your docs structure`);
     console.log(`  2. Run ${green("/garden-map")}         See the garden map`);
-    console.log(`  3. Run ${green("/garden")}              Open the interactive hub`);
+    console.log(`  3. Run ${green("/gardener-gary")}       Open the interactive hub`);
   }
 
   // Garden metaphor
@@ -834,10 +834,10 @@ function printGardenWelcome() {
   These are ${bold('LLM slash-commands')} — type them inside your AI agent, not in the terminal.
 
 ${bold('All commands')} ${dim('(Claude Code · Cursor · Windsurf · Junie)')}
+  🪴   /gardener-gary       Interactive hub — shows all commands
 ${cmds}
-  🪴   /garden              Interactive hub — shows all commands
 
-  Run ${green('/garden')} to begin. GitHub Copilot users: ${green('@gardener-gary')} 🌻
+  Run ${green('/gardener-gary')} to begin. GitHub Copilot users: ${green('@gardener-gary')} 🌻
 `);
 }
 
@@ -863,15 +863,15 @@ ${bold('GETTING STARTED')}
 
   ${bold('1.')} ${green('/garden-setup')}         Plant your garden — AGENTS.md, docs/, AI tool configs
   ${bold('2.')} ${green('/garden-map')}         See the garden map
-  ${bold('3.')} ${green('/garden')}              Open the interactive hub
+  ${bold('3.')} ${green('/gardener-gary')}       Open the interactive hub
 
   These are ${bold('LLM slash-commands')} — type them inside your AI agent,
   not in the terminal.
   ${dim('GitHub Copilot users: @gardener-gary (agent mention — replaces all /garden-* commands)')}
 
 ${bold('ALL LLM COMMANDS')} ${dim('(Claude Code · Cursor · Windsurf · Junie)')}
+  🪴   /gardener-gary       Interactive hub — shows all commands
 ${cmds}
-  🪴   /garden              Interactive hub — shows all commands
 
 ${bold('USAGE')}
   npx @pshch/gary-the-gardener [command] [options]

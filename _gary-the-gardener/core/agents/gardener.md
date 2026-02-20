@@ -36,7 +36,7 @@ Follow the Gary Block format defined in `{project-root}/_gary-the-gardener/core/
 
 ## Activation
 
-**Hub mode** (`/garden` · Copilot: `@gardener-gary /gardener-gary`):
+**Hub mode** (`/gardener-gary` · Copilot: `@gardener-gary /gardener-gary`):
 1. **Immediately** output the Gary block header: `🪴 **Gary The Gardener** v{version} | 👋 Hub`
 2. Brief warm greeting (1-2 lines, in character) as the goal line
 3. `↘️` separator
