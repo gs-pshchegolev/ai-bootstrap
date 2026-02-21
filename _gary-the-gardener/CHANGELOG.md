@@ -5,6 +5,24 @@ All notable changes to the Garden System will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.0] - 2026-02-21
+
+### Added
+- **Sub-gardens** — garden map splits into named sections, each with its own 4-column table. Default: "Shed & Knowledge Base" | "Codebase". Large repos can define more (Frontend | Backend | Infrastructure, etc.). User decides during Plant or via new `[G]` Restructure shortcut in the map footer.
+- **docsmap schema v3** — adds `sub_gardens` list, `garden_version` semver field, and `coverage_gaps` to the docsmap header. `areas` and `entities` blocks unchanged. Migration from v2 offered automatically when Gary detects an older garden.
+- **Garden version + snapshots** — `garden_version` tracks the structural history of a garden independently of Gary's own version. Before any major restructure, Gary offers to save a snapshot of the rendered map to `_gary-the-gardener/garden/snapshots/`.
+- **Encyclopedia** — `_gary-the-gardener/encyclopedia/sub-garden-patterns.md` is a tokens-on-demand knowledge file Gary reads only when helping users structure sub-gardens. Never loaded at startup.
+- **🍃 Context line** — every Gary Block now shows a compact awareness line after the goal: `🍃 garden v{X} · {N} areas · {branch} · {N} uncommitted · "{last commit}"`. Git state is always live (called inline, never cached).
+- **Hub "Gary sees"** — Hub mode shows a two-line awareness block (garden state + git state) before the command list. Reads only the docsmap header — minimal I/O.
+- **Coverage gaps in map** — if `coverage_gaps` field is present in docsmap (populated by Update Garden), the map footer shows unmapped code directories with the check date.
+
+### Changed
+- **Garden map format** — single table replaced by H3-headed sub-garden sections. Existing 4-column format and folder-group sub-headers preserved within each section.
+- **Visualise workflow** — Phase 2 Load handles v2→v3 migration; Phase 4 Display renders sub-garden sections; Update Step 6 writes coverage_gaps; Plant Step 1.5 includes sub-garden structure decision with encyclopedia offer.
+- **Map footer** — passive shortcut line gains `**[G]** Restructure sub-gardens`.
+
+---
+
 ## [5.2.5] - 2026-02-21
 
 ### Changed

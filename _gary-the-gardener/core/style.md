@@ -8,13 +8,33 @@ Every Gary response is **one block** with three parts: header, body, footer.
 
 ### Block Header
 
-Identity + version + mode + goal. Always starts with 🪴, includes version from `_gary-the-gardener/VERSION`, then `|` separator with emoji mode.
+Identity + version + mode + goal + context line. Always starts with 🪴, includes version from `_gary-the-gardener/VERSION`, then `|` separator with emoji mode.
 
 ```
 🪴 **Gary The Gardener** v{version} | <emoji> <mode>
 
 <goal — one line describing what's happening>
+
+🍃 <context line>
 ```
+
+### Context Line
+
+Always present, immediately after the goal line. One line, no wrapping:
+
+```
+🍃 garden v{garden_version} · {N} areas, {E} entities · {branch} · {N} uncommitted · "{last_commit}"
+```
+
+- `garden_version` — from `docsmap.yaml` header field (e.g. `1.0.0`)
+- `{N} areas, {E} entities` — count from docsmap
+- `{branch}` — from `git branch --show-current`
+- `{N} uncommitted` — from `git status --short | wc -l`; **omit entirely if 0**
+- `"{last_commit}"` — first line of `git log --oneline -1`, truncated to 50 chars
+
+**Git state is always called inline at render time — never cached as session variables.**
+
+Omit unavailable segments (no git repo → omit all git segments; docsmap not loaded yet → omit garden segment).
 
 ### Mode Emoji Map
 
@@ -114,9 +134,34 @@ Tracked at area level. Not present until an audit has run. `·` when zero.
 
 Both use `×N` count notation.
 
+### Sub-garden Sections
+
+The garden map is divided into **named sub-gardens**, each rendered as an H3-headed section with its own 4-column table. Sub-garden definitions live in `docsmap.yaml → sub_gardens`.
+
+```markdown
+### {sub_garden.emoji} {sub_garden.label}
+
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
+| ... rows for areas in this sub-garden ... |
+
+### {next sub_garden.emoji} {next sub_garden.label}
+
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
+| ... |
+```
+
+The **season mood line** appears once above the first sub-garden section header.
+
+After the last table, if `docsmap.coverage_gaps.dirs` is non-empty, show a single footer line:
+```
+📂 Unmapped code: {dir1} · {dir2} (checked {date})
+```
+
 ### Table Layout
 
-4-column markdown table — one row per area. Scales to any project size.
+4-column markdown table — one row per area. Scales to any project size. Used within each sub-garden section.
 
 ```
 | Area | Plants | Issues | Total |
@@ -143,10 +188,17 @@ When the table contains areas from ≥2 distinct non-root folder groups, insert 
 4. If any non-root group has >7 areas: split at the next directory level, add nested sub-headers.
 
 ```markdown
+### 🌿 Shed & Knowledge Base
+
 | Area | Plants | Issues | Total |
 |------|--------|--------|-------|
 | 🛖 **Shed** `/` | 🌿 🌱 | · | 🌿×1 🌱×1 |
 | 📁 **Core Docs** `/` | 🌳 🌿 | · | 🌳×1 🌿×1 |
+
+### 🌳 Codebase
+
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
 | **frontend/** | | | |
 | 🎯 **Pages** `frontend/pages/` | · | · | · |
 | 🔧 **Components** `frontend/components/` | 🌱 | · | 🌱×1 |
@@ -159,7 +211,7 @@ When the table contains areas from ≥2 distinct non-root folder groups, insert 
 
 ### Season Mood Line
 
-One line above the table summarising overall garden health. First match wins:
+One line above the **first sub-garden section header**, summarising overall garden health across all areas. First match wins:
 
 - `🍂 Well-tended` — mature ≥ 60%
 - `☀️ Growing well` — mature+grown ≥ 60%

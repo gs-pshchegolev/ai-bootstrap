@@ -74,6 +74,15 @@ Supported AI tools: Claude Code, Cursor, GitHub Copilot, JetBrains Junie.
 - AGENTS.md max line limit: 150 lines (enforced by garden system)
 - `.npmrc` contains auth token reference — never commit actual tokens
 
+## Gary — When To Invoke
+
+Consider invoking Gary when it would add value:
+- Before designing a new feature: `/garden-map` (understand what's documented)
+- After significant code changes: `/garden-health` (catch doc drift)
+- Planning mode or major refactor: `/garden-inspect` (deep audit)
+
+Not needed for: bug fixes, typos, small changes, dependency bumps.
+
 ## Further Reading
 
 - `docs/ARCHITECTURE.md` — detailed architecture and domain boundaries

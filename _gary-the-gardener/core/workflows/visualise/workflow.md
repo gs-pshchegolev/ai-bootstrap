@@ -53,7 +53,11 @@ Only proceed to Phase 2 if `garden.md` is absent.
 
 Check if `docsmap.yaml` exists. If it does, read and parse it. If not, enter the **Plant the Garden** sub-flow (see below).
 
-After loading, validate `version === 2`. If mismatched, **warn only** — do NOT re-plant. Display the garden as-is with a note: "docsmap schema is older — run `/garden-setup` to migrate." Proceed to Phase 3 regardless.
+After loading, validate `version`:
+
+- **`version === 3`** — current schema, proceed normally.
+- **`version === 2`** — offer migration to v3 (see **Sub-flow: Migrate v2 → v3** below). If user declines, proceed with the v2 data — the map renders without sub-garden sections (single flat table, as before).
+- **other** — warn only, proceed as-is with a note: "docsmap schema is unexpected — run `/garden-setup` to migrate."
 
 ## Phase 3: Decide & Render
 
@@ -85,16 +89,28 @@ Compute the **season mood line** from aggregate totals across all areas (see Ren
 Write `garden.md`:
 ```markdown
 # Garden Map
-> Rendered {DD-MM-YYYY} | Gary v{VERSION} | hash: {hash}
+> Rendered {DD-MM-YYYY} | Gary v{VERSION} | hash: {hash} | garden v{garden_version}
 > {X} entities across {N} areas
 **Legend:** 🌱 small · 🌿 grown · 🌳 mature
 
 {season-mood-line}
 
+### {sub_garden.emoji} {sub_garden.label}
+
 | Area | Plants | Issues | Total |
 |------|--------|--------|-------|
 | {area.emoji} **{area.label}** `{path-hint}` | {plants-cell} | {issues-cell} | {total-cell} |
+
+### {next sub_garden.emoji} {next sub_garden.label}
+
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
+| ... |
+
+{coverage_gaps_footer — if coverage_gaps.dirs non-empty}
 ```
+
+If `docsmap.version === 2` (user declined migration), fall back to the legacy single-table format — no sub-garden H3 headers.
 
 `doc_issues` is written by the audit workflow — never by visualise. If absent, treat all quality counts as 0.
 
@@ -105,9 +121,19 @@ Output the Gary Block. **Display shows all areas** (both primary and secondary).
 ```
 🪴 **Gary The Gardener** v{version} | 🏞️ Garden Map
 
+<goal line>
+
+🍃 <context line>
+
 <season-mood-line>
 
-<garden table — all areas>
+### {sub_garden.emoji} {sub_garden.label}
+<table for this sub-garden>
+
+### {next sub_garden.emoji} {next sub_garden.label}
+<table>
+
+{📂 Unmapped code: ... — if coverage_gaps.dirs non-empty}
 
 🌱 *Did you know? <fun gardening fact>*
 ```
@@ -115,7 +141,7 @@ Output the Gary Block. **Display shows all areas** (both primary and secondary).
 **Footer — passive shortcut line. Do NOT call AskUserQuestion here.**
 
 ```
-↘️ **[B]** Browse area · **[S]** Summary & suggestions · **[U]** Update · **[D]** Done
+↘️ **[B]** Browse area · **[S]** Summary & suggestions · **[U]** Update · **[G]** Restructure sub-gardens · **[D]** Done
 ```
 
 Turn ends. Gary waits for the user to follow up.
@@ -152,6 +178,7 @@ When the user replies with a shortcut or intent, Gary acts:
 | `B` / `browse` | Asks which area via `AskUserQuestion`, then runs Browse area flow |
 | `S` / `summary` | Runs Summary & Suggestions sub-flow |
 | `U` / `update` | Runs Update Garden sub-flow |
+| `G` / `restructure` | Runs Restructure Sub-gardens sub-flow |
 | `D` / `done` | Signs off with a brief closing line |
 
 **"Browse area"** flow:
@@ -171,13 +198,20 @@ When the user replies with a shortcut or intent, Gary acts:
 
 ### Table Format
 
-One row per area. Four columns.
+Rendered as sub-garden sections (H3 headers), each containing one 4-column table.
 
 ```markdown
+### 🌿 Shed & Knowledge Base
+
 | Area | Plants | Issues | Total |
 |------|--------|--------|-------|
 | 🛖 **Shed** `/` | 🌿 🌿 🌱 🌿 🌱 | 🍂×1 | 🌿×3 🌱×2 🍂×1 |
 | 📁 **Docs** `docs/` | 🌿 🌿 🌳 🌳 🌿 | 🪱×2 🍂×1 | 🌳×2 🌿×3 🪱×2 🍂×1 |
+
+### 🌳 Codebase
+
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
 | 🎯 **Pages** `src/pages/` | · | · | · |
 | 🌐 **API** `src/api/` | 🌿 | · | 🌿×1 |
 | 🧪 **Tests** `tests/` | 🌳 🌳 🌳 | · | 🌳×3 |
@@ -185,13 +219,20 @@ One row per area. Four columns.
 
 **Area column:** `area.emoji` from docsmap (fixed semantic emoji, not readiness-derived) + **bold** label + `path-hint` code span. Path hint = longest common dir prefix of all `include` patterns; `/` if no common root.
 
-**Grouping sub-headers:** When the table has ≥2 distinct non-root folder groups, insert a sub-header row before each group. Sub-header row: `| **{folder}/** | | | |` — plain bold, no backticks, no emoji, all other cells empty. Root-group areas (`/`) render first with no sub-header. Groups with >7 areas split at the next directory level with nested sub-headers.
+**Grouping sub-headers:** When a sub-garden's table has ≥2 distinct non-root folder groups, insert a folder-group sub-header row before each group. Sub-header row: `| **{folder}/** | | | |` — plain bold, no backticks, no emoji, all other cells empty. Root-group areas (`/`) render first with no sub-header. Groups with >7 areas split at the next directory level with nested sub-headers.
 
 ```markdown
+### 🌿 Shed & Knowledge Base
+
 | Area | Plants | Issues | Total |
 |------|--------|--------|-------|
 | 🛖 **Shed** `/` | 🌿 🌿 🌱 | · | 🌿×2 🌱×1 |
 | 📁 **Docs** `/` | 🌳 🌳 🌿 | 🪱×1 | 🌳×2 🌿×1 🪱×1 |
+
+### 🌳 Codebase
+
+| Area | Plants | Issues | Total |
+|------|--------|--------|-------|
 | **frontend/** | | | |
 | 🎯 **Pages** `frontend/pages/` | · | · | · |
 | 🔧 **Components** `frontend/components/` | 🌱 | · | 🌱×1 |
@@ -351,8 +392,25 @@ Codebase (10 areas):
 📦 (remaining small dirs merged into nearest parent)
 ```
 
-**After user picks A/B/C**: Gary proceeds directly to Step 2 with the computed layout.
-**Custom**: Gary asks one clarifying question (which Codebase areas to merge/split/rename), then proceeds.
+**After user picks A/B/C**: Gary proceeds to the sub-garden structure question before Step 2.
+**Custom**: Gary asks one clarifying question (which Codebase areas to merge/split/rename), then proceeds to sub-garden structure.
+
+### Step 1.6: Sub-garden Structure
+
+After granularity is decided, Gary defines how areas are grouped into sub-gardens for the map display.
+
+**Default (no input needed)**: Two sub-gardens — "Shed & Knowledge Base" (all Shed + Documentation areas) and "Codebase" (all remaining areas). Gary proposes this and asks:
+
+```
+AskUserQuestion: "How should the garden map be organised?"
+→ Default — Shed & Knowledge Base | Codebase
+→ Check patterns (Gary reads encyclopedia/sub-garden-patterns.md and suggests options)
+→ Custom (Gary asks one question about grouping, then confirms)
+```
+
+**If user picks Check patterns**: Gary reads `{project-root}/_gary-the-gardener/encyclopedia/sub-garden-patterns.md` and presents matching patterns as `AskUserQuestion` options based on the repo's detected tech stack and directory shape.
+
+**Result**: A confirmed `sub_gardens` list (id, label, emoji, areas) written to `docsmap.yaml` in Step 5.
 
 ---
 
@@ -415,9 +473,20 @@ Write areas with full entity and grid layout:
 1. Write `docsmap.yaml` with areas, entities, grid layout. **Areas with no documentation have empty entity lists** — their grid rows have empty `entities: []`. This is valid; those areas represent undocumented code directories.
 
 ```yaml
-version: 2
+version: 3
+garden_version: "1.0.0"
 generated: "{DD-MM-YYYY}"
-hash: "v2-{entityCount}-{generated}"
+hash: "v3-{entityCount}-{generated}"
+
+sub_gardens:
+  - id: {id}
+    label: "{label}"
+    emoji: "{emoji}"
+    areas: [{area-id}, ...]
+
+coverage_gaps:
+  checked: "{DD-MM-YYYY}"
+  dirs: []
 
 areas:
   {area-id}:
@@ -510,13 +579,22 @@ For all existing entities (parallelizable per area — see Execution Hints):
 ### Step 6: Update State
 
 1. Bump `generated` timestamp to current `{DD-MM-YYYY}`
-2. Update `hash` to `v2-{newEntityCount}-{DD-MM-YYYY}`
-3. Write updated `docsmap.yaml`
-4. Append `update` entry to `history.jsonl`:
+2. Update `hash` to `v{schema_version}-{newEntityCount}-{DD-MM-YYYY}` (use current schema version prefix)
+3. Write uncovered dirs from Scan C to `coverage_gaps` field:
+   ```yaml
+   coverage_gaps:
+     checked: "{DD-MM-YYYY}"
+     dirs:
+       - path: "{dir}/"
+         files: {N}
+   ```
+   If no uncovered dirs found, write `coverage_gaps: {checked: "{DD-MM-YYYY}", dirs: []}`.
+4. Write updated `docsmap.yaml`
+5. Append `update` entry to `history.jsonl`:
 ```jsonl
 {"ts":"{DD-MM-YYYY}","action":"update","summary":"+{N} new, -{N} removed, {N} promoted, {N} demoted","counts":{"added":{N},"removed":{N},"promoted":{N},"demoted":{N}}}
 ```
-5. Re-render `garden.md` (Phase 3)
+6. Re-render `garden.md` (Phase 3)
 
 ### Step 7: Report
 
@@ -603,6 +681,75 @@ End with `AskUserQuestion`:
 - Browse an area
 - Update garden
 - Done
+
+## Sub-flow: Migrate v2 → v3
+
+Triggered when Phase 2 detects `version: 2`.
+
+1. Offer a snapshot first:
+   ```
+   AskUserQuestion: "Your garden uses schema v2. Migrate to v3 (adds sub-gardens + garden versioning)?"
+   → Migrate (save snapshot first — recommended)
+   → Migrate (skip snapshot)
+   → Not now (display as-is with legacy flat table)
+   ```
+2. If "save snapshot first": run **Sub-flow: Save Snapshot** with current `garden.md` before writing anything.
+3. Derive a default `sub_gardens` layout:
+   - Sub-garden 1 "Shed & Knowledge Base" — all areas where `type: shed` or `type: instructions` OR `display: primary`
+   - Sub-garden 2 "Codebase" — all remaining areas
+4. Ask:
+   ```
+   AskUserQuestion: "Proposed sub-garden split — confirm or check patterns?"
+   → Looks good — apply
+   → Check patterns (reads encyclopedia/sub-garden-patterns.md)
+   → Customise
+   ```
+5. Write updated `docsmap.yaml` with `version: 3`, `garden_version: "1.0.0"`, `sub_gardens`, and `coverage_gaps: {checked: today, dirs: []}`.
+6. Append to `history.jsonl`:
+   ```jsonl
+   {"ts":"{DD-MM-YYYY}","action":"migrate","summary":"Schema migrated v2→v3; {N} sub-gardens defined","garden_version":"1.0.0"}
+   ```
+7. Proceed to Phase 3 to re-render.
+
+## Sub-flow: Save Snapshot
+
+Triggered before any garden_version major bump or explicit user request.
+
+1. Read current `garden.md`. If absent, skip silently.
+2. Write to `{project-root}/_gary-the-gardener/garden/snapshots/garden-v{garden_version}-{DD-MM-YYYY}.md`.
+   Create the `snapshots/` directory if it doesn't exist.
+3. Append to `history.jsonl`:
+   ```jsonl
+   {"ts":"{DD-MM-YYYY}","action":"snapshot","summary":"Snapshot saved before restructure","file":"garden-v{garden_version}-{DD-MM-YYYY}.md"}
+   ```
+4. Confirm to user: `📸 Snapshot saved: garden-v{garden_version}-{DD-MM-YYYY}.md`
+
+## Sub-flow: Restructure Sub-gardens
+
+Triggered when user replies `[G]` / `restructure` from the map footer.
+
+1. Offer encyclopedia patterns:
+   ```
+   AskUserQuestion: "How to restructure sub-gardens?"
+   → Check patterns (reads encyclopedia/sub-garden-patterns.md)
+   → Custom (Gary asks one question about grouping)
+   → Cancel
+   ```
+2. If Check patterns: read `{project-root}/_gary-the-gardener/encyclopedia/sub-garden-patterns.md`. Present matching patterns as options based on repo tech stack + directory shape.
+3. Show proposed new layout. Ask:
+   ```
+   AskUserQuestion: "Apply this sub-garden structure?"
+   → Save snapshot and apply (recommended)
+   → Apply without snapshot
+   → Cancel
+   ```
+4. If saving snapshot: run **Sub-flow: Save Snapshot**.
+5. Write new `sub_gardens` to `docsmap.yaml`. Bump `garden_version` major (e.g. `1.0.0` → `2.0.0`). Update `hash` and `generated`.
+6. Append to `history.jsonl`:
+   ```jsonl
+   {"ts":"{DD-MM-YYYY}","action":"restructure","summary":"Sub-gardens restructured to {N} sections","garden_version":"{new_version}"}
+   ```
+7. Re-render `garden.md` (Phase 3) and display.
 
 ## Rules
 
