@@ -178,7 +178,7 @@ One row per area. Four columns.
 |------|--------|--------|-------|
 | 🛖 **Shed** `/` | 🌿 🌿 🌱 🌿 🌱 | 🍂×1 | 🌿×3 🌱×2 🍂×1 |
 | 📁 **Docs** `docs/` | 🌿 🌿 🌳 🌳 🌿 | 🪱×2 🍂×1 | 🌳×2 🌿×3 🪱×2 🍂×1 |
-| 🎯 **Destination UI** `src/destination/` | · | · | · |
+| 🎯 **Pages** `src/pages/` | · | · | · |
 | 🌐 **API** `src/api/` | 🌿 | · | 🌿×1 |
 | 🧪 **Tests** `tests/` | 🌳 🌳 🌳 | · | 🌳×3 |
 ```
@@ -193,8 +193,8 @@ One row per area. Four columns.
 | 🛖 **Shed** `/` | 🌿 🌿 🌱 | · | 🌿×2 🌱×1 |
 | 📁 **Docs** `/` | 🌳 🌳 🌿 | 🪱×1 | 🌳×2 🌿×1 🪱×1 |
 | **frontend/** | | | |
-| 🎯 **Destination UI** `frontend/destination/` | · | · | · |
-| 🔧 **Control UI** `frontend/control/` | 🌱 | · | 🌱×1 |
+| 🎯 **Pages** `frontend/pages/` | · | · | · |
+| 🔧 **Components** `frontend/components/` | 🌱 | · | 🌱×1 |
 | 🎣 **Hooks** `frontend/hooks/` | 🌿 🌿 | · | 🌿×2 |
 | **src/** | | | |
 | 🌐 **API** `src/api/` | 🌿 🌳 | 🍂×1 | 🌳×1 🌿×1 🍂×1 |

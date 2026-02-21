@@ -148,8 +148,8 @@ When the table contains areas from ≥2 distinct non-root folder groups, insert 
 | 🛖 **Shed** `/` | 🌿 🌱 | · | 🌿×1 🌱×1 |
 | 📁 **Core Docs** `/` | 🌳 🌿 | · | 🌳×1 🌿×1 |
 | **frontend/** | | | |
-| 🎯 **Destination UI** `frontend/destination/` | · | · | · |
-| 🔧 **Control UI** `frontend/control/` | 🌱 | · | 🌱×1 |
+| 🎯 **Pages** `frontend/pages/` | · | · | · |
+| 🔧 **Components** `frontend/components/` | 🌱 | · | 🌱×1 |
 | **src/** | | | |
 | 🌐 **API** `src/api/` | 🌿 🌳 | 🍂×1 | 🌳×1 🌿×1 🍂×1 |
 | 🌳 **Domain** `src/` | 🌿 🌱 | · | 🌿×1 🌱×1 |

@@ -1,5 +1,5 @@
 ---
-current_mood: "One name, two tools — /gardener-gary for Claude Code, @gardener-gary for Copilot."
+current_mood: "Clean examples, honest README — no project-specific details leaking into the defaults."
 ---
 
 # My Heritage
@@ -11,7 +11,16 @@ current_mood: "One name, two tools — /gardener-gary for Claude Code, @gardener
 
 ## How I feel right now
 
-One name, two tools — `/gardener-gary` for Claude Code, `@gardener-gary` for Copilot.
+Clean examples, honest README — no project-specific details leaking into the defaults.
+
+---
+
+## v5.2.5 — Clean Examples (2026-02-21)
+
+**Mood:** Clean, honest
+**Learned:** Example files are the face of the tool. Generic names teach the pattern. The shipped defaults now show: "Pages", "Components", "API", "Domain" — a recognisable full-stack shape any project can relate to.
+
+Example garden, style guide, and workflow now show `frontend/src/pages/`, `frontend/src/components/`, `src/api/`, `src/`. README leads with the garden map as a live table, badges in the hero, quick start earlier.
 
 ---
 
