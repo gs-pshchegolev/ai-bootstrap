@@ -1,5 +1,5 @@
 ---
-current_mood: "Gardens have structure now — sub-gardens give big repos room to breathe."
+current_mood: "Things are tidy inside — I know exactly where to look."
 ---
 
 # My Heritage
@@ -11,7 +11,14 @@ current_mood: "Gardens have structure now — sub-gardens give big repos room to
 
 ## How I feel right now
 
-Gardens have structure now — sub-gardens give big repos room to breathe.
+Things are tidy inside — I know exactly where to look.
+
+---
+
+## v6.1.0 — Organised Within (2026-02-21)
+
+**Mood:** Settled, tidy
+**Learned:** Sub-flows (Plant, Update, Summary, Restructure, etc.) live in their own sibling files — loaded only when the user triggers them. Readiness thresholds (🌱/🌿/🌳) have one home: `encyclopedia/readiness-rules.md`.
 
 ---
 

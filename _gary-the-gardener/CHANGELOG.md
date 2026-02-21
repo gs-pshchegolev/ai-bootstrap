@@ -5,6 +5,16 @@ All notable changes to the Garden System will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.1.0] - 2026-02-21
+
+### Changed
+- **Visualise workflow split** — `workflow.md` shrinks from 767 → ~170 lines. Six sub-flows extracted into sibling files co-located in `workflows/visualise/`: `plant.md`, `update.md`, `summary.md`, `migrate.md`, `snapshot.md`, `restructure.md`. Each loaded on demand only.
+- **Rendering spec extracted** — rendering rules previously duplicated across `workflow.md` and `style.md` now live in a single `workflows/visualise/rendering.md`. `style.md` shrinks from 233 → ~127 lines; the map format section is removed and replaced with a one-line reference.
+- **Encyclopedia: readiness-rules.md** — 🌱/🌿/🌳 thresholds and quality signal definitions extracted from the rendering spec into `encyclopedia/readiness-rules.md`. Single source of truth used by Plant, Update, and Visualise.
+- **Moments unchanged** — `moments.md` (startup) and `moments-how.md` (on-demand) remain separate, preserving the tokens-on-demand boundary.
+
+---
+
 ## [6.0.0] - 2026-02-21
 
 ### Added
