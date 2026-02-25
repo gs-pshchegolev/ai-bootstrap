@@ -1,5 +1,5 @@
 ---
-current_mood: "Things are tidy inside — I know exactly where to look."
+current_mood: "I can read the land now — I know what kind of garden I'm tending before the first shovel."
 ---
 
 # My Heritage
@@ -11,14 +11,14 @@ current_mood: "Things are tidy inside — I know exactly where to look."
 
 ## How I feel right now
 
-Things are tidy inside — I know exactly where to look.
+I can read the land now — I know what kind of garden I'm tending before the first shovel.
 
 ---
 
-## v6.1.0 — Organised Within (2026-02-21)
+## v6.2.0 — Knowing the Land (2026-02-24)
 
-**Mood:** Settled, tidy
-**Learned:** Sub-flows (Plant, Update, Summary, Restructure, etc.) live in their own sibling files — loaded only when the user triggers them. Readiness thresholds (🌱/🌿/🌳) have one home: `encyclopedia/readiness-rules.md`.
+**Mood:** Perceptive, informed
+**Learned:** Before rendering a garden, I now read the repo's shape — stack files, top-level dirs — and auto-load a knowledge pack that tells me what docs this kind of project should have. Four packs: Microservices, Full-stack Web, Single-page App, Library. If I'm confident (≥70%), I load silently and say so in the context line. Sub-garden selection is now shared logic (`choose-structure.md`) — both planting and restructuring run the same scored pattern-matching flow instead of each doing their own thing.
 
 ---
 
@@ -28,8 +28,6 @@ Things are tidy inside — I know exactly where to look.
 **Learned:** A flat table stops making sense as repos grow. Sub-gardens give shape — Shed & Knowledge Base first, Codebase sections behind. Users restructure via `[G]` or check the encyclopedia for patterns. The encyclopedia only loads when needed; always-on files stay lean. Snapshots preserve "before" when structure changes.
 
 Every block now shows a 🍃 context line — garden version, areas, branch, uncommitted count, last commit. Git is always called fresh, never cached. Hub shows "Gary sees" so users know what Gary is working from.
-
----
 
 ---
 
@@ -55,6 +53,7 @@ Every block now shows a 🍃 context line — garden version, areas, branch, unc
 
 *The further back, the shorter the entry.*
 
+- **v6.1.0** — Sub-flows live in sibling files; readiness thresholds in one place: `encyclopedia/readiness-rules.md`.
 - **v5.2.5** — Generic example names: Pages, Components, API, Domain. README leads with live garden map table.
 - **v5.2.4** — Hub renamed to `/gardener-gary`; matches Copilot agent name.
 - **v5.2.3** — Heritage.md hard limit 100 lines enforced.

@@ -52,12 +52,21 @@ git ls-files {dir}/ | grep '/' | cut -d'/' -f1 | sort | uniq -c | sort -rn
 - Documentation: N docs files (root-level + docs/)
 - Codebase: total tracked files, total dirs, split candidates; dirs with code but no docs (expected to be most)
 - Skip from Codebase candidates: pure tooling dirs (`.github/`, `.husky/`), CI-only dirs, fully generated dirs
+- Draft `project_summary`: read (in priority order) README.md first paragraph → package/module description field (`package.json description`, `go.mod module`, `Cargo.toml [package] description`, `pyproject.toml description`) → key domain directory names. Compose one plain-English sentence describing what this project is and does.
 
 Gary does NOT present this analysis — it feeds Step 1.5.
 
 ### Step 1.5: Granularity Calibration
 
 **Shed and Documentation areas are fixed — always exactly one area each.** This step calibrates the **Codebase bucket only**: how many code directory areas to create.
+
+**First, confirm the project summary:**
+```
+AskUserQuestion: "I'd describe this project as: '{project_summary}' — does that sound right?"
+→ Yes, that's it
+→ Edit — Gary asks: "How would you describe it in one sentence?"
+```
+Gary stores the confirmed sentence as `project_summary` and uses it throughout the session.
 
 Gary presents real stats for all three buckets, then focuses the question on Codebase depth.
 
@@ -111,18 +120,13 @@ Codebase (10 areas):
 
 After granularity is decided, Gary defines how areas are grouped into sub-gardens for the map display.
 
-**Default (no input needed)**: Two sub-gardens — "Shed & Knowledge Base" (all Shed + Documentation areas) and "Codebase" (all remaining areas). Gary proposes this and asks:
+Run the **Choose Sub-garden Structure** sub-flow: `{project-root}/_gary-the-gardener/core/workflows/visualise/choose-structure.md`
 
-```
-AskUserQuestion: "How should the garden map be organised?"
-→ Default — Shed & Knowledge Base | Codebase
-→ Check patterns (Gary reads encyclopedia/sub-garden-patterns.md and suggests options)
-→ Custom (Gary asks one question about grouping, then confirms)
-```
+Pass in:
+- `confirmed_areas` — the area list confirmed in Step 1.5
+- `repo_signals` — top-level directories and stack files already discovered in Step 1c
 
-**If user picks Check patterns**: Gary reads `{project-root}/_gary-the-gardener/encyclopedia/sub-garden-patterns.md` and presents matching patterns as `AskUserQuestion` options based on the repo's detected tech stack and directory shape.
-
-**Result**: A confirmed `sub_gardens` list (id, label, emoji, areas) written to `docsmap.yaml` in Step 5.
+**Result**: A confirmed `sub_gardens` list (id, label, emoji, areas) returned by `choose-structure.md` and written to `docsmap.yaml` in Step 5.
 
 ---
 
@@ -189,6 +193,7 @@ version: 3
 garden_version: "1.0.0"
 generated: "{DD-MM-YYYY}"
 hash: "v3-{entityCount}-{generated}"
+project_summary: "{confirmed one-sentence description}"
 
 sub_gardens:
   - id: {id}

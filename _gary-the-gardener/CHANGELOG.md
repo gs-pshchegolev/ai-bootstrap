@@ -2,8 +2,23 @@
 
 All notable changes to the Garden System will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [6.2.0] - 2026-02-24
+
+### Added
+- **`project_summary`** — Gary infers a one-sentence project description from README, module manifest, and domain directory names during `/garden-plant`. Confirmed by the user once and stored in `docsmap.yaml`. Shown on the garden map context line and used to frame health suggestions.
+- **`choose-structure.md`** — shared sub-flow for sub-garden structure selection. Scores repo signals (stack files, top-level directories) against patterns and presents the top 1–2 matches with concrete area mappings. Called from Plant step 1.6 and Restructure `[G]`.
+
+### Changed
+- **`restructure.md`** — Restructured into Discover / Confirm / Apply semantic groups. Snapshot question now asks "Save before applying?" rather than re-confirming the structure choice (which `choose-structure.md` already confirmed).
+- **`migrate.md`** — Step 4 "Check patterns" now routes through `choose-structure.md` instead of reading `sub-garden-patterns.md` directly (documented in new `§ Amendments` block).
+- **`sub-garden-patterns.md`** — Each pattern gains a `Use when:` scoring block; patterns are now machine-readable by `choose-structure.md` for signal-based scoring.
+- **`workflow.md` Phase 1** — Steps restructured into semantic **Load** / **Branch** groups to prevent renumbering cascades on future insertions. `project_summary` extracted alongside `hash` during Load.
+- **Encyclopedia** — Volumes (vol-1 through vol-5) and architecture packs removed. Encyclopedia returns to its two committed files (`readiness-rules.md`, `sub-garden-patterns.md`). LLM training knowledge replaces encyclopedia education; only Gary-specific vocabulary and canonical reference data are stored.
+
+---
 
 ## [6.1.0] - 2026-02-21
 

@@ -39,13 +39,16 @@ This workflow is **tool-agnostic** — it describes operations, not specific too
 ## Phase 1: Fast Path
 
 Check if `garden.md` exists. If it does:
-1. Read `garden.md` and extract its `hash:` line and `Gary v{X.Y.Z}` from the header.
-2. Read current Gary version from `{project-root}/_gary-the-gardener/VERSION`.
-3. **If Gary versions differ**: set `gary_grew = true`. Proceed regardless — the garden still renders.
-4. Read `docsmap.yaml` and extract its `hash` field.
-5. **If hashes match**: jump directly to Phase 4 — no re-render needed.
-6. **If hashes differ** (docsmap changed since last render): skip to Phase 3 cache-miss path to re-render.
-7. **If docsmap.yaml is absent**: display `garden.md` as-is with a note that the garden state file is missing.
+
+**Load:**
+- Read `garden.md` → extract `hash:` line and `Gary v{X.Y.Z}` from the header
+- Read `VERSION` → if Gary versions differ, set `gary_grew = true` (garden still renders)
+- Read `docsmap.yaml` → extract `hash` field and `project_summary` (if present)
+
+**Branch:**
+- Hashes match → jump to Phase 4 (no re-render needed)
+- Hashes differ → jump to Phase 3 (cache-miss re-render)
+- `docsmap.yaml` absent → display `garden.md` as-is with a note that the garden state file is missing
 
 Only proceed to Phase 2 if `garden.md` is absent.
 
@@ -123,7 +126,7 @@ Output the Gary Block. **Display shows all areas** (both primary and secondary).
 
 <goal line>
 
-🍃 <context line>
+🍃 {project_summary from docsmap.yaml — omit line if absent}
 
 <season-mood-line>
 
@@ -221,6 +224,11 @@ When the user replies with a shortcut or intent, Gary acts:
 ## Sub-flow: Restructure Sub-gardens
 
 > Full specification: `_gary-the-gardener/core/workflows/visualise/restructure.md`
+
+## Sub-flow: Choose Sub-garden Structure
+
+> Full specification: `_gary-the-gardener/core/workflows/visualise/choose-structure.md`
+> Called by: Plant step 1.6, Restructure step 2
 
 ## Rules
 

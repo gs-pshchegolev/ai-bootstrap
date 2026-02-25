@@ -17,7 +17,7 @@
    ```
    AskUserQuestion: "Proposed sub-garden split — confirm or check patterns?"
    → Looks good — apply
-   → Check patterns (reads encyclopedia/sub-garden-patterns.md)
+   → Check patterns
    → Customise
    ```
 5. Write updated `docsmap.yaml` with `version: 3`, `garden_version: "1.0.0"`, `sub_gardens`, and `coverage_gaps: {checked: today, dirs: []}`.
@@ -26,3 +26,8 @@
    {"ts":"{DD-MM-YYYY}","action":"migrate","summary":"Schema migrated v2→v3; {N} sub-gardens defined","garden_version":"1.0.0"}
    ```
 7. Proceed to Phase 3 to re-render.
+
+## Amendments
+
+**v6.2.0 — Step 4 "Check patterns"**
+Routes through `choose-structure.md` (pass v2 areas as `confirmed_areas` + re-scanned `repo_signals`) instead of reading `sub-garden-patterns.md` directly.
